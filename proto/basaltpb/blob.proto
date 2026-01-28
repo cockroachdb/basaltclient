@@ -1,0 +1,103 @@
+syntax = "proto3";
+
+package basaltpb;
+
+option go_package = "github.com/cockroachdb/basaltclient/proto/basaltpb";
+
+import "proto/basaltpb/common.proto";
+
+// Blob handles object storage operations on a single blob server.
+// Each blob server stores object replicas on local disks.
+service Blob {
+  // Create initializes a new object on this blob server.
+  rpc Create(BlobCreateRequest) returns (BlobCreateResponse);
+
+  // Append writes data to the end of an unsealed object.
+  rpc Append(BlobAppendRequest) returns (BlobAppendResponse);
+
+  // Sync ensures all previous appends are durably persisted.
+  rpc Sync(BlobSyncRequest) returns (BlobSyncResponse);
+
+  // Seal marks an object as immutable on this replica.
+  rpc Seal(BlobSealRequest) returns (BlobSealResponse);
+
+  // Read retrieves data from an object at a given offset.
+  rpc Read(BlobReadRequest) returns (BlobReadResponse);
+
+  // Delete removes an object from this blob server.
+  rpc Delete(BlobDeleteRequest) returns (BlobDeleteResponse);
+
+  // Stat returns metadata about an object.
+  rpc Stat(BlobStatRequest) returns (BlobStatResponse);
+
+  // TODO: Add streaming variants for large reads/writes:
+  // - StreamAppend for streaming writes
+  // - StreamRead for streaming reads
+}
+
+message BlobCreateRequest {
+  ObjectID id = 1;
+}
+
+message BlobCreateResponse {}
+
+message BlobAppendRequest {
+  ObjectID id = 1;
+  // Data to append to the object.
+  bytes data = 2;
+  // Expected offset for the append (for consistency checking).
+  int64 expected_offset = 3;
+}
+
+message BlobAppendResponse {
+  // New offset after the append.
+  int64 new_offset = 1;
+}
+
+message BlobSyncRequest {
+  ObjectID id = 1;
+}
+
+message BlobSyncResponse {
+  // Synced offset (all data up to this point is durable).
+  int64 synced_offset = 1;
+}
+
+message BlobSealRequest {
+  ObjectID id = 1;
+}
+
+message BlobSealResponse {
+  // Final size of the sealed object.
+  int64 final_size = 1;
+}
+
+message BlobReadRequest {
+  ObjectID id = 1;
+  // Offset to start reading from.
+  int64 offset = 2;
+  // Maximum number of bytes to read.
+  int64 length = 3;
+}
+
+message BlobReadResponse {
+  // Data read from the object.
+  bytes data = 1;
+}
+
+message BlobDeleteRequest {
+  ObjectID id = 1;
+}
+
+message BlobDeleteResponse {}
+
+message BlobStatRequest {
+  ObjectID id = 1;
+}
+
+message BlobStatResponse {
+  // Current size of the object.
+  int64 size = 1;
+  // Whether the object is sealed.
+  bool sealed = 2;
+}

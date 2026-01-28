@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package basaltpb;
+
+option go_package = "github.com/cockroachdb/basaltclient/proto/basaltpb";
+
+import "proto/basaltpb/common.proto";
+
+// Compactor performs flush and compaction operations on behalf of mounts.
+// Compactors run Pebble in a special mode that reads from blob servers
+// and writes new objects back to blob servers.
+service Compactor {
+  // Flush triggers a memtable flush for a mount.
+  rpc Flush(FlushRequest) returns (FlushResponse);
+
+  // Compact triggers a compaction for a mount.
+  rpc Compact(CompactRequest) returns (CompactResponse);
+
+  // TODO: Add additional RPCs:
+  // - Status for checking compaction progress
+  // - Cancel for aborting a compaction
+}
+
+message FlushRequest {
+  MountID mount_id = 1;
+  // Objects containing the memtable data to flush.
+  repeated ObjectID memtable_objects = 2;
+}
+
+message FlushResponse {
+  // New SSTable objects created by the flush.
+  repeated ObjectMeta output_tables = 1;
+}
+
+message CompactRequest {
+  MountID mount_id = 1;
+  // Input SSTable objects to compact.
+  repeated ObjectID input_tables = 2;
+  // Target level for the compaction output.
+  int32 output_level = 3;
+}
+
+message CompactResponse {
+  // New SSTable objects created by the compaction.
+  repeated ObjectMeta output_tables = 1;
+}

@@ -1,0 +1,94 @@
+syntax = "proto3";
+
+package basaltpb;
+
+option go_package = "github.com/cockroachdb/basaltclient/proto/basaltpb";
+
+import "proto/basaltpb/common.proto";
+
+// Controller coordinates object placement, mounts, and repairs in Basalt.
+service Controller {
+  // Mount registers a new Pebble instance and returns its mount ID.
+  // The mount ID is used to fence operations and coordinate with compactors.
+  rpc Mount(MountRequest) returns (MountResponse);
+
+  // Unmount deregisters a Pebble instance.
+  rpc Unmount(UnmountRequest) returns (UnmountResponse);
+
+  // Create allocates a new object and selects replicas for it.
+  // Returns the object ID and replica locations.
+  rpc Create(CreateRequest) returns (CreateResponse);
+
+  // Lookup returns metadata for an existing object.
+  rpc Lookup(LookupRequest) returns (LookupResponse);
+
+  // Delete removes an object from the system.
+  rpc Delete(DeleteRequest) returns (DeleteResponse);
+
+  // Seal marks an object as immutable.
+  rpc Seal(SealRequest) returns (SealResponse);
+
+  // TODO: Add additional RPCs:
+  // - Heartbeat for mount liveness
+  // - ListObjects for directory enumeration
+  // - ReportFailure for replica health reporting
+}
+
+message MountRequest {
+  // Identifier for this Pebble instance (e.g., node ID + store ID).
+  string instance_id = 1;
+  // Availability zone of the mounting node.
+  string az = 2;
+}
+
+message MountResponse {
+  // Unique mount ID for this session.
+  MountID mount_id = 1;
+}
+
+message UnmountRequest {
+  MountID mount_id = 1;
+}
+
+message UnmountResponse {}
+
+message CreateRequest {
+  MountID mount_id = 1;
+  // Logical path/name for the object (e.g., "000001.sst").
+  string name = 2;
+  // Desired replication factor.
+  int32 replication = 3;
+}
+
+message CreateResponse {
+  ObjectMeta meta = 1;
+}
+
+message LookupRequest {
+  MountID mount_id = 1;
+  // Object to look up by ID or name.
+  oneof key {
+    ObjectID id = 2;
+    string name = 3;
+  }
+}
+
+message LookupResponse {
+  ObjectMeta meta = 1;
+}
+
+message DeleteRequest {
+  MountID mount_id = 1;
+  ObjectID id = 2;
+}
+
+message DeleteResponse {}
+
+message SealRequest {
+  MountID mount_id = 1;
+  ObjectID id = 2;
+  // Final size of the object.
+  int64 size = 3;
+}
+
+message SealResponse {}

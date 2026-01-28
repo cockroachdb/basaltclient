@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package basaltpb;
+
+option go_package = "github.com/cockroachdb/basaltclient/proto/basaltpb";
+
+// ObjectID uniquely identifies an object in the Basalt storage system.
+message ObjectID {
+  // UUID of the object as 16 bytes.
+  bytes uuid = 1;
+}
+
+// ReplicaInfo describes a replica of an object stored on a blob server.
+message ReplicaInfo {
+  // Address of the blob server holding this replica (host:port).
+  string address = 1;
+  // Availability zone of the blob server.
+  string az = 2;
+}
+
+// ObjectMeta contains metadata about an object.
+message ObjectMeta {
+  // Unique identifier for this object.
+  ObjectID id = 1;
+  // List of replicas storing this object.
+  repeated ReplicaInfo replicas = 2;
+  // Current size of the object in bytes.
+  int64 size = 3;
+  // Whether the object has been sealed (immutable).
+  bool sealed = 4;
+}
+
+// MountID uniquely identifies an active mount of a Pebble instance.
+message MountID {
+  // UUID of the mount as 16 bytes.
+  bytes uuid = 1;
+}
+
+// TODO: Add additional shared types as needed:
+// - RangeID for per-range materialization
+// - Epoch for fencing
+// - Error codes and status types
