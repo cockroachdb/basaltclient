@@ -2,9 +2,9 @@ syntax = "proto3";
 
 package basaltpb;
 
-option go_package = "github.com/cockroachdb/basaltclient/proto/basaltpb";
+option go_package = "github.com/cockroachdb/basaltclient/basaltpb";
 
-import "proto/basaltpb/common.proto";
+import "basaltpb/common.proto";
 
 // Controller coordinates object placement, mounts, and repairs in Basalt.
 service Controller {

@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package basaltpb;
 
-option go_package = "github.com/cockroachdb/basaltclient/proto/basaltpb";
+option go_package = "github.com/cockroachdb/basaltclient/basaltpb";
 
 // ObjectID uniquely identifies an object in the Basalt storage system.
 message ObjectID {

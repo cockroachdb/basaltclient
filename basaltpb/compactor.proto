@@ -2,9 +2,9 @@ syntax = "proto3";
 
 package basaltpb;
 
-option go_package = "github.com/cockroachdb/basaltclient/proto/basaltpb";
+option go_package = "github.com/cockroachdb/basaltclient/basaltpb";
 
-import "proto/basaltpb/common.proto";
+import "basaltpb/common.proto";
 
 // Compactor performs flush and compaction operations on behalf of mounts.
 // Compactors run Pebble in a special mode that reads from blob servers

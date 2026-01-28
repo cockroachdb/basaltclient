@@ -2,9 +2,9 @@ syntax = "proto3";
 
 package basaltpb;
 
-option go_package = "github.com/cockroachdb/basaltclient/proto/basaltpb";
+option go_package = "github.com/cockroachdb/basaltclient/basaltpb";
 
-import "proto/basaltpb/common.proto";
+import "basaltpb/common.proto";
 
 // Blob handles object storage operations on a single blob server.
 // Each blob server stores object replicas on local disks.
