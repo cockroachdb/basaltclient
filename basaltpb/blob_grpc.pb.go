@@ -20,10 +20,7 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	Blob_Create_FullMethodName = "/basaltpb.Blob/Create"
-	Blob_Append_FullMethodName = "/basaltpb.Blob/Append"
-	Blob_Sync_FullMethodName   = "/basaltpb.Blob/Sync"
 	Blob_Seal_FullMethodName   = "/basaltpb.Blob/Seal"
-	Blob_Read_FullMethodName   = "/basaltpb.Blob/Read"
 	Blob_Delete_FullMethodName = "/basaltpb.Blob/Delete"
 	Blob_Stat_FullMethodName   = "/basaltpb.Blob/Stat"
 )
@@ -32,19 +29,16 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// Blob handles object storage operations on a single blob server.
+// Blob handles control operations on a single blob server.
 // Each blob server stores object replicas on local disks.
+//
+// Data operations (Append, Read) use a separate custom TCP protocol
+// for lower overhead - see internal/blob/protocol.go for details.
 type BlobClient interface {
 	// Create initializes a new object on this blob server.
 	Create(ctx context.Context, in *BlobCreateRequest, opts ...grpc.CallOption) (*BlobCreateResponse, error)
-	// Append writes data to the end of an unsealed object.
-	Append(ctx context.Context, in *BlobAppendRequest, opts ...grpc.CallOption) (*BlobAppendResponse, error)
-	// Sync ensures all previous appends are durably persisted.
-	Sync(ctx context.Context, in *BlobSyncRequest, opts ...grpc.CallOption) (*BlobSyncResponse, error)
 	// Seal marks an object as immutable on this replica.
 	Seal(ctx context.Context, in *BlobSealRequest, opts ...grpc.CallOption) (*BlobSealResponse, error)
-	// Read retrieves data from an object at a given offset.
-	Read(ctx context.Context, in *BlobReadRequest, opts ...grpc.CallOption) (*BlobReadResponse, error)
 	// Delete removes an object from this blob server.
 	Delete(ctx context.Context, in *BlobDeleteRequest, opts ...grpc.CallOption) (*BlobDeleteResponse, error)
 	// Stat returns metadata about an object.
@@ -69,40 +63,10 @@ func (c *blobClient) Create(ctx context.Context, in *BlobCreateRequest, opts ...
 	return out, nil
 }
 
-func (c *blobClient) Append(ctx context.Context, in *BlobAppendRequest, opts ...grpc.CallOption) (*BlobAppendResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(BlobAppendResponse)
-	err := c.cc.Invoke(ctx, Blob_Append_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *blobClient) Sync(ctx context.Context, in *BlobSyncRequest, opts ...grpc.CallOption) (*BlobSyncResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(BlobSyncResponse)
-	err := c.cc.Invoke(ctx, Blob_Sync_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *blobClient) Seal(ctx context.Context, in *BlobSealRequest, opts ...grpc.CallOption) (*BlobSealResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(BlobSealResponse)
 	err := c.cc.Invoke(ctx, Blob_Seal_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *blobClient) Read(ctx context.Context, in *BlobReadRequest, opts ...grpc.CallOption) (*BlobReadResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(BlobReadResponse)
-	err := c.cc.Invoke(ctx, Blob_Read_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -133,19 +97,16 @@ func (c *blobClient) Stat(ctx context.Context, in *BlobStatRequest, opts ...grpc
 // All implementations must embed UnimplementedBlobServer
 // for forward compatibility.
 //
-// Blob handles object storage operations on a single blob server.
+// Blob handles control operations on a single blob server.
 // Each blob server stores object replicas on local disks.
+//
+// Data operations (Append, Read) use a separate custom TCP protocol
+// for lower overhead - see internal/blob/protocol.go for details.
 type BlobServer interface {
 	// Create initializes a new object on this blob server.
 	Create(context.Context, *BlobCreateRequest) (*BlobCreateResponse, error)
-	// Append writes data to the end of an unsealed object.
-	Append(context.Context, *BlobAppendRequest) (*BlobAppendResponse, error)
-	// Sync ensures all previous appends are durably persisted.
-	Sync(context.Context, *BlobSyncRequest) (*BlobSyncResponse, error)
 	// Seal marks an object as immutable on this replica.
 	Seal(context.Context, *BlobSealRequest) (*BlobSealResponse, error)
-	// Read retrieves data from an object at a given offset.
-	Read(context.Context, *BlobReadRequest) (*BlobReadResponse, error)
 	// Delete removes an object from this blob server.
 	Delete(context.Context, *BlobDeleteRequest) (*BlobDeleteResponse, error)
 	// Stat returns metadata about an object.
@@ -163,17 +124,8 @@ type UnimplementedBlobServer struct{}
 func (UnimplementedBlobServer) Create(context.Context, *BlobCreateRequest) (*BlobCreateResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Create not implemented")
 }
-func (UnimplementedBlobServer) Append(context.Context, *BlobAppendRequest) (*BlobAppendResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method Append not implemented")
-}
-func (UnimplementedBlobServer) Sync(context.Context, *BlobSyncRequest) (*BlobSyncResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method Sync not implemented")
-}
 func (UnimplementedBlobServer) Seal(context.Context, *BlobSealRequest) (*BlobSealResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Seal not implemented")
-}
-func (UnimplementedBlobServer) Read(context.Context, *BlobReadRequest) (*BlobReadResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method Read not implemented")
 }
 func (UnimplementedBlobServer) Delete(context.Context, *BlobDeleteRequest) (*BlobDeleteResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Delete not implemented")
@@ -220,42 +172,6 @@ func _Blob_Create_Handler(srv interface{}, ctx context.Context, dec func(interfa
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Blob_Append_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(BlobAppendRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(BlobServer).Append(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Blob_Append_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BlobServer).Append(ctx, req.(*BlobAppendRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Blob_Sync_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(BlobSyncRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(BlobServer).Sync(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Blob_Sync_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BlobServer).Sync(ctx, req.(*BlobSyncRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _Blob_Seal_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(BlobSealRequest)
 	if err := dec(in); err != nil {
@@ -270,24 +186,6 @@ func _Blob_Seal_Handler(srv interface{}, ctx context.Context, dec func(interface
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BlobServer).Seal(ctx, req.(*BlobSealRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Blob_Read_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(BlobReadRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(BlobServer).Read(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Blob_Read_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BlobServer).Read(ctx, req.(*BlobReadRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -340,20 +238,8 @@ var Blob_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Blob_Create_Handler,
 		},
 		{
-			MethodName: "Append",
-			Handler:    _Blob_Append_Handler,
-		},
-		{
-			MethodName: "Sync",
-			Handler:    _Blob_Sync_Handler,
-		},
-		{
 			MethodName: "Seal",
 			Handler:    _Blob_Seal_Handler,
-		},
-		{
-			MethodName: "Read",
-			Handler:    _Blob_Read_Handler,
 		},
 		{
 			MethodName: "Delete",

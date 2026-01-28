@@ -101,202 +101,6 @@ func (*BlobCreateResponse) Descriptor() ([]byte, []int) {
 	return file_basaltpb_blob_proto_rawDescGZIP(), []int{1}
 }
 
-type BlobAppendRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	Id    *ObjectID              `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	// Data to append to the object.
-	Data []byte `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`
-	// Expected offset for the append (for consistency checking).
-	ExpectedOffset int64 `protobuf:"varint,3,opt,name=expected_offset,json=expectedOffset,proto3" json:"expected_offset,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
-}
-
-func (x *BlobAppendRequest) Reset() {
-	*x = BlobAppendRequest{}
-	mi := &file_basaltpb_blob_proto_msgTypes[2]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *BlobAppendRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*BlobAppendRequest) ProtoMessage() {}
-
-func (x *BlobAppendRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_basaltpb_blob_proto_msgTypes[2]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use BlobAppendRequest.ProtoReflect.Descriptor instead.
-func (*BlobAppendRequest) Descriptor() ([]byte, []int) {
-	return file_basaltpb_blob_proto_rawDescGZIP(), []int{2}
-}
-
-func (x *BlobAppendRequest) GetId() *ObjectID {
-	if x != nil {
-		return x.Id
-	}
-	return nil
-}
-
-func (x *BlobAppendRequest) GetData() []byte {
-	if x != nil {
-		return x.Data
-	}
-	return nil
-}
-
-func (x *BlobAppendRequest) GetExpectedOffset() int64 {
-	if x != nil {
-		return x.ExpectedOffset
-	}
-	return 0
-}
-
-type BlobAppendResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// New offset after the append.
-	NewOffset     int64 `protobuf:"varint,1,opt,name=new_offset,json=newOffset,proto3" json:"new_offset,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *BlobAppendResponse) Reset() {
-	*x = BlobAppendResponse{}
-	mi := &file_basaltpb_blob_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *BlobAppendResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*BlobAppendResponse) ProtoMessage() {}
-
-func (x *BlobAppendResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_basaltpb_blob_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use BlobAppendResponse.ProtoReflect.Descriptor instead.
-func (*BlobAppendResponse) Descriptor() ([]byte, []int) {
-	return file_basaltpb_blob_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *BlobAppendResponse) GetNewOffset() int64 {
-	if x != nil {
-		return x.NewOffset
-	}
-	return 0
-}
-
-type BlobSyncRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            *ObjectID              `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *BlobSyncRequest) Reset() {
-	*x = BlobSyncRequest{}
-	mi := &file_basaltpb_blob_proto_msgTypes[4]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *BlobSyncRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*BlobSyncRequest) ProtoMessage() {}
-
-func (x *BlobSyncRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_basaltpb_blob_proto_msgTypes[4]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use BlobSyncRequest.ProtoReflect.Descriptor instead.
-func (*BlobSyncRequest) Descriptor() ([]byte, []int) {
-	return file_basaltpb_blob_proto_rawDescGZIP(), []int{4}
-}
-
-func (x *BlobSyncRequest) GetId() *ObjectID {
-	if x != nil {
-		return x.Id
-	}
-	return nil
-}
-
-type BlobSyncResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Synced offset (all data up to this point is durable).
-	SyncedOffset  int64 `protobuf:"varint,1,opt,name=synced_offset,json=syncedOffset,proto3" json:"synced_offset,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *BlobSyncResponse) Reset() {
-	*x = BlobSyncResponse{}
-	mi := &file_basaltpb_blob_proto_msgTypes[5]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *BlobSyncResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*BlobSyncResponse) ProtoMessage() {}
-
-func (x *BlobSyncResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_basaltpb_blob_proto_msgTypes[5]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use BlobSyncResponse.ProtoReflect.Descriptor instead.
-func (*BlobSyncResponse) Descriptor() ([]byte, []int) {
-	return file_basaltpb_blob_proto_rawDescGZIP(), []int{5}
-}
-
-func (x *BlobSyncResponse) GetSyncedOffset() int64 {
-	if x != nil {
-		return x.SyncedOffset
-	}
-	return 0
-}
-
 type BlobSealRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            *ObjectID              `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -306,7 +110,7 @@ type BlobSealRequest struct {
 
 func (x *BlobSealRequest) Reset() {
 	*x = BlobSealRequest{}
-	mi := &file_basaltpb_blob_proto_msgTypes[6]
+	mi := &file_basaltpb_blob_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -318,7 +122,7 @@ func (x *BlobSealRequest) String() string {
 func (*BlobSealRequest) ProtoMessage() {}
 
 func (x *BlobSealRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_basaltpb_blob_proto_msgTypes[6]
+	mi := &file_basaltpb_blob_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -331,7 +135,7 @@ func (x *BlobSealRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BlobSealRequest.ProtoReflect.Descriptor instead.
 func (*BlobSealRequest) Descriptor() ([]byte, []int) {
-	return file_basaltpb_blob_proto_rawDescGZIP(), []int{6}
+	return file_basaltpb_blob_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *BlobSealRequest) GetId() *ObjectID {
@@ -351,7 +155,7 @@ type BlobSealResponse struct {
 
 func (x *BlobSealResponse) Reset() {
 	*x = BlobSealResponse{}
-	mi := &file_basaltpb_blob_proto_msgTypes[7]
+	mi := &file_basaltpb_blob_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -363,7 +167,7 @@ func (x *BlobSealResponse) String() string {
 func (*BlobSealResponse) ProtoMessage() {}
 
 func (x *BlobSealResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_basaltpb_blob_proto_msgTypes[7]
+	mi := &file_basaltpb_blob_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -376,7 +180,7 @@ func (x *BlobSealResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BlobSealResponse.ProtoReflect.Descriptor instead.
 func (*BlobSealResponse) Descriptor() ([]byte, []int) {
-	return file_basaltpb_blob_proto_rawDescGZIP(), []int{7}
+	return file_basaltpb_blob_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *BlobSealResponse) GetFinalSize() int64 {
@@ -384,113 +188,6 @@ func (x *BlobSealResponse) GetFinalSize() int64 {
 		return x.FinalSize
 	}
 	return 0
-}
-
-type BlobReadRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	Id    *ObjectID              `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	// Offset to start reading from.
-	Offset int64 `protobuf:"varint,2,opt,name=offset,proto3" json:"offset,omitempty"`
-	// Maximum number of bytes to read.
-	Length        int64 `protobuf:"varint,3,opt,name=length,proto3" json:"length,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *BlobReadRequest) Reset() {
-	*x = BlobReadRequest{}
-	mi := &file_basaltpb_blob_proto_msgTypes[8]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *BlobReadRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*BlobReadRequest) ProtoMessage() {}
-
-func (x *BlobReadRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_basaltpb_blob_proto_msgTypes[8]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use BlobReadRequest.ProtoReflect.Descriptor instead.
-func (*BlobReadRequest) Descriptor() ([]byte, []int) {
-	return file_basaltpb_blob_proto_rawDescGZIP(), []int{8}
-}
-
-func (x *BlobReadRequest) GetId() *ObjectID {
-	if x != nil {
-		return x.Id
-	}
-	return nil
-}
-
-func (x *BlobReadRequest) GetOffset() int64 {
-	if x != nil {
-		return x.Offset
-	}
-	return 0
-}
-
-func (x *BlobReadRequest) GetLength() int64 {
-	if x != nil {
-		return x.Length
-	}
-	return 0
-}
-
-type BlobReadResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Data read from the object.
-	Data          []byte `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *BlobReadResponse) Reset() {
-	*x = BlobReadResponse{}
-	mi := &file_basaltpb_blob_proto_msgTypes[9]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *BlobReadResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*BlobReadResponse) ProtoMessage() {}
-
-func (x *BlobReadResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_basaltpb_blob_proto_msgTypes[9]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use BlobReadResponse.ProtoReflect.Descriptor instead.
-func (*BlobReadResponse) Descriptor() ([]byte, []int) {
-	return file_basaltpb_blob_proto_rawDescGZIP(), []int{9}
-}
-
-func (x *BlobReadResponse) GetData() []byte {
-	if x != nil {
-		return x.Data
-	}
-	return nil
 }
 
 type BlobDeleteRequest struct {
@@ -502,7 +199,7 @@ type BlobDeleteRequest struct {
 
 func (x *BlobDeleteRequest) Reset() {
 	*x = BlobDeleteRequest{}
-	mi := &file_basaltpb_blob_proto_msgTypes[10]
+	mi := &file_basaltpb_blob_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -514,7 +211,7 @@ func (x *BlobDeleteRequest) String() string {
 func (*BlobDeleteRequest) ProtoMessage() {}
 
 func (x *BlobDeleteRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_basaltpb_blob_proto_msgTypes[10]
+	mi := &file_basaltpb_blob_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -527,7 +224,7 @@ func (x *BlobDeleteRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BlobDeleteRequest.ProtoReflect.Descriptor instead.
 func (*BlobDeleteRequest) Descriptor() ([]byte, []int) {
-	return file_basaltpb_blob_proto_rawDescGZIP(), []int{10}
+	return file_basaltpb_blob_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *BlobDeleteRequest) GetId() *ObjectID {
@@ -545,7 +242,7 @@ type BlobDeleteResponse struct {
 
 func (x *BlobDeleteResponse) Reset() {
 	*x = BlobDeleteResponse{}
-	mi := &file_basaltpb_blob_proto_msgTypes[11]
+	mi := &file_basaltpb_blob_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -557,7 +254,7 @@ func (x *BlobDeleteResponse) String() string {
 func (*BlobDeleteResponse) ProtoMessage() {}
 
 func (x *BlobDeleteResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_basaltpb_blob_proto_msgTypes[11]
+	mi := &file_basaltpb_blob_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -570,7 +267,7 @@ func (x *BlobDeleteResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BlobDeleteResponse.ProtoReflect.Descriptor instead.
 func (*BlobDeleteResponse) Descriptor() ([]byte, []int) {
-	return file_basaltpb_blob_proto_rawDescGZIP(), []int{11}
+	return file_basaltpb_blob_proto_rawDescGZIP(), []int{5}
 }
 
 type BlobStatRequest struct {
@@ -582,7 +279,7 @@ type BlobStatRequest struct {
 
 func (x *BlobStatRequest) Reset() {
 	*x = BlobStatRequest{}
-	mi := &file_basaltpb_blob_proto_msgTypes[12]
+	mi := &file_basaltpb_blob_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -594,7 +291,7 @@ func (x *BlobStatRequest) String() string {
 func (*BlobStatRequest) ProtoMessage() {}
 
 func (x *BlobStatRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_basaltpb_blob_proto_msgTypes[12]
+	mi := &file_basaltpb_blob_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -607,7 +304,7 @@ func (x *BlobStatRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BlobStatRequest.ProtoReflect.Descriptor instead.
 func (*BlobStatRequest) Descriptor() ([]byte, []int) {
-	return file_basaltpb_blob_proto_rawDescGZIP(), []int{12}
+	return file_basaltpb_blob_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *BlobStatRequest) GetId() *ObjectID {
@@ -629,7 +326,7 @@ type BlobStatResponse struct {
 
 func (x *BlobStatResponse) Reset() {
 	*x = BlobStatResponse{}
-	mi := &file_basaltpb_blob_proto_msgTypes[13]
+	mi := &file_basaltpb_blob_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -641,7 +338,7 @@ func (x *BlobStatResponse) String() string {
 func (*BlobStatResponse) ProtoMessage() {}
 
 func (x *BlobStatResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_basaltpb_blob_proto_msgTypes[13]
+	mi := &file_basaltpb_blob_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -654,7 +351,7 @@ func (x *BlobStatResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BlobStatResponse.ProtoReflect.Descriptor instead.
 func (*BlobStatResponse) Descriptor() ([]byte, []int) {
-	return file_basaltpb_blob_proto_rawDescGZIP(), []int{13}
+	return file_basaltpb_blob_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *BlobStatResponse) GetSize() int64 {
@@ -678,29 +375,12 @@ const file_basaltpb_blob_proto_rawDesc = "" +
 	"\x13basaltpb/blob.proto\x12\bbasaltpb\x1a\x15basaltpb/common.proto\"7\n" +
 	"\x11BlobCreateRequest\x12\"\n" +
 	"\x02id\x18\x01 \x01(\v2\x12.basaltpb.ObjectIDR\x02id\"\x14\n" +
-	"\x12BlobCreateResponse\"t\n" +
-	"\x11BlobAppendRequest\x12\"\n" +
-	"\x02id\x18\x01 \x01(\v2\x12.basaltpb.ObjectIDR\x02id\x12\x12\n" +
-	"\x04data\x18\x02 \x01(\fR\x04data\x12'\n" +
-	"\x0fexpected_offset\x18\x03 \x01(\x03R\x0eexpectedOffset\"3\n" +
-	"\x12BlobAppendResponse\x12\x1d\n" +
-	"\n" +
-	"new_offset\x18\x01 \x01(\x03R\tnewOffset\"5\n" +
-	"\x0fBlobSyncRequest\x12\"\n" +
-	"\x02id\x18\x01 \x01(\v2\x12.basaltpb.ObjectIDR\x02id\"7\n" +
-	"\x10BlobSyncResponse\x12#\n" +
-	"\rsynced_offset\x18\x01 \x01(\x03R\fsyncedOffset\"5\n" +
+	"\x12BlobCreateResponse\"5\n" +
 	"\x0fBlobSealRequest\x12\"\n" +
 	"\x02id\x18\x01 \x01(\v2\x12.basaltpb.ObjectIDR\x02id\"1\n" +
 	"\x10BlobSealResponse\x12\x1d\n" +
 	"\n" +
-	"final_size\x18\x01 \x01(\x03R\tfinalSize\"e\n" +
-	"\x0fBlobReadRequest\x12\"\n" +
-	"\x02id\x18\x01 \x01(\v2\x12.basaltpb.ObjectIDR\x02id\x12\x16\n" +
-	"\x06offset\x18\x02 \x01(\x03R\x06offset\x12\x16\n" +
-	"\x06length\x18\x03 \x01(\x03R\x06length\"&\n" +
-	"\x10BlobReadResponse\x12\x12\n" +
-	"\x04data\x18\x01 \x01(\fR\x04data\"7\n" +
+	"final_size\x18\x01 \x01(\x03R\tfinalSize\"7\n" +
 	"\x11BlobDeleteRequest\x12\"\n" +
 	"\x02id\x18\x01 \x01(\v2\x12.basaltpb.ObjectIDR\x02id\"\x14\n" +
 	"\x12BlobDeleteResponse\"5\n" +
@@ -708,13 +388,10 @@ const file_basaltpb_blob_proto_rawDesc = "" +
 	"\x02id\x18\x01 \x01(\v2\x12.basaltpb.ObjectIDR\x02id\">\n" +
 	"\x10BlobStatResponse\x12\x12\n" +
 	"\x04size\x18\x01 \x01(\x03R\x04size\x12\x16\n" +
-	"\x06sealed\x18\x02 \x01(\bR\x06sealed2\xd1\x03\n" +
+	"\x06sealed\x18\x02 \x01(\bR\x06sealed2\x8e\x02\n" +
 	"\x04Blob\x12C\n" +
-	"\x06Create\x12\x1b.basaltpb.BlobCreateRequest\x1a\x1c.basaltpb.BlobCreateResponse\x12C\n" +
-	"\x06Append\x12\x1b.basaltpb.BlobAppendRequest\x1a\x1c.basaltpb.BlobAppendResponse\x12=\n" +
-	"\x04Sync\x12\x19.basaltpb.BlobSyncRequest\x1a\x1a.basaltpb.BlobSyncResponse\x12=\n" +
-	"\x04Seal\x12\x19.basaltpb.BlobSealRequest\x1a\x1a.basaltpb.BlobSealResponse\x12=\n" +
-	"\x04Read\x12\x19.basaltpb.BlobReadRequest\x1a\x1a.basaltpb.BlobReadResponse\x12C\n" +
+	"\x06Create\x12\x1b.basaltpb.BlobCreateRequest\x1a\x1c.basaltpb.BlobCreateResponse\x12=\n" +
+	"\x04Seal\x12\x19.basaltpb.BlobSealRequest\x1a\x1a.basaltpb.BlobSealResponse\x12C\n" +
 	"\x06Delete\x12\x1b.basaltpb.BlobDeleteRequest\x1a\x1c.basaltpb.BlobDeleteResponse\x12=\n" +
 	"\x04Stat\x12\x19.basaltpb.BlobStatRequest\x1a\x1a.basaltpb.BlobStatResponseB.Z,github.com/cockroachdb/basaltclient/basaltpbb\x06proto3"
 
@@ -730,51 +407,36 @@ func file_basaltpb_blob_proto_rawDescGZIP() []byte {
 	return file_basaltpb_blob_proto_rawDescData
 }
 
-var file_basaltpb_blob_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
+var file_basaltpb_blob_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_basaltpb_blob_proto_goTypes = []any{
 	(*BlobCreateRequest)(nil),  // 0: basaltpb.BlobCreateRequest
 	(*BlobCreateResponse)(nil), // 1: basaltpb.BlobCreateResponse
-	(*BlobAppendRequest)(nil),  // 2: basaltpb.BlobAppendRequest
-	(*BlobAppendResponse)(nil), // 3: basaltpb.BlobAppendResponse
-	(*BlobSyncRequest)(nil),    // 4: basaltpb.BlobSyncRequest
-	(*BlobSyncResponse)(nil),   // 5: basaltpb.BlobSyncResponse
-	(*BlobSealRequest)(nil),    // 6: basaltpb.BlobSealRequest
-	(*BlobSealResponse)(nil),   // 7: basaltpb.BlobSealResponse
-	(*BlobReadRequest)(nil),    // 8: basaltpb.BlobReadRequest
-	(*BlobReadResponse)(nil),   // 9: basaltpb.BlobReadResponse
-	(*BlobDeleteRequest)(nil),  // 10: basaltpb.BlobDeleteRequest
-	(*BlobDeleteResponse)(nil), // 11: basaltpb.BlobDeleteResponse
-	(*BlobStatRequest)(nil),    // 12: basaltpb.BlobStatRequest
-	(*BlobStatResponse)(nil),   // 13: basaltpb.BlobStatResponse
-	(*ObjectID)(nil),           // 14: basaltpb.ObjectID
+	(*BlobSealRequest)(nil),    // 2: basaltpb.BlobSealRequest
+	(*BlobSealResponse)(nil),   // 3: basaltpb.BlobSealResponse
+	(*BlobDeleteRequest)(nil),  // 4: basaltpb.BlobDeleteRequest
+	(*BlobDeleteResponse)(nil), // 5: basaltpb.BlobDeleteResponse
+	(*BlobStatRequest)(nil),    // 6: basaltpb.BlobStatRequest
+	(*BlobStatResponse)(nil),   // 7: basaltpb.BlobStatResponse
+	(*ObjectID)(nil),           // 8: basaltpb.ObjectID
 }
 var file_basaltpb_blob_proto_depIdxs = []int32{
-	14, // 0: basaltpb.BlobCreateRequest.id:type_name -> basaltpb.ObjectID
-	14, // 1: basaltpb.BlobAppendRequest.id:type_name -> basaltpb.ObjectID
-	14, // 2: basaltpb.BlobSyncRequest.id:type_name -> basaltpb.ObjectID
-	14, // 3: basaltpb.BlobSealRequest.id:type_name -> basaltpb.ObjectID
-	14, // 4: basaltpb.BlobReadRequest.id:type_name -> basaltpb.ObjectID
-	14, // 5: basaltpb.BlobDeleteRequest.id:type_name -> basaltpb.ObjectID
-	14, // 6: basaltpb.BlobStatRequest.id:type_name -> basaltpb.ObjectID
-	0,  // 7: basaltpb.Blob.Create:input_type -> basaltpb.BlobCreateRequest
-	2,  // 8: basaltpb.Blob.Append:input_type -> basaltpb.BlobAppendRequest
-	4,  // 9: basaltpb.Blob.Sync:input_type -> basaltpb.BlobSyncRequest
-	6,  // 10: basaltpb.Blob.Seal:input_type -> basaltpb.BlobSealRequest
-	8,  // 11: basaltpb.Blob.Read:input_type -> basaltpb.BlobReadRequest
-	10, // 12: basaltpb.Blob.Delete:input_type -> basaltpb.BlobDeleteRequest
-	12, // 13: basaltpb.Blob.Stat:input_type -> basaltpb.BlobStatRequest
-	1,  // 14: basaltpb.Blob.Create:output_type -> basaltpb.BlobCreateResponse
-	3,  // 15: basaltpb.Blob.Append:output_type -> basaltpb.BlobAppendResponse
-	5,  // 16: basaltpb.Blob.Sync:output_type -> basaltpb.BlobSyncResponse
-	7,  // 17: basaltpb.Blob.Seal:output_type -> basaltpb.BlobSealResponse
-	9,  // 18: basaltpb.Blob.Read:output_type -> basaltpb.BlobReadResponse
-	11, // 19: basaltpb.Blob.Delete:output_type -> basaltpb.BlobDeleteResponse
-	13, // 20: basaltpb.Blob.Stat:output_type -> basaltpb.BlobStatResponse
-	14, // [14:21] is the sub-list for method output_type
-	7,  // [7:14] is the sub-list for method input_type
-	7,  // [7:7] is the sub-list for extension type_name
-	7,  // [7:7] is the sub-list for extension extendee
-	0,  // [0:7] is the sub-list for field type_name
+	8, // 0: basaltpb.BlobCreateRequest.id:type_name -> basaltpb.ObjectID
+	8, // 1: basaltpb.BlobSealRequest.id:type_name -> basaltpb.ObjectID
+	8, // 2: basaltpb.BlobDeleteRequest.id:type_name -> basaltpb.ObjectID
+	8, // 3: basaltpb.BlobStatRequest.id:type_name -> basaltpb.ObjectID
+	0, // 4: basaltpb.Blob.Create:input_type -> basaltpb.BlobCreateRequest
+	2, // 5: basaltpb.Blob.Seal:input_type -> basaltpb.BlobSealRequest
+	4, // 6: basaltpb.Blob.Delete:input_type -> basaltpb.BlobDeleteRequest
+	6, // 7: basaltpb.Blob.Stat:input_type -> basaltpb.BlobStatRequest
+	1, // 8: basaltpb.Blob.Create:output_type -> basaltpb.BlobCreateResponse
+	3, // 9: basaltpb.Blob.Seal:output_type -> basaltpb.BlobSealResponse
+	5, // 10: basaltpb.Blob.Delete:output_type -> basaltpb.BlobDeleteResponse
+	7, // 11: basaltpb.Blob.Stat:output_type -> basaltpb.BlobStatResponse
+	8, // [8:12] is the sub-list for method output_type
+	4, // [4:8] is the sub-list for method input_type
+	4, // [4:4] is the sub-list for extension type_name
+	4, // [4:4] is the sub-list for extension extendee
+	0, // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_basaltpb_blob_proto_init() }
@@ -789,7 +451,7 @@ func file_basaltpb_blob_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_basaltpb_blob_proto_rawDesc), len(file_basaltpb_blob_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   14,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
