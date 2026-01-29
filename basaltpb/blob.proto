@@ -23,6 +23,28 @@ service Blob {
 
   // Stat returns metadata about an object.
   rpc Stat(BlobStatRequest) returns (BlobStatResponse);
+
+  // CopyTo uploads a local object to object storage.
+  // Used after SSTable creation to archive to S3/GCS/Azure for cross-AZ
+  // replication and continuous backup.
+  //
+  // Destination URL format: "s3://bucket/object-id", "gcs://bucket/object-id"
+  //
+  // The blob server uploads directly to object storage and returns an
+  // archive_ref with integrity check (etag for S3).
+  rpc CopyTo(BlobCopyToRequest) returns (BlobCopyToResponse);
+
+  // CopyFrom copies an object from a source URL to this blob server.
+  // Used for cross-AZ materialization (from object storage) and repair
+  // (from object storage or another blob server).
+  //
+  // Source URL formats:
+  // - Object storage: "s3://bucket/object-id?etag=xxx", "gcs://bucket/object-id"
+  // - Blob server: "blob://host:port/object-id"
+  //
+  // The blob server downloads from the source, verifies integrity (etag for S3),
+  // and stores locally with the specified object ID.
+  rpc CopyFrom(BlobCopyFromRequest) returns (BlobCopyFromResponse);
 }
 
 message BlobCreateRequest {
@@ -55,4 +77,39 @@ message BlobStatResponse {
   int64 size = 1;
   // Whether the object is sealed.
   bool sealed = 2;
+}
+
+message BlobCopyToRequest {
+  // Object ID to upload from local storage.
+  ObjectID id = 1;
+  // Destination URL in object storage:
+  // - "s3://bucket/object-id"
+  // - "gcs://bucket/object-id"
+  // - "azure://container/object-id"
+  string destination = 2;
+}
+
+message BlobCopyToResponse {
+  // Archive reference URL with integrity check.
+  // For S3: "s3://bucket/object-id?etag=xxx"
+  // For GCS: "gcs://bucket/object-id#generation=xxx"
+  string archive_ref = 1;
+  // Size of the uploaded object in bytes.
+  int64 size = 2;
+}
+
+message BlobCopyFromRequest {
+  // Target object ID for local storage.
+  ObjectID id = 1;
+  // Fully self-describing source URL:
+  // - "s3://bucket/object-id?etag=xxx" (S3 with integrity check)
+  // - "gcs://bucket/object-id" (GCS)
+  // - "azure://container/object-id" (Azure Blob)
+  // - "blob://host:port/object-id" (another blob server)
+  string source = 2;
+}
+
+message BlobCopyFromResponse {
+  // Size of the copied object in bytes.
+  int64 size = 1;
 }
