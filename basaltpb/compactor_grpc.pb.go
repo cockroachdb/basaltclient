@@ -27,13 +27,11 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// Compactor performs flush and compaction operations on behalf of mounts.
-// Compactors run Pebble in a special mode that reads from blob servers
-// and writes new objects back to blob servers.
+// Compactor is the gRPC service for remote flush and compaction operations.
 type CompactorClient interface {
-	// Flush triggers a memtable flush for a mount.
+	// Flush replays WAL objects and creates L0 SSTables.
 	Flush(ctx context.Context, in *FlushRequest, opts ...grpc.CallOption) (*FlushResponse, error)
-	// Compact triggers a compaction for a mount.
+	// Compact merges input SSTables and creates output SSTables.
 	Compact(ctx context.Context, in *CompactRequest, opts ...grpc.CallOption) (*CompactResponse, error)
 }
 
@@ -69,13 +67,11 @@ func (c *compactorClient) Compact(ctx context.Context, in *CompactRequest, opts 
 // All implementations must embed UnimplementedCompactorServer
 // for forward compatibility.
 //
-// Compactor performs flush and compaction operations on behalf of mounts.
-// Compactors run Pebble in a special mode that reads from blob servers
-// and writes new objects back to blob servers.
+// Compactor is the gRPC service for remote flush and compaction operations.
 type CompactorServer interface {
-	// Flush triggers a memtable flush for a mount.
+	// Flush replays WAL objects and creates L0 SSTables.
 	Flush(context.Context, *FlushRequest) (*FlushResponse, error)
-	// Compact triggers a compaction for a mount.
+	// Compact merges input SSTables and creates output SSTables.
 	Compact(context.Context, *CompactRequest) (*CompactResponse, error)
 	mustEmbedUnimplementedCompactorServer()
 }

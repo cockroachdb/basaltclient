@@ -21,18 +21,894 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// TombstoneElisionMode controls when tombstones can be elided.
+type TombstoneElisionMode int32
+
+const (
+	TombstoneElisionMode_ELIDE_NOTHING               TombstoneElisionMode = 0
+	TombstoneElisionMode_ELIDE_OUTSIDE_IN_USE_RANGES TombstoneElisionMode = 1
+)
+
+// Enum value maps for TombstoneElisionMode.
+var (
+	TombstoneElisionMode_name = map[int32]string{
+		0: "ELIDE_NOTHING",
+		1: "ELIDE_OUTSIDE_IN_USE_RANGES",
+	}
+	TombstoneElisionMode_value = map[string]int32{
+		"ELIDE_NOTHING":               0,
+		"ELIDE_OUTSIDE_IN_USE_RANGES": 1,
+	}
+)
+
+func (x TombstoneElisionMode) Enum() *TombstoneElisionMode {
+	p := new(TombstoneElisionMode)
+	*p = x
+	return p
+}
+
+func (x TombstoneElisionMode) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (TombstoneElisionMode) Descriptor() protoreflect.EnumDescriptor {
+	return file_basaltpb_compactor_proto_enumTypes[0].Descriptor()
+}
+
+func (TombstoneElisionMode) Type() protoreflect.EnumType {
+	return &file_basaltpb_compactor_proto_enumTypes[0]
+}
+
+func (x TombstoneElisionMode) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use TombstoneElisionMode.Descriptor instead.
+func (TombstoneElisionMode) EnumDescriptor() ([]byte, []int) {
+	return file_basaltpb_compactor_proto_rawDescGZIP(), []int{0}
+}
+
+// CompressionType specifies the compression algorithm for SSTable blocks.
+type CompressionType int32
+
+const (
+	CompressionType_COMPRESSION_NONE   CompressionType = 0
+	CompressionType_COMPRESSION_SNAPPY CompressionType = 1
+	CompressionType_COMPRESSION_ZSTD   CompressionType = 2
+	CompressionType_COMPRESSION_LZ4    CompressionType = 3
+)
+
+// Enum value maps for CompressionType.
+var (
+	CompressionType_name = map[int32]string{
+		0: "COMPRESSION_NONE",
+		1: "COMPRESSION_SNAPPY",
+		2: "COMPRESSION_ZSTD",
+		3: "COMPRESSION_LZ4",
+	}
+	CompressionType_value = map[string]int32{
+		"COMPRESSION_NONE":   0,
+		"COMPRESSION_SNAPPY": 1,
+		"COMPRESSION_ZSTD":   2,
+		"COMPRESSION_LZ4":    3,
+	}
+)
+
+func (x CompressionType) Enum() *CompressionType {
+	p := new(CompressionType)
+	*p = x
+	return p
+}
+
+func (x CompressionType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (CompressionType) Descriptor() protoreflect.EnumDescriptor {
+	return file_basaltpb_compactor_proto_enumTypes[1].Descriptor()
+}
+
+func (CompressionType) Type() protoreflect.EnumType {
+	return &file_basaltpb_compactor_proto_enumTypes[1]
+}
+
+func (x CompressionType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use CompressionType.Descriptor instead.
+func (CompressionType) EnumDescriptor() ([]byte, []int) {
+	return file_basaltpb_compactor_proto_rawDescGZIP(), []int{1}
+}
+
+// ObjectRef references a blob object by UUID and includes its size.
+type ObjectRef struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ObjectId      []byte                 `protobuf:"bytes,1,opt,name=object_id,json=objectId,proto3" json:"object_id,omitempty"` // UUID
+	Size          int64                  `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty"`                        // Size in bytes
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ObjectRef) Reset() {
+	*x = ObjectRef{}
+	mi := &file_basaltpb_compactor_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ObjectRef) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ObjectRef) ProtoMessage() {}
+
+func (x *ObjectRef) ProtoReflect() protoreflect.Message {
+	mi := &file_basaltpb_compactor_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ObjectRef.ProtoReflect.Descriptor instead.
+func (*ObjectRef) Descriptor() ([]byte, []int) {
+	return file_basaltpb_compactor_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *ObjectRef) GetObjectId() []byte {
+	if x != nil {
+		return x.ObjectId
+	}
+	return nil
+}
+
+func (x *ObjectRef) GetSize() int64 {
+	if x != nil {
+		return x.Size
+	}
+	return 0
+}
+
+// InternalKey represents a Pebble internal key with user key, sequence number,
+// and key kind.
+type InternalKey struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserKey       []byte                 `protobuf:"bytes,1,opt,name=user_key,json=userKey,proto3" json:"user_key,omitempty"`
+	SeqNum        uint64                 `protobuf:"varint,2,opt,name=seq_num,json=seqNum,proto3" json:"seq_num,omitempty"`
+	Kind          uint32                 `protobuf:"varint,3,opt,name=kind,proto3" json:"kind,omitempty"` // base.InternalKeyKind
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *InternalKey) Reset() {
+	*x = InternalKey{}
+	mi := &file_basaltpb_compactor_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *InternalKey) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*InternalKey) ProtoMessage() {}
+
+func (x *InternalKey) ProtoReflect() protoreflect.Message {
+	mi := &file_basaltpb_compactor_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use InternalKey.ProtoReflect.Descriptor instead.
+func (*InternalKey) Descriptor() ([]byte, []int) {
+	return file_basaltpb_compactor_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *InternalKey) GetUserKey() []byte {
+	if x != nil {
+		return x.UserKey
+	}
+	return nil
+}
+
+func (x *InternalKey) GetSeqNum() uint64 {
+	if x != nil {
+		return x.SeqNum
+	}
+	return 0
+}
+
+func (x *InternalKey) GetKind() uint32 {
+	if x != nil {
+		return x.Kind
+	}
+	return 0
+}
+
+// KeyBounds represents a range of internal keys.
+type KeyBounds struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Smallest      *InternalKey           `protobuf:"bytes,1,opt,name=smallest,proto3" json:"smallest,omitempty"`
+	Largest       *InternalKey           `protobuf:"bytes,2,opt,name=largest,proto3" json:"largest,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *KeyBounds) Reset() {
+	*x = KeyBounds{}
+	mi := &file_basaltpb_compactor_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *KeyBounds) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*KeyBounds) ProtoMessage() {}
+
+func (x *KeyBounds) ProtoReflect() protoreflect.Message {
+	mi := &file_basaltpb_compactor_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use KeyBounds.ProtoReflect.Descriptor instead.
+func (*KeyBounds) Descriptor() ([]byte, []int) {
+	return file_basaltpb_compactor_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *KeyBounds) GetSmallest() *InternalKey {
+	if x != nil {
+		return x.Smallest
+	}
+	return nil
+}
+
+func (x *KeyBounds) GetLargest() *InternalKey {
+	if x != nil {
+		return x.Largest
+	}
+	return nil
+}
+
+// UserKeyBounds represents a range of user keys.
+type UserKeyBounds struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Start         []byte                 `protobuf:"bytes,1,opt,name=start,proto3" json:"start,omitempty"`
+	End           []byte                 `protobuf:"bytes,2,opt,name=end,proto3" json:"end,omitempty"`
+	EndExclusive  bool                   `protobuf:"varint,3,opt,name=end_exclusive,json=endExclusive,proto3" json:"end_exclusive,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UserKeyBounds) Reset() {
+	*x = UserKeyBounds{}
+	mi := &file_basaltpb_compactor_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UserKeyBounds) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UserKeyBounds) ProtoMessage() {}
+
+func (x *UserKeyBounds) ProtoReflect() protoreflect.Message {
+	mi := &file_basaltpb_compactor_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UserKeyBounds.ProtoReflect.Descriptor instead.
+func (*UserKeyBounds) Descriptor() ([]byte, []int) {
+	return file_basaltpb_compactor_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *UserKeyBounds) GetStart() []byte {
+	if x != nil {
+		return x.Start
+	}
+	return nil
+}
+
+func (x *UserKeyBounds) GetEnd() []byte {
+	if x != nil {
+		return x.End
+	}
+	return nil
+}
+
+func (x *UserKeyBounds) GetEndExclusive() bool {
+	if x != nil {
+		return x.EndExclusive
+	}
+	return false
+}
+
+// InputSSTMeta describes an input SSTable for compaction. Includes full
+// metadata and object reference for reading.
+type InputSSTMeta struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Ref           *ObjectRef             `protobuf:"bytes,1,opt,name=ref,proto3" json:"ref,omitempty"`
+	Level         int32                  `protobuf:"varint,2,opt,name=level,proto3" json:"level,omitempty"`
+	Sublevel      int32                  `protobuf:"varint,3,opt,name=sublevel,proto3" json:"sublevel,omitempty"` // L0 only
+	Bounds        *KeyBounds             `protobuf:"bytes,4,opt,name=bounds,proto3" json:"bounds,omitempty"`
+	SeqNumLow     uint64                 `protobuf:"varint,5,opt,name=seq_num_low,json=seqNumLow,proto3" json:"seq_num_low,omitempty"`
+	SeqNumHigh    uint64                 `protobuf:"varint,6,opt,name=seq_num_high,json=seqNumHigh,proto3" json:"seq_num_high,omitempty"`
+	HasPointKeys  bool                   `protobuf:"varint,7,opt,name=has_point_keys,json=hasPointKeys,proto3" json:"has_point_keys,omitempty"`
+	HasRangeKeys  bool                   `protobuf:"varint,8,opt,name=has_range_keys,json=hasRangeKeys,proto3" json:"has_range_keys,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *InputSSTMeta) Reset() {
+	*x = InputSSTMeta{}
+	mi := &file_basaltpb_compactor_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *InputSSTMeta) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*InputSSTMeta) ProtoMessage() {}
+
+func (x *InputSSTMeta) ProtoReflect() protoreflect.Message {
+	mi := &file_basaltpb_compactor_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use InputSSTMeta.ProtoReflect.Descriptor instead.
+func (*InputSSTMeta) Descriptor() ([]byte, []int) {
+	return file_basaltpb_compactor_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *InputSSTMeta) GetRef() *ObjectRef {
+	if x != nil {
+		return x.Ref
+	}
+	return nil
+}
+
+func (x *InputSSTMeta) GetLevel() int32 {
+	if x != nil {
+		return x.Level
+	}
+	return 0
+}
+
+func (x *InputSSTMeta) GetSublevel() int32 {
+	if x != nil {
+		return x.Sublevel
+	}
+	return 0
+}
+
+func (x *InputSSTMeta) GetBounds() *KeyBounds {
+	if x != nil {
+		return x.Bounds
+	}
+	return nil
+}
+
+func (x *InputSSTMeta) GetSeqNumLow() uint64 {
+	if x != nil {
+		return x.SeqNumLow
+	}
+	return 0
+}
+
+func (x *InputSSTMeta) GetSeqNumHigh() uint64 {
+	if x != nil {
+		return x.SeqNumHigh
+	}
+	return 0
+}
+
+func (x *InputSSTMeta) GetHasPointKeys() bool {
+	if x != nil {
+		return x.HasPointKeys
+	}
+	return false
+}
+
+func (x *InputSSTMeta) GetHasRangeKeys() bool {
+	if x != nil {
+		return x.HasRangeKeys
+	}
+	return false
+}
+
+// GrandparentMeta describes a grandparent SSTable (in outputLevel+1). Only
+// bounds and size are needed since grandparents are not read during compaction.
+type GrandparentMeta struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Bounds        *UserKeyBounds         `protobuf:"bytes,1,opt,name=bounds,proto3" json:"bounds,omitempty"`
+	Size          int64                  `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GrandparentMeta) Reset() {
+	*x = GrandparentMeta{}
+	mi := &file_basaltpb_compactor_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GrandparentMeta) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GrandparentMeta) ProtoMessage() {}
+
+func (x *GrandparentMeta) ProtoReflect() protoreflect.Message {
+	mi := &file_basaltpb_compactor_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GrandparentMeta.ProtoReflect.Descriptor instead.
+func (*GrandparentMeta) Descriptor() ([]byte, []int) {
+	return file_basaltpb_compactor_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *GrandparentMeta) GetBounds() *UserKeyBounds {
+	if x != nil {
+		return x.Bounds
+	}
+	return nil
+}
+
+func (x *GrandparentMeta) GetSize() int64 {
+	if x != nil {
+		return x.Size
+	}
+	return 0
+}
+
+// OutputSSTMeta describes an output SSTable created by flush or compaction.
+type OutputSSTMeta struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ObjectId      []byte                 `protobuf:"bytes,1,opt,name=object_id,json=objectId,proto3" json:"object_id,omitempty"` // UUID
+	Size          int64                  `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty"`
+	Bounds        *KeyBounds             `protobuf:"bytes,3,opt,name=bounds,proto3" json:"bounds,omitempty"`
+	SeqNumLow     uint64                 `protobuf:"varint,4,opt,name=seq_num_low,json=seqNumLow,proto3" json:"seq_num_low,omitempty"`
+	SeqNumHigh    uint64                 `protobuf:"varint,5,opt,name=seq_num_high,json=seqNumHigh,proto3" json:"seq_num_high,omitempty"`
+	Level         int32                  `protobuf:"varint,6,opt,name=level,proto3" json:"level,omitempty"`
+	Sublevel      int32                  `protobuf:"varint,7,opt,name=sublevel,proto3" json:"sublevel,omitempty"` // L0 only
+	HasPointKeys  bool                   `protobuf:"varint,8,opt,name=has_point_keys,json=hasPointKeys,proto3" json:"has_point_keys,omitempty"`
+	HasRangeKeys  bool                   `protobuf:"varint,9,opt,name=has_range_keys,json=hasRangeKeys,proto3" json:"has_range_keys,omitempty"`
+	Stats         *TableStats            `protobuf:"bytes,10,opt,name=stats,proto3" json:"stats,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *OutputSSTMeta) Reset() {
+	*x = OutputSSTMeta{}
+	mi := &file_basaltpb_compactor_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *OutputSSTMeta) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*OutputSSTMeta) ProtoMessage() {}
+
+func (x *OutputSSTMeta) ProtoReflect() protoreflect.Message {
+	mi := &file_basaltpb_compactor_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use OutputSSTMeta.ProtoReflect.Descriptor instead.
+func (*OutputSSTMeta) Descriptor() ([]byte, []int) {
+	return file_basaltpb_compactor_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *OutputSSTMeta) GetObjectId() []byte {
+	if x != nil {
+		return x.ObjectId
+	}
+	return nil
+}
+
+func (x *OutputSSTMeta) GetSize() int64 {
+	if x != nil {
+		return x.Size
+	}
+	return 0
+}
+
+func (x *OutputSSTMeta) GetBounds() *KeyBounds {
+	if x != nil {
+		return x.Bounds
+	}
+	return nil
+}
+
+func (x *OutputSSTMeta) GetSeqNumLow() uint64 {
+	if x != nil {
+		return x.SeqNumLow
+	}
+	return 0
+}
+
+func (x *OutputSSTMeta) GetSeqNumHigh() uint64 {
+	if x != nil {
+		return x.SeqNumHigh
+	}
+	return 0
+}
+
+func (x *OutputSSTMeta) GetLevel() int32 {
+	if x != nil {
+		return x.Level
+	}
+	return 0
+}
+
+func (x *OutputSSTMeta) GetSublevel() int32 {
+	if x != nil {
+		return x.Sublevel
+	}
+	return 0
+}
+
+func (x *OutputSSTMeta) GetHasPointKeys() bool {
+	if x != nil {
+		return x.HasPointKeys
+	}
+	return false
+}
+
+func (x *OutputSSTMeta) GetHasRangeKeys() bool {
+	if x != nil {
+		return x.HasRangeKeys
+	}
+	return false
+}
+
+func (x *OutputSSTMeta) GetStats() *TableStats {
+	if x != nil {
+		return x.Stats
+	}
+	return nil
+}
+
+// TableStats contains statistics about an SSTable.
+type TableStats struct {
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	NumEntries        uint64                 `protobuf:"varint,1,opt,name=num_entries,json=numEntries,proto3" json:"num_entries,omitempty"`
+	NumDeletions      uint64                 `protobuf:"varint,2,opt,name=num_deletions,json=numDeletions,proto3" json:"num_deletions,omitempty"`
+	NumRangeDeletions uint64                 `protobuf:"varint,3,opt,name=num_range_deletions,json=numRangeDeletions,proto3" json:"num_range_deletions,omitempty"`
+	RawKeySize        uint64                 `protobuf:"varint,4,opt,name=raw_key_size,json=rawKeySize,proto3" json:"raw_key_size,omitempty"`
+	RawValueSize      uint64                 `protobuf:"varint,5,opt,name=raw_value_size,json=rawValueSize,proto3" json:"raw_value_size,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *TableStats) Reset() {
+	*x = TableStats{}
+	mi := &file_basaltpb_compactor_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TableStats) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TableStats) ProtoMessage() {}
+
+func (x *TableStats) ProtoReflect() protoreflect.Message {
+	mi := &file_basaltpb_compactor_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TableStats.ProtoReflect.Descriptor instead.
+func (*TableStats) Descriptor() ([]byte, []int) {
+	return file_basaltpb_compactor_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *TableStats) GetNumEntries() uint64 {
+	if x != nil {
+		return x.NumEntries
+	}
+	return 0
+}
+
+func (x *TableStats) GetNumDeletions() uint64 {
+	if x != nil {
+		return x.NumDeletions
+	}
+	return 0
+}
+
+func (x *TableStats) GetNumRangeDeletions() uint64 {
+	if x != nil {
+		return x.NumRangeDeletions
+	}
+	return 0
+}
+
+func (x *TableStats) GetRawKeySize() uint64 {
+	if x != nil {
+		return x.RawKeySize
+	}
+	return 0
+}
+
+func (x *TableStats) GetRawValueSize() uint64 {
+	if x != nil {
+		return x.RawValueSize
+	}
+	return 0
+}
+
+// TombstoneElision specifies the tombstone elision policy.
+type TombstoneElision struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Mode           TombstoneElisionMode   `protobuf:"varint,1,opt,name=mode,proto3,enum=basaltpb.TombstoneElisionMode" json:"mode,omitempty"`
+	InUseKeyRanges []*UserKeyBounds       `protobuf:"bytes,2,rep,name=in_use_key_ranges,json=inUseKeyRanges,proto3" json:"in_use_key_ranges,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *TombstoneElision) Reset() {
+	*x = TombstoneElision{}
+	mi := &file_basaltpb_compactor_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TombstoneElision) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TombstoneElision) ProtoMessage() {}
+
+func (x *TombstoneElision) ProtoReflect() protoreflect.Message {
+	mi := &file_basaltpb_compactor_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TombstoneElision.ProtoReflect.Descriptor instead.
+func (*TombstoneElision) Descriptor() ([]byte, []int) {
+	return file_basaltpb_compactor_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *TombstoneElision) GetMode() TombstoneElisionMode {
+	if x != nil {
+		return x.Mode
+	}
+	return TombstoneElisionMode_ELIDE_NOTHING
+}
+
+func (x *TombstoneElision) GetInUseKeyRanges() []*UserKeyBounds {
+	if x != nil {
+		return x.InUseKeyRanges
+	}
+	return nil
+}
+
+// CompactionOptions controls SSTable output formatting and splitting.
+type CompactionOptions struct {
+	state                      protoimpl.MessageState `protogen:"open.v1"`
+	TargetFileSize             int64                  `protobuf:"varint,1,opt,name=target_file_size,json=targetFileSize,proto3" json:"target_file_size,omitempty"`
+	MaxGrandparentOverlapBytes int64                  `protobuf:"varint,2,opt,name=max_grandparent_overlap_bytes,json=maxGrandparentOverlapBytes,proto3" json:"max_grandparent_overlap_bytes,omitempty"`
+	BlockSize                  int32                  `protobuf:"varint,3,opt,name=block_size,json=blockSize,proto3" json:"block_size,omitempty"`
+	Compression                CompressionType        `protobuf:"varint,4,opt,name=compression,proto3,enum=basaltpb.CompressionType" json:"compression,omitempty"`
+	FilterBitsPerKey           int32                  `protobuf:"varint,5,opt,name=filter_bits_per_key,json=filterBitsPerKey,proto3" json:"filter_bits_per_key,omitempty"`
+	unknownFields              protoimpl.UnknownFields
+	sizeCache                  protoimpl.SizeCache
+}
+
+func (x *CompactionOptions) Reset() {
+	*x = CompactionOptions{}
+	mi := &file_basaltpb_compactor_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CompactionOptions) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CompactionOptions) ProtoMessage() {}
+
+func (x *CompactionOptions) ProtoReflect() protoreflect.Message {
+	mi := &file_basaltpb_compactor_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CompactionOptions.ProtoReflect.Descriptor instead.
+func (*CompactionOptions) Descriptor() ([]byte, []int) {
+	return file_basaltpb_compactor_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *CompactionOptions) GetTargetFileSize() int64 {
+	if x != nil {
+		return x.TargetFileSize
+	}
+	return 0
+}
+
+func (x *CompactionOptions) GetMaxGrandparentOverlapBytes() int64 {
+	if x != nil {
+		return x.MaxGrandparentOverlapBytes
+	}
+	return 0
+}
+
+func (x *CompactionOptions) GetBlockSize() int32 {
+	if x != nil {
+		return x.BlockSize
+	}
+	return 0
+}
+
+func (x *CompactionOptions) GetCompression() CompressionType {
+	if x != nil {
+		return x.Compression
+	}
+	return CompressionType_COMPRESSION_NONE
+}
+
+func (x *CompactionOptions) GetFilterBitsPerKey() int32 {
+	if x != nil {
+		return x.FilterBitsPerKey
+	}
+	return 0
+}
+
+// L0FileMeta describes an existing L0 file for sublevel assignment.
+type L0FileMeta struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Bounds        *UserKeyBounds         `protobuf:"bytes,1,opt,name=bounds,proto3" json:"bounds,omitempty"`
+	Sublevel      int32                  `protobuf:"varint,2,opt,name=sublevel,proto3" json:"sublevel,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *L0FileMeta) Reset() {
+	*x = L0FileMeta{}
+	mi := &file_basaltpb_compactor_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *L0FileMeta) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*L0FileMeta) ProtoMessage() {}
+
+func (x *L0FileMeta) ProtoReflect() protoreflect.Message {
+	mi := &file_basaltpb_compactor_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use L0FileMeta.ProtoReflect.Descriptor instead.
+func (*L0FileMeta) Descriptor() ([]byte, []int) {
+	return file_basaltpb_compactor_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *L0FileMeta) GetBounds() *UserKeyBounds {
+	if x != nil {
+		return x.Bounds
+	}
+	return nil
+}
+
+func (x *L0FileMeta) GetSublevel() int32 {
+	if x != nil {
+		return x.Sublevel
+	}
+	return 0
+}
+
+// FlushRequest contains all state needed for a remote flush operation.
 type FlushRequest struct {
-	state   protoimpl.MessageState `protogen:"open.v1"`
-	MountId *MountID               `protobuf:"bytes,1,opt,name=mount_id,json=mountId,proto3" json:"mount_id,omitempty"`
-	// Objects containing the memtable data to flush.
-	MemtableObjects []*ObjectID `protobuf:"bytes,2,rep,name=memtable_objects,json=memtableObjects,proto3" json:"memtable_objects,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Version compatibility - worker execs binary with matching Pebble version.
+	FormatMajorVersion uint64       `protobuf:"varint,1,opt,name=format_major_version,json=formatMajorVersion,proto3" json:"format_major_version,omitempty"`
+	StoreId            []byte       `protobuf:"bytes,2,opt,name=store_id,json=storeId,proto3" json:"store_id,omitempty"`          // UUID
+	WalObjects         []*ObjectRef `protobuf:"bytes,3,rep,name=wal_objects,json=walObjects,proto3" json:"wal_objects,omitempty"` // 1:1 with logical WAL/memtable
+	EncryptionKey      []byte       `protobuf:"bytes,4,opt,name=encryption_key,json=encryptionKey,proto3" json:"encryption_key,omitempty"`
+	// Output splitting
+	L0SplitKeys  [][]byte           `protobuf:"bytes,5,rep,name=l0_split_keys,json=l0SplitKeys,proto3" json:"l0_split_keys,omitempty"`
+	BaseLevel    int32              `protobuf:"varint,6,opt,name=base_level,json=baseLevel,proto3" json:"base_level,omitempty"`
+	Grandparents []*GrandparentMeta `protobuf:"bytes,7,rep,name=grandparents,proto3" json:"grandparents,omitempty"`
+	// Options
+	Options *CompactionOptions `protobuf:"bytes,8,opt,name=options,proto3" json:"options,omitempty"`
+	// Iteration config
+	ComparerName string `protobuf:"bytes,9,opt,name=comparer_name,json=comparerName,proto3" json:"comparer_name,omitempty"`
+	MergerName   string `protobuf:"bytes,10,opt,name=merger_name,json=mergerName,proto3" json:"merger_name,omitempty"`
+	// L0 sublevel assignment
+	ExistingL0Files []*L0FileMeta `protobuf:"bytes,11,rep,name=existing_l0_files,json=existingL0Files,proto3" json:"existing_l0_files,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
 
 func (x *FlushRequest) Reset() {
 	*x = FlushRequest{}
-	mi := &file_basaltpb_compactor_proto_msgTypes[0]
+	mi := &file_basaltpb_compactor_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -44,7 +920,7 @@ func (x *FlushRequest) String() string {
 func (*FlushRequest) ProtoMessage() {}
 
 func (x *FlushRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_basaltpb_compactor_proto_msgTypes[0]
+	mi := &file_basaltpb_compactor_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -57,34 +933,98 @@ func (x *FlushRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FlushRequest.ProtoReflect.Descriptor instead.
 func (*FlushRequest) Descriptor() ([]byte, []int) {
-	return file_basaltpb_compactor_proto_rawDescGZIP(), []int{0}
+	return file_basaltpb_compactor_proto_rawDescGZIP(), []int{11}
 }
 
-func (x *FlushRequest) GetMountId() *MountID {
+func (x *FlushRequest) GetFormatMajorVersion() uint64 {
 	if x != nil {
-		return x.MountId
+		return x.FormatMajorVersion
+	}
+	return 0
+}
+
+func (x *FlushRequest) GetStoreId() []byte {
+	if x != nil {
+		return x.StoreId
 	}
 	return nil
 }
 
-func (x *FlushRequest) GetMemtableObjects() []*ObjectID {
+func (x *FlushRequest) GetWalObjects() []*ObjectRef {
 	if x != nil {
-		return x.MemtableObjects
+		return x.WalObjects
 	}
 	return nil
 }
 
+func (x *FlushRequest) GetEncryptionKey() []byte {
+	if x != nil {
+		return x.EncryptionKey
+	}
+	return nil
+}
+
+func (x *FlushRequest) GetL0SplitKeys() [][]byte {
+	if x != nil {
+		return x.L0SplitKeys
+	}
+	return nil
+}
+
+func (x *FlushRequest) GetBaseLevel() int32 {
+	if x != nil {
+		return x.BaseLevel
+	}
+	return 0
+}
+
+func (x *FlushRequest) GetGrandparents() []*GrandparentMeta {
+	if x != nil {
+		return x.Grandparents
+	}
+	return nil
+}
+
+func (x *FlushRequest) GetOptions() *CompactionOptions {
+	if x != nil {
+		return x.Options
+	}
+	return nil
+}
+
+func (x *FlushRequest) GetComparerName() string {
+	if x != nil {
+		return x.ComparerName
+	}
+	return ""
+}
+
+func (x *FlushRequest) GetMergerName() string {
+	if x != nil {
+		return x.MergerName
+	}
+	return ""
+}
+
+func (x *FlushRequest) GetExistingL0Files() []*L0FileMeta {
+	if x != nil {
+		return x.ExistingL0Files
+	}
+	return nil
+}
+
+// FlushResponse contains the result of a flush operation.
 type FlushResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// New SSTable objects created by the flush.
-	OutputTables  []*ObjectMeta `protobuf:"bytes,1,rep,name=output_tables,json=outputTables,proto3" json:"output_tables,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	OutputSstables []*OutputSSTMeta       `protobuf:"bytes,1,rep,name=output_sstables,json=outputSstables,proto3" json:"output_sstables,omitempty"`
+	Stats          *FlushStats            `protobuf:"bytes,2,opt,name=stats,proto3" json:"stats,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *FlushResponse) Reset() {
 	*x = FlushResponse{}
-	mi := &file_basaltpb_compactor_proto_msgTypes[1]
+	mi := &file_basaltpb_compactor_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -96,7 +1036,7 @@ func (x *FlushResponse) String() string {
 func (*FlushResponse) ProtoMessage() {}
 
 func (x *FlushResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_basaltpb_compactor_proto_msgTypes[1]
+	mi := &file_basaltpb_compactor_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -109,30 +1049,124 @@ func (x *FlushResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FlushResponse.ProtoReflect.Descriptor instead.
 func (*FlushResponse) Descriptor() ([]byte, []int) {
-	return file_basaltpb_compactor_proto_rawDescGZIP(), []int{1}
+	return file_basaltpb_compactor_proto_rawDescGZIP(), []int{12}
 }
 
-func (x *FlushResponse) GetOutputTables() []*ObjectMeta {
+func (x *FlushResponse) GetOutputSstables() []*OutputSSTMeta {
 	if x != nil {
-		return x.OutputTables
+		return x.OutputSstables
 	}
 	return nil
 }
 
+func (x *FlushResponse) GetStats() *FlushStats {
+	if x != nil {
+		return x.Stats
+	}
+	return nil
+}
+
+// FlushStats contains statistics about a flush operation.
+type FlushStats struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	InputBytes     int64                  `protobuf:"varint,1,opt,name=input_bytes,json=inputBytes,proto3" json:"input_bytes,omitempty"`
+	OutputBytes    int64                  `protobuf:"varint,2,opt,name=output_bytes,json=outputBytes,proto3" json:"output_bytes,omitempty"`
+	NumOutputFiles int32                  `protobuf:"varint,3,opt,name=num_output_files,json=numOutputFiles,proto3" json:"num_output_files,omitempty"`
+	DurationMs     int64                  `protobuf:"varint,4,opt,name=duration_ms,json=durationMs,proto3" json:"duration_ms,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *FlushStats) Reset() {
+	*x = FlushStats{}
+	mi := &file_basaltpb_compactor_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FlushStats) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FlushStats) ProtoMessage() {}
+
+func (x *FlushStats) ProtoReflect() protoreflect.Message {
+	mi := &file_basaltpb_compactor_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FlushStats.ProtoReflect.Descriptor instead.
+func (*FlushStats) Descriptor() ([]byte, []int) {
+	return file_basaltpb_compactor_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *FlushStats) GetInputBytes() int64 {
+	if x != nil {
+		return x.InputBytes
+	}
+	return 0
+}
+
+func (x *FlushStats) GetOutputBytes() int64 {
+	if x != nil {
+		return x.OutputBytes
+	}
+	return 0
+}
+
+func (x *FlushStats) GetNumOutputFiles() int32 {
+	if x != nil {
+		return x.NumOutputFiles
+	}
+	return 0
+}
+
+func (x *FlushStats) GetDurationMs() int64 {
+	if x != nil {
+		return x.DurationMs
+	}
+	return 0
+}
+
+// CompactRequest contains all state needed for a remote compaction operation.
 type CompactRequest struct {
-	state   protoimpl.MessageState `protogen:"open.v1"`
-	MountId *MountID               `protobuf:"bytes,1,opt,name=mount_id,json=mountId,proto3" json:"mount_id,omitempty"`
-	// Input SSTable objects to compact.
-	InputTables []*ObjectID `protobuf:"bytes,2,rep,name=input_tables,json=inputTables,proto3" json:"input_tables,omitempty"`
-	// Target level for the compaction output.
-	OutputLevel   int32 `protobuf:"varint,3,opt,name=output_level,json=outputLevel,proto3" json:"output_level,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Version compatibility - worker execs binary with matching Pebble version.
+	FormatMajorVersion uint64          `protobuf:"varint,1,opt,name=format_major_version,json=formatMajorVersion,proto3" json:"format_major_version,omitempty"`
+	StoreId            []byte          `protobuf:"bytes,2,opt,name=store_id,json=storeId,proto3" json:"store_id,omitempty"` // UUID
+	InputSstables      []*InputSSTMeta `protobuf:"bytes,3,rep,name=input_sstables,json=inputSstables,proto3" json:"input_sstables,omitempty"`
+	StartLevel         int32           `protobuf:"varint,4,opt,name=start_level,json=startLevel,proto3" json:"start_level,omitempty"`
+	OutputLevel        int32           `protobuf:"varint,5,opt,name=output_level,json=outputLevel,proto3" json:"output_level,omitempty"`
+	EncryptionKey      []byte          `protobuf:"bytes,6,opt,name=encryption_key,json=encryptionKey,proto3" json:"encryption_key,omitempty"`
+	// Compaction bounds
+	Bounds *UserKeyBounds `protobuf:"bytes,7,opt,name=bounds,proto3" json:"bounds,omitempty"`
+	// Output splitting
+	Grandparents []*GrandparentMeta `protobuf:"bytes,8,rep,name=grandparents,proto3" json:"grandparents,omitempty"`
+	Options      *CompactionOptions `protobuf:"bytes,9,opt,name=options,proto3" json:"options,omitempty"`
+	// Tombstone elision
+	Snapshots             []uint64          `protobuf:"varint,10,rep,packed,name=snapshots,proto3" json:"snapshots,omitempty"` // Active snapshot seqnums, ascending
+	DelElision            *TombstoneElision `protobuf:"bytes,11,opt,name=del_elision,json=delElision,proto3" json:"del_elision,omitempty"`
+	RangeKeyElision       *TombstoneElision `protobuf:"bytes,12,opt,name=range_key_elision,json=rangeKeyElision,proto3" json:"range_key_elision,omitempty"`
+	IsBottommostDataLayer bool              `protobuf:"varint,13,opt,name=is_bottommost_data_layer,json=isBottommostDataLayer,proto3" json:"is_bottommost_data_layer,omitempty"`
+	// Iteration config
+	ComparerName string `protobuf:"bytes,14,opt,name=comparer_name,json=comparerName,proto3" json:"comparer_name,omitempty"`
+	MergerName   string `protobuf:"bytes,15,opt,name=merger_name,json=mergerName,proto3" json:"merger_name,omitempty"`
+	// L0-specific (for intra-L0 and sublevel assignment)
+	ExistingL0Files []*L0FileMeta `protobuf:"bytes,16,rep,name=existing_l0_files,json=existingL0Files,proto3" json:"existing_l0_files,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *CompactRequest) Reset() {
 	*x = CompactRequest{}
-	mi := &file_basaltpb_compactor_proto_msgTypes[2]
+	mi := &file_basaltpb_compactor_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -144,7 +1178,7 @@ func (x *CompactRequest) String() string {
 func (*CompactRequest) ProtoMessage() {}
 
 func (x *CompactRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_basaltpb_compactor_proto_msgTypes[2]
+	mi := &file_basaltpb_compactor_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -157,21 +1191,35 @@ func (x *CompactRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CompactRequest.ProtoReflect.Descriptor instead.
 func (*CompactRequest) Descriptor() ([]byte, []int) {
-	return file_basaltpb_compactor_proto_rawDescGZIP(), []int{2}
+	return file_basaltpb_compactor_proto_rawDescGZIP(), []int{14}
 }
 
-func (x *CompactRequest) GetMountId() *MountID {
+func (x *CompactRequest) GetFormatMajorVersion() uint64 {
 	if x != nil {
-		return x.MountId
+		return x.FormatMajorVersion
+	}
+	return 0
+}
+
+func (x *CompactRequest) GetStoreId() []byte {
+	if x != nil {
+		return x.StoreId
 	}
 	return nil
 }
 
-func (x *CompactRequest) GetInputTables() []*ObjectID {
+func (x *CompactRequest) GetInputSstables() []*InputSSTMeta {
 	if x != nil {
-		return x.InputTables
+		return x.InputSstables
 	}
 	return nil
+}
+
+func (x *CompactRequest) GetStartLevel() int32 {
+	if x != nil {
+		return x.StartLevel
+	}
+	return 0
 }
 
 func (x *CompactRequest) GetOutputLevel() int32 {
@@ -181,17 +1229,95 @@ func (x *CompactRequest) GetOutputLevel() int32 {
 	return 0
 }
 
+func (x *CompactRequest) GetEncryptionKey() []byte {
+	if x != nil {
+		return x.EncryptionKey
+	}
+	return nil
+}
+
+func (x *CompactRequest) GetBounds() *UserKeyBounds {
+	if x != nil {
+		return x.Bounds
+	}
+	return nil
+}
+
+func (x *CompactRequest) GetGrandparents() []*GrandparentMeta {
+	if x != nil {
+		return x.Grandparents
+	}
+	return nil
+}
+
+func (x *CompactRequest) GetOptions() *CompactionOptions {
+	if x != nil {
+		return x.Options
+	}
+	return nil
+}
+
+func (x *CompactRequest) GetSnapshots() []uint64 {
+	if x != nil {
+		return x.Snapshots
+	}
+	return nil
+}
+
+func (x *CompactRequest) GetDelElision() *TombstoneElision {
+	if x != nil {
+		return x.DelElision
+	}
+	return nil
+}
+
+func (x *CompactRequest) GetRangeKeyElision() *TombstoneElision {
+	if x != nil {
+		return x.RangeKeyElision
+	}
+	return nil
+}
+
+func (x *CompactRequest) GetIsBottommostDataLayer() bool {
+	if x != nil {
+		return x.IsBottommostDataLayer
+	}
+	return false
+}
+
+func (x *CompactRequest) GetComparerName() string {
+	if x != nil {
+		return x.ComparerName
+	}
+	return ""
+}
+
+func (x *CompactRequest) GetMergerName() string {
+	if x != nil {
+		return x.MergerName
+	}
+	return ""
+}
+
+func (x *CompactRequest) GetExistingL0Files() []*L0FileMeta {
+	if x != nil {
+		return x.ExistingL0Files
+	}
+	return nil
+}
+
+// CompactResponse contains the result of a compaction operation.
 type CompactResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// New SSTable objects created by the compaction.
-	OutputTables  []*ObjectMeta `protobuf:"bytes,1,rep,name=output_tables,json=outputTables,proto3" json:"output_tables,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	OutputSstables []*OutputSSTMeta       `protobuf:"bytes,1,rep,name=output_sstables,json=outputSstables,proto3" json:"output_sstables,omitempty"`
+	Stats          *CompactStats          `protobuf:"bytes,2,opt,name=stats,proto3" json:"stats,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *CompactResponse) Reset() {
 	*x = CompactResponse{}
-	mi := &file_basaltpb_compactor_proto_msgTypes[3]
+	mi := &file_basaltpb_compactor_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -203,7 +1329,7 @@ func (x *CompactResponse) String() string {
 func (*CompactResponse) ProtoMessage() {}
 
 func (x *CompactResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_basaltpb_compactor_proto_msgTypes[3]
+	mi := &file_basaltpb_compactor_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -216,32 +1342,253 @@ func (x *CompactResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CompactResponse.ProtoReflect.Descriptor instead.
 func (*CompactResponse) Descriptor() ([]byte, []int) {
-	return file_basaltpb_compactor_proto_rawDescGZIP(), []int{3}
+	return file_basaltpb_compactor_proto_rawDescGZIP(), []int{15}
 }
 
-func (x *CompactResponse) GetOutputTables() []*ObjectMeta {
+func (x *CompactResponse) GetOutputSstables() []*OutputSSTMeta {
 	if x != nil {
-		return x.OutputTables
+		return x.OutputSstables
 	}
 	return nil
+}
+
+func (x *CompactResponse) GetStats() *CompactStats {
+	if x != nil {
+		return x.Stats
+	}
+	return nil
+}
+
+// CompactStats contains statistics about a compaction operation.
+type CompactStats struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	InputBytes     int64                  `protobuf:"varint,1,opt,name=input_bytes,json=inputBytes,proto3" json:"input_bytes,omitempty"`
+	OutputBytes    int64                  `protobuf:"varint,2,opt,name=output_bytes,json=outputBytes,proto3" json:"output_bytes,omitempty"`
+	NumInputFiles  int32                  `protobuf:"varint,3,opt,name=num_input_files,json=numInputFiles,proto3" json:"num_input_files,omitempty"`
+	NumOutputFiles int32                  `protobuf:"varint,4,opt,name=num_output_files,json=numOutputFiles,proto3" json:"num_output_files,omitempty"`
+	DurationMs     int64                  `protobuf:"varint,5,opt,name=duration_ms,json=durationMs,proto3" json:"duration_ms,omitempty"`
+	PinnedBytes    int64                  `protobuf:"varint,6,opt,name=pinned_bytes,json=pinnedBytes,proto3" json:"pinned_bytes,omitempty"`
+	DeletedBytes   int64                  `protobuf:"varint,7,opt,name=deleted_bytes,json=deletedBytes,proto3" json:"deleted_bytes,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *CompactStats) Reset() {
+	*x = CompactStats{}
+	mi := &file_basaltpb_compactor_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CompactStats) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CompactStats) ProtoMessage() {}
+
+func (x *CompactStats) ProtoReflect() protoreflect.Message {
+	mi := &file_basaltpb_compactor_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CompactStats.ProtoReflect.Descriptor instead.
+func (*CompactStats) Descriptor() ([]byte, []int) {
+	return file_basaltpb_compactor_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *CompactStats) GetInputBytes() int64 {
+	if x != nil {
+		return x.InputBytes
+	}
+	return 0
+}
+
+func (x *CompactStats) GetOutputBytes() int64 {
+	if x != nil {
+		return x.OutputBytes
+	}
+	return 0
+}
+
+func (x *CompactStats) GetNumInputFiles() int32 {
+	if x != nil {
+		return x.NumInputFiles
+	}
+	return 0
+}
+
+func (x *CompactStats) GetNumOutputFiles() int32 {
+	if x != nil {
+		return x.NumOutputFiles
+	}
+	return 0
+}
+
+func (x *CompactStats) GetDurationMs() int64 {
+	if x != nil {
+		return x.DurationMs
+	}
+	return 0
+}
+
+func (x *CompactStats) GetPinnedBytes() int64 {
+	if x != nil {
+		return x.PinnedBytes
+	}
+	return 0
+}
+
+func (x *CompactStats) GetDeletedBytes() int64 {
+	if x != nil {
+		return x.DeletedBytes
+	}
+	return 0
 }
 
 var File_basaltpb_compactor_proto protoreflect.FileDescriptor
 
 const file_basaltpb_compactor_proto_rawDesc = "" +
 	"\n" +
-	"\x18basaltpb/compactor.proto\x12\bbasaltpb\x1a\x15basaltpb/common.proto\"{\n" +
-	"\fFlushRequest\x12,\n" +
-	"\bmount_id\x18\x01 \x01(\v2\x11.basaltpb.MountIDR\amountId\x12=\n" +
-	"\x10memtable_objects\x18\x02 \x03(\v2\x12.basaltpb.ObjectIDR\x0fmemtableObjects\"J\n" +
-	"\rFlushResponse\x129\n" +
-	"\routput_tables\x18\x01 \x03(\v2\x14.basaltpb.ObjectMetaR\foutputTables\"\x98\x01\n" +
-	"\x0eCompactRequest\x12,\n" +
-	"\bmount_id\x18\x01 \x01(\v2\x11.basaltpb.MountIDR\amountId\x125\n" +
-	"\finput_tables\x18\x02 \x03(\v2\x12.basaltpb.ObjectIDR\vinputTables\x12!\n" +
-	"\foutput_level\x18\x03 \x01(\x05R\voutputLevel\"L\n" +
-	"\x0fCompactResponse\x129\n" +
-	"\routput_tables\x18\x01 \x03(\v2\x14.basaltpb.ObjectMetaR\foutputTables2\x85\x01\n" +
+	"\x18basaltpb/compactor.proto\x12\bbasaltpb\"<\n" +
+	"\tObjectRef\x12\x1b\n" +
+	"\tobject_id\x18\x01 \x01(\fR\bobjectId\x12\x12\n" +
+	"\x04size\x18\x02 \x01(\x03R\x04size\"U\n" +
+	"\vInternalKey\x12\x19\n" +
+	"\buser_key\x18\x01 \x01(\fR\auserKey\x12\x17\n" +
+	"\aseq_num\x18\x02 \x01(\x04R\x06seqNum\x12\x12\n" +
+	"\x04kind\x18\x03 \x01(\rR\x04kind\"o\n" +
+	"\tKeyBounds\x121\n" +
+	"\bsmallest\x18\x01 \x01(\v2\x15.basaltpb.InternalKeyR\bsmallest\x12/\n" +
+	"\alargest\x18\x02 \x01(\v2\x15.basaltpb.InternalKeyR\alargest\"\\\n" +
+	"\rUserKeyBounds\x12\x14\n" +
+	"\x05start\x18\x01 \x01(\fR\x05start\x12\x10\n" +
+	"\x03end\x18\x02 \x01(\fR\x03end\x12#\n" +
+	"\rend_exclusive\x18\x03 \x01(\bR\fendExclusive\"\xa2\x02\n" +
+	"\fInputSSTMeta\x12%\n" +
+	"\x03ref\x18\x01 \x01(\v2\x13.basaltpb.ObjectRefR\x03ref\x12\x14\n" +
+	"\x05level\x18\x02 \x01(\x05R\x05level\x12\x1a\n" +
+	"\bsublevel\x18\x03 \x01(\x05R\bsublevel\x12+\n" +
+	"\x06bounds\x18\x04 \x01(\v2\x13.basaltpb.KeyBoundsR\x06bounds\x12\x1e\n" +
+	"\vseq_num_low\x18\x05 \x01(\x04R\tseqNumLow\x12 \n" +
+	"\fseq_num_high\x18\x06 \x01(\x04R\n" +
+	"seqNumHigh\x12$\n" +
+	"\x0ehas_point_keys\x18\a \x01(\bR\fhasPointKeys\x12$\n" +
+	"\x0ehas_range_keys\x18\b \x01(\bR\fhasRangeKeys\"V\n" +
+	"\x0fGrandparentMeta\x12/\n" +
+	"\x06bounds\x18\x01 \x01(\v2\x17.basaltpb.UserKeyBoundsR\x06bounds\x12\x12\n" +
+	"\x04size\x18\x02 \x01(\x03R\x04size\"\xd9\x02\n" +
+	"\rOutputSSTMeta\x12\x1b\n" +
+	"\tobject_id\x18\x01 \x01(\fR\bobjectId\x12\x12\n" +
+	"\x04size\x18\x02 \x01(\x03R\x04size\x12+\n" +
+	"\x06bounds\x18\x03 \x01(\v2\x13.basaltpb.KeyBoundsR\x06bounds\x12\x1e\n" +
+	"\vseq_num_low\x18\x04 \x01(\x04R\tseqNumLow\x12 \n" +
+	"\fseq_num_high\x18\x05 \x01(\x04R\n" +
+	"seqNumHigh\x12\x14\n" +
+	"\x05level\x18\x06 \x01(\x05R\x05level\x12\x1a\n" +
+	"\bsublevel\x18\a \x01(\x05R\bsublevel\x12$\n" +
+	"\x0ehas_point_keys\x18\b \x01(\bR\fhasPointKeys\x12$\n" +
+	"\x0ehas_range_keys\x18\t \x01(\bR\fhasRangeKeys\x12*\n" +
+	"\x05stats\x18\n" +
+	" \x01(\v2\x14.basaltpb.TableStatsR\x05stats\"\xca\x01\n" +
+	"\n" +
+	"TableStats\x12\x1f\n" +
+	"\vnum_entries\x18\x01 \x01(\x04R\n" +
+	"numEntries\x12#\n" +
+	"\rnum_deletions\x18\x02 \x01(\x04R\fnumDeletions\x12.\n" +
+	"\x13num_range_deletions\x18\x03 \x01(\x04R\x11numRangeDeletions\x12 \n" +
+	"\fraw_key_size\x18\x04 \x01(\x04R\n" +
+	"rawKeySize\x12$\n" +
+	"\x0eraw_value_size\x18\x05 \x01(\x04R\frawValueSize\"\x8a\x01\n" +
+	"\x10TombstoneElision\x122\n" +
+	"\x04mode\x18\x01 \x01(\x0e2\x1e.basaltpb.TombstoneElisionModeR\x04mode\x12B\n" +
+	"\x11in_use_key_ranges\x18\x02 \x03(\v2\x17.basaltpb.UserKeyBoundsR\x0einUseKeyRanges\"\x8b\x02\n" +
+	"\x11CompactionOptions\x12(\n" +
+	"\x10target_file_size\x18\x01 \x01(\x03R\x0etargetFileSize\x12A\n" +
+	"\x1dmax_grandparent_overlap_bytes\x18\x02 \x01(\x03R\x1amaxGrandparentOverlapBytes\x12\x1d\n" +
+	"\n" +
+	"block_size\x18\x03 \x01(\x05R\tblockSize\x12;\n" +
+	"\vcompression\x18\x04 \x01(\x0e2\x19.basaltpb.CompressionTypeR\vcompression\x12-\n" +
+	"\x13filter_bits_per_key\x18\x05 \x01(\x05R\x10filterBitsPerKey\"Y\n" +
+	"\n" +
+	"L0FileMeta\x12/\n" +
+	"\x06bounds\x18\x01 \x01(\v2\x17.basaltpb.UserKeyBoundsR\x06bounds\x12\x1a\n" +
+	"\bsublevel\x18\x02 \x01(\x05R\bsublevel\"\xf9\x03\n" +
+	"\fFlushRequest\x120\n" +
+	"\x14format_major_version\x18\x01 \x01(\x04R\x12formatMajorVersion\x12\x19\n" +
+	"\bstore_id\x18\x02 \x01(\fR\astoreId\x124\n" +
+	"\vwal_objects\x18\x03 \x03(\v2\x13.basaltpb.ObjectRefR\n" +
+	"walObjects\x12%\n" +
+	"\x0eencryption_key\x18\x04 \x01(\fR\rencryptionKey\x12\"\n" +
+	"\rl0_split_keys\x18\x05 \x03(\fR\vl0SplitKeys\x12\x1d\n" +
+	"\n" +
+	"base_level\x18\x06 \x01(\x05R\tbaseLevel\x12=\n" +
+	"\fgrandparents\x18\a \x03(\v2\x19.basaltpb.GrandparentMetaR\fgrandparents\x125\n" +
+	"\aoptions\x18\b \x01(\v2\x1b.basaltpb.CompactionOptionsR\aoptions\x12#\n" +
+	"\rcomparer_name\x18\t \x01(\tR\fcomparerName\x12\x1f\n" +
+	"\vmerger_name\x18\n" +
+	" \x01(\tR\n" +
+	"mergerName\x12@\n" +
+	"\x11existing_l0_files\x18\v \x03(\v2\x14.basaltpb.L0FileMetaR\x0fexistingL0Files\"}\n" +
+	"\rFlushResponse\x12@\n" +
+	"\x0foutput_sstables\x18\x01 \x03(\v2\x17.basaltpb.OutputSSTMetaR\x0eoutputSstables\x12*\n" +
+	"\x05stats\x18\x02 \x01(\v2\x14.basaltpb.FlushStatsR\x05stats\"\x9b\x01\n" +
+	"\n" +
+	"FlushStats\x12\x1f\n" +
+	"\vinput_bytes\x18\x01 \x01(\x03R\n" +
+	"inputBytes\x12!\n" +
+	"\foutput_bytes\x18\x02 \x01(\x03R\voutputBytes\x12(\n" +
+	"\x10num_output_files\x18\x03 \x01(\x05R\x0enumOutputFiles\x12\x1f\n" +
+	"\vduration_ms\x18\x04 \x01(\x03R\n" +
+	"durationMs\"\x92\x06\n" +
+	"\x0eCompactRequest\x120\n" +
+	"\x14format_major_version\x18\x01 \x01(\x04R\x12formatMajorVersion\x12\x19\n" +
+	"\bstore_id\x18\x02 \x01(\fR\astoreId\x12=\n" +
+	"\x0einput_sstables\x18\x03 \x03(\v2\x16.basaltpb.InputSSTMetaR\rinputSstables\x12\x1f\n" +
+	"\vstart_level\x18\x04 \x01(\x05R\n" +
+	"startLevel\x12!\n" +
+	"\foutput_level\x18\x05 \x01(\x05R\voutputLevel\x12%\n" +
+	"\x0eencryption_key\x18\x06 \x01(\fR\rencryptionKey\x12/\n" +
+	"\x06bounds\x18\a \x01(\v2\x17.basaltpb.UserKeyBoundsR\x06bounds\x12=\n" +
+	"\fgrandparents\x18\b \x03(\v2\x19.basaltpb.GrandparentMetaR\fgrandparents\x125\n" +
+	"\aoptions\x18\t \x01(\v2\x1b.basaltpb.CompactionOptionsR\aoptions\x12\x1c\n" +
+	"\tsnapshots\x18\n" +
+	" \x03(\x04R\tsnapshots\x12;\n" +
+	"\vdel_elision\x18\v \x01(\v2\x1a.basaltpb.TombstoneElisionR\n" +
+	"delElision\x12F\n" +
+	"\x11range_key_elision\x18\f \x01(\v2\x1a.basaltpb.TombstoneElisionR\x0frangeKeyElision\x127\n" +
+	"\x18is_bottommost_data_layer\x18\r \x01(\bR\x15isBottommostDataLayer\x12#\n" +
+	"\rcomparer_name\x18\x0e \x01(\tR\fcomparerName\x12\x1f\n" +
+	"\vmerger_name\x18\x0f \x01(\tR\n" +
+	"mergerName\x12@\n" +
+	"\x11existing_l0_files\x18\x10 \x03(\v2\x14.basaltpb.L0FileMetaR\x0fexistingL0Files\"\x81\x01\n" +
+	"\x0fCompactResponse\x12@\n" +
+	"\x0foutput_sstables\x18\x01 \x03(\v2\x17.basaltpb.OutputSSTMetaR\x0eoutputSstables\x12,\n" +
+	"\x05stats\x18\x02 \x01(\v2\x16.basaltpb.CompactStatsR\x05stats\"\x8d\x02\n" +
+	"\fCompactStats\x12\x1f\n" +
+	"\vinput_bytes\x18\x01 \x01(\x03R\n" +
+	"inputBytes\x12!\n" +
+	"\foutput_bytes\x18\x02 \x01(\x03R\voutputBytes\x12&\n" +
+	"\x0fnum_input_files\x18\x03 \x01(\x05R\rnumInputFiles\x12(\n" +
+	"\x10num_output_files\x18\x04 \x01(\x05R\x0enumOutputFiles\x12\x1f\n" +
+	"\vduration_ms\x18\x05 \x01(\x03R\n" +
+	"durationMs\x12!\n" +
+	"\fpinned_bytes\x18\x06 \x01(\x03R\vpinnedBytes\x12#\n" +
+	"\rdeleted_bytes\x18\a \x01(\x03R\fdeletedBytes*J\n" +
+	"\x14TombstoneElisionMode\x12\x11\n" +
+	"\rELIDE_NOTHING\x10\x00\x12\x1f\n" +
+	"\x1bELIDE_OUTSIDE_IN_USE_RANGES\x10\x01*j\n" +
+	"\x0fCompressionType\x12\x14\n" +
+	"\x10COMPRESSION_NONE\x10\x00\x12\x16\n" +
+	"\x12COMPRESSION_SNAPPY\x10\x01\x12\x14\n" +
+	"\x10COMPRESSION_ZSTD\x10\x02\x12\x13\n" +
+	"\x0fCOMPRESSION_LZ4\x10\x032\x85\x01\n" +
 	"\tCompactor\x128\n" +
 	"\x05Flush\x12\x16.basaltpb.FlushRequest\x1a\x17.basaltpb.FlushResponse\x12>\n" +
 	"\aCompact\x12\x18.basaltpb.CompactRequest\x1a\x19.basaltpb.CompactResponseB.Z,github.com/cockroachdb/basaltclient/basaltpbb\x06proto3"
@@ -258,32 +1605,65 @@ func file_basaltpb_compactor_proto_rawDescGZIP() []byte {
 	return file_basaltpb_compactor_proto_rawDescData
 }
 
-var file_basaltpb_compactor_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_basaltpb_compactor_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
+var file_basaltpb_compactor_proto_msgTypes = make([]protoimpl.MessageInfo, 17)
 var file_basaltpb_compactor_proto_goTypes = []any{
-	(*FlushRequest)(nil),    // 0: basaltpb.FlushRequest
-	(*FlushResponse)(nil),   // 1: basaltpb.FlushResponse
-	(*CompactRequest)(nil),  // 2: basaltpb.CompactRequest
-	(*CompactResponse)(nil), // 3: basaltpb.CompactResponse
-	(*MountID)(nil),         // 4: basaltpb.MountID
-	(*ObjectID)(nil),        // 5: basaltpb.ObjectID
-	(*ObjectMeta)(nil),      // 6: basaltpb.ObjectMeta
+	(TombstoneElisionMode)(0), // 0: basaltpb.TombstoneElisionMode
+	(CompressionType)(0),      // 1: basaltpb.CompressionType
+	(*ObjectRef)(nil),         // 2: basaltpb.ObjectRef
+	(*InternalKey)(nil),       // 3: basaltpb.InternalKey
+	(*KeyBounds)(nil),         // 4: basaltpb.KeyBounds
+	(*UserKeyBounds)(nil),     // 5: basaltpb.UserKeyBounds
+	(*InputSSTMeta)(nil),      // 6: basaltpb.InputSSTMeta
+	(*GrandparentMeta)(nil),   // 7: basaltpb.GrandparentMeta
+	(*OutputSSTMeta)(nil),     // 8: basaltpb.OutputSSTMeta
+	(*TableStats)(nil),        // 9: basaltpb.TableStats
+	(*TombstoneElision)(nil),  // 10: basaltpb.TombstoneElision
+	(*CompactionOptions)(nil), // 11: basaltpb.CompactionOptions
+	(*L0FileMeta)(nil),        // 12: basaltpb.L0FileMeta
+	(*FlushRequest)(nil),      // 13: basaltpb.FlushRequest
+	(*FlushResponse)(nil),     // 14: basaltpb.FlushResponse
+	(*FlushStats)(nil),        // 15: basaltpb.FlushStats
+	(*CompactRequest)(nil),    // 16: basaltpb.CompactRequest
+	(*CompactResponse)(nil),   // 17: basaltpb.CompactResponse
+	(*CompactStats)(nil),      // 18: basaltpb.CompactStats
 }
 var file_basaltpb_compactor_proto_depIdxs = []int32{
-	4, // 0: basaltpb.FlushRequest.mount_id:type_name -> basaltpb.MountID
-	5, // 1: basaltpb.FlushRequest.memtable_objects:type_name -> basaltpb.ObjectID
-	6, // 2: basaltpb.FlushResponse.output_tables:type_name -> basaltpb.ObjectMeta
-	4, // 3: basaltpb.CompactRequest.mount_id:type_name -> basaltpb.MountID
-	5, // 4: basaltpb.CompactRequest.input_tables:type_name -> basaltpb.ObjectID
-	6, // 5: basaltpb.CompactResponse.output_tables:type_name -> basaltpb.ObjectMeta
-	0, // 6: basaltpb.Compactor.Flush:input_type -> basaltpb.FlushRequest
-	2, // 7: basaltpb.Compactor.Compact:input_type -> basaltpb.CompactRequest
-	1, // 8: basaltpb.Compactor.Flush:output_type -> basaltpb.FlushResponse
-	3, // 9: basaltpb.Compactor.Compact:output_type -> basaltpb.CompactResponse
-	8, // [8:10] is the sub-list for method output_type
-	6, // [6:8] is the sub-list for method input_type
-	6, // [6:6] is the sub-list for extension type_name
-	6, // [6:6] is the sub-list for extension extendee
-	0, // [0:6] is the sub-list for field type_name
+	3,  // 0: basaltpb.KeyBounds.smallest:type_name -> basaltpb.InternalKey
+	3,  // 1: basaltpb.KeyBounds.largest:type_name -> basaltpb.InternalKey
+	2,  // 2: basaltpb.InputSSTMeta.ref:type_name -> basaltpb.ObjectRef
+	4,  // 3: basaltpb.InputSSTMeta.bounds:type_name -> basaltpb.KeyBounds
+	5,  // 4: basaltpb.GrandparentMeta.bounds:type_name -> basaltpb.UserKeyBounds
+	4,  // 5: basaltpb.OutputSSTMeta.bounds:type_name -> basaltpb.KeyBounds
+	9,  // 6: basaltpb.OutputSSTMeta.stats:type_name -> basaltpb.TableStats
+	0,  // 7: basaltpb.TombstoneElision.mode:type_name -> basaltpb.TombstoneElisionMode
+	5,  // 8: basaltpb.TombstoneElision.in_use_key_ranges:type_name -> basaltpb.UserKeyBounds
+	1,  // 9: basaltpb.CompactionOptions.compression:type_name -> basaltpb.CompressionType
+	5,  // 10: basaltpb.L0FileMeta.bounds:type_name -> basaltpb.UserKeyBounds
+	2,  // 11: basaltpb.FlushRequest.wal_objects:type_name -> basaltpb.ObjectRef
+	7,  // 12: basaltpb.FlushRequest.grandparents:type_name -> basaltpb.GrandparentMeta
+	11, // 13: basaltpb.FlushRequest.options:type_name -> basaltpb.CompactionOptions
+	12, // 14: basaltpb.FlushRequest.existing_l0_files:type_name -> basaltpb.L0FileMeta
+	8,  // 15: basaltpb.FlushResponse.output_sstables:type_name -> basaltpb.OutputSSTMeta
+	15, // 16: basaltpb.FlushResponse.stats:type_name -> basaltpb.FlushStats
+	6,  // 17: basaltpb.CompactRequest.input_sstables:type_name -> basaltpb.InputSSTMeta
+	5,  // 18: basaltpb.CompactRequest.bounds:type_name -> basaltpb.UserKeyBounds
+	7,  // 19: basaltpb.CompactRequest.grandparents:type_name -> basaltpb.GrandparentMeta
+	11, // 20: basaltpb.CompactRequest.options:type_name -> basaltpb.CompactionOptions
+	10, // 21: basaltpb.CompactRequest.del_elision:type_name -> basaltpb.TombstoneElision
+	10, // 22: basaltpb.CompactRequest.range_key_elision:type_name -> basaltpb.TombstoneElision
+	12, // 23: basaltpb.CompactRequest.existing_l0_files:type_name -> basaltpb.L0FileMeta
+	8,  // 24: basaltpb.CompactResponse.output_sstables:type_name -> basaltpb.OutputSSTMeta
+	18, // 25: basaltpb.CompactResponse.stats:type_name -> basaltpb.CompactStats
+	13, // 26: basaltpb.Compactor.Flush:input_type -> basaltpb.FlushRequest
+	16, // 27: basaltpb.Compactor.Compact:input_type -> basaltpb.CompactRequest
+	14, // 28: basaltpb.Compactor.Flush:output_type -> basaltpb.FlushResponse
+	17, // 29: basaltpb.Compactor.Compact:output_type -> basaltpb.CompactResponse
+	28, // [28:30] is the sub-list for method output_type
+	26, // [26:28] is the sub-list for method input_type
+	26, // [26:26] is the sub-list for extension type_name
+	26, // [26:26] is the sub-list for extension extendee
+	0,  // [0:26] is the sub-list for field type_name
 }
 
 func init() { file_basaltpb_compactor_proto_init() }
@@ -291,19 +1671,19 @@ func file_basaltpb_compactor_proto_init() {
 	if File_basaltpb_compactor_proto != nil {
 		return
 	}
-	file_basaltpb_common_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_basaltpb_compactor_proto_rawDesc), len(file_basaltpb_compactor_proto_rawDesc)),
-			NumEnums:      0,
-			NumMessages:   4,
+			NumEnums:      2,
+			NumMessages:   17,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_basaltpb_compactor_proto_goTypes,
 		DependencyIndexes: file_basaltpb_compactor_proto_depIdxs,
+		EnumInfos:         file_basaltpb_compactor_proto_enumTypes,
 		MessageInfos:      file_basaltpb_compactor_proto_msgTypes,
 	}.Build()
 	File_basaltpb_compactor_proto = out.File

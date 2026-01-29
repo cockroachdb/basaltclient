@@ -4,43 +4,236 @@ package basaltpb;
 
 option go_package = "github.com/cockroachdb/basaltclient/basaltpb";
 
-import "basaltpb/common.proto";
+// =============================================================================
+// Common Types
+// =============================================================================
 
-// Compactor performs flush and compaction operations on behalf of mounts.
-// Compactors run Pebble in a special mode that reads from blob servers
-// and writes new objects back to blob servers.
+// ObjectRef references a blob object by UUID and includes its size.
+message ObjectRef {
+  bytes object_id = 1;  // UUID
+  int64 size = 2;       // Size in bytes
+}
+
+// InternalKey represents a Pebble internal key with user key, sequence number,
+// and key kind.
+message InternalKey {
+  bytes user_key = 1;
+  uint64 seq_num = 2;
+  uint32 kind = 3;      // base.InternalKeyKind
+}
+
+// KeyBounds represents a range of internal keys.
+message KeyBounds {
+  InternalKey smallest = 1;
+  InternalKey largest = 2;
+}
+
+// UserKeyBounds represents a range of user keys.
+message UserKeyBounds {
+  bytes start = 1;
+  bytes end = 2;
+  bool end_exclusive = 3;
+}
+
+// =============================================================================
+// SSTable Metadata
+// =============================================================================
+
+// InputSSTMeta describes an input SSTable for compaction. Includes full
+// metadata and object reference for reading.
+message InputSSTMeta {
+  ObjectRef ref = 1;
+  int32 level = 2;
+  int32 sublevel = 3;        // L0 only
+  KeyBounds bounds = 4;
+  uint64 seq_num_low = 5;
+  uint64 seq_num_high = 6;
+  bool has_point_keys = 7;
+  bool has_range_keys = 8;
+}
+
+// GrandparentMeta describes a grandparent SSTable (in outputLevel+1). Only
+// bounds and size are needed since grandparents are not read during compaction.
+message GrandparentMeta {
+  UserKeyBounds bounds = 1;
+  int64 size = 2;
+}
+
+// OutputSSTMeta describes an output SSTable created by flush or compaction.
+message OutputSSTMeta {
+  bytes object_id = 1;       // UUID
+  int64 size = 2;
+  KeyBounds bounds = 3;
+  uint64 seq_num_low = 4;
+  uint64 seq_num_high = 5;
+  int32 level = 6;
+  int32 sublevel = 7;        // L0 only
+  bool has_point_keys = 8;
+  bool has_range_keys = 9;
+  TableStats stats = 10;
+}
+
+// TableStats contains statistics about an SSTable.
+message TableStats {
+  uint64 num_entries = 1;
+  uint64 num_deletions = 2;
+  uint64 num_range_deletions = 3;
+  uint64 raw_key_size = 4;
+  uint64 raw_value_size = 5;
+}
+
+// =============================================================================
+// Tombstone Elision
+// =============================================================================
+
+// TombstoneElisionMode controls when tombstones can be elided.
+enum TombstoneElisionMode {
+  ELIDE_NOTHING = 0;
+  ELIDE_OUTSIDE_IN_USE_RANGES = 1;
+}
+
+// TombstoneElision specifies the tombstone elision policy.
+message TombstoneElision {
+  TombstoneElisionMode mode = 1;
+  repeated UserKeyBounds in_use_key_ranges = 2;
+}
+
+// =============================================================================
+// Compaction Options
+// =============================================================================
+
+// CompressionType specifies the compression algorithm for SSTable blocks.
+enum CompressionType {
+  COMPRESSION_NONE = 0;
+  COMPRESSION_SNAPPY = 1;
+  COMPRESSION_ZSTD = 2;
+  COMPRESSION_LZ4 = 3;
+}
+
+// CompactionOptions controls SSTable output formatting and splitting.
+message CompactionOptions {
+  int64 target_file_size = 1;
+  int64 max_grandparent_overlap_bytes = 2;
+  int32 block_size = 3;
+  CompressionType compression = 4;
+  int32 filter_bits_per_key = 5;
+}
+
+// =============================================================================
+// L0 State
+// =============================================================================
+
+// L0FileMeta describes an existing L0 file for sublevel assignment.
+message L0FileMeta {
+  UserKeyBounds bounds = 1;
+  int32 sublevel = 2;
+}
+
+// =============================================================================
+// Flush Request/Response
+// =============================================================================
+
+// FlushRequest contains all state needed for a remote flush operation.
+message FlushRequest {
+  // Version compatibility - worker execs binary with matching Pebble version.
+  uint64 format_major_version = 1;
+
+  bytes store_id = 2;                  // UUID
+  repeated ObjectRef wal_objects = 3;  // 1:1 with logical WAL/memtable
+  bytes encryption_key = 4;
+
+  // Output splitting
+  repeated bytes l0_split_keys = 5;
+  int32 base_level = 6;
+  repeated GrandparentMeta grandparents = 7;
+
+  // Options
+  CompactionOptions options = 8;
+
+  // Iteration config
+  string comparer_name = 9;
+  string merger_name = 10;
+
+  // L0 sublevel assignment
+  repeated L0FileMeta existing_l0_files = 11;
+}
+
+// FlushResponse contains the result of a flush operation.
+message FlushResponse {
+  repeated OutputSSTMeta output_sstables = 1;
+  FlushStats stats = 2;
+}
+
+// FlushStats contains statistics about a flush operation.
+message FlushStats {
+  int64 input_bytes = 1;
+  int64 output_bytes = 2;
+  int32 num_output_files = 3;
+  int64 duration_ms = 4;
+}
+
+// =============================================================================
+// Compact Request/Response
+// =============================================================================
+
+// CompactRequest contains all state needed for a remote compaction operation.
+message CompactRequest {
+  // Version compatibility - worker execs binary with matching Pebble version.
+  uint64 format_major_version = 1;
+
+  bytes store_id = 2;                      // UUID
+  repeated InputSSTMeta input_sstables = 3;
+  int32 start_level = 4;
+  int32 output_level = 5;
+  bytes encryption_key = 6;
+
+  // Compaction bounds
+  UserKeyBounds bounds = 7;
+
+  // Output splitting
+  repeated GrandparentMeta grandparents = 8;
+  CompactionOptions options = 9;
+
+  // Tombstone elision
+  repeated uint64 snapshots = 10;  // Active snapshot seqnums, ascending
+  TombstoneElision del_elision = 11;
+  TombstoneElision range_key_elision = 12;
+  bool is_bottommost_data_layer = 13;
+
+  // Iteration config
+  string comparer_name = 14;
+  string merger_name = 15;
+
+  // L0-specific (for intra-L0 and sublevel assignment)
+  repeated L0FileMeta existing_l0_files = 16;
+}
+
+// CompactResponse contains the result of a compaction operation.
+message CompactResponse {
+  repeated OutputSSTMeta output_sstables = 1;
+  CompactStats stats = 2;
+}
+
+// CompactStats contains statistics about a compaction operation.
+message CompactStats {
+  int64 input_bytes = 1;
+  int64 output_bytes = 2;
+  int32 num_input_files = 3;
+  int32 num_output_files = 4;
+  int64 duration_ms = 5;
+  int64 pinned_bytes = 6;
+  int64 deleted_bytes = 7;
+}
+
+// =============================================================================
+// Service Definition
+// =============================================================================
+
+// Compactor is the gRPC service for remote flush and compaction operations.
 service Compactor {
-  // Flush triggers a memtable flush for a mount.
+  // Flush replays WAL objects and creates L0 SSTables.
   rpc Flush(FlushRequest) returns (FlushResponse);
 
-  // Compact triggers a compaction for a mount.
+  // Compact merges input SSTables and creates output SSTables.
   rpc Compact(CompactRequest) returns (CompactResponse);
-
-  // TODO: Add additional RPCs:
-  // - Status for checking compaction progress
-  // - Cancel for aborting a compaction
-}
-
-message FlushRequest {
-  MountID mount_id = 1;
-  // Objects containing the memtable data to flush.
-  repeated ObjectID memtable_objects = 2;
-}
-
-message FlushResponse {
-  // New SSTable objects created by the flush.
-  repeated ObjectMeta output_tables = 1;
-}
-
-message CompactRequest {
-  MountID mount_id = 1;
-  // Input SSTable objects to compact.
-  repeated ObjectID input_tables = 2;
-  // Target level for the compaction output.
-  int32 output_level = 3;
-}
-
-message CompactResponse {
-  // New SSTable objects created by the compaction.
-  repeated ObjectMeta output_tables = 1;
 }
