@@ -172,3 +172,8 @@ func (c *DataClient) Read(id ObjectID, offset uint64, p []byte) (int, error) {
 		Length:   uint64(len(p)),
 	}, nil, p)
 }
+
+// Addr returns the server address this client connects to.
+func (c *DataClient) Addr() string {
+	return c.addr
+}

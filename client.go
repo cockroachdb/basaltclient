@@ -69,6 +69,25 @@ func NewBlobDataClient(addr string) *BlobDataClient {
 	return blob.NewDataClient(addr)
 }
 
+// BlobDataClientPool manages pooled connections to blob server data endpoints.
+// It maintains separate per-server pools and provides exclusive access to
+// clients via acquire/release semantics.
+type BlobDataClientPool = blob.DataClientPool
+
+// BlobDataClientPoolOption configures a BlobDataClientPool.
+type BlobDataClientPoolOption = blob.DataClientPoolOption
+
+// WithBlobPoolSize sets the maximum number of connections per server.
+// The default is 8.
+func WithBlobPoolSize(size int) BlobDataClientPoolOption {
+	return blob.WithPoolSize(size)
+}
+
+// NewBlobDataClientPool creates a new data client pool.
+func NewBlobDataClientPool(opts ...BlobDataClientPoolOption) *BlobDataClientPool {
+	return blob.NewDataClientPool(opts...)
+}
+
 // QuorumWriter provides dedicated WAL writing with quorum semantics.
 // It uses persistent connections per replica and persistent goroutines
 // per replica. Writes complete when a quorum of replicas acknowledge,
