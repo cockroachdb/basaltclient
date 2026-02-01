@@ -8,29 +8,53 @@ import "basaltpb/common.proto";
 
 // Controller coordinates object placement, mounts, and repairs in Basalt.
 service Controller {
-  // Mount registers a new Pebble instance and returns its mount ID.
-  // The mount ID is used to fence operations and coordinate with compactors.
+  // Mount registers a Pebble instance and acquires exclusive write access
+  // to its store directory. Returns the mount ID and directory ID.
   rpc Mount(MountRequest) returns (MountResponse);
 
-  // Unmount deregisters a Pebble instance.
+  // Unmount releases the write lock on a store directory.
   rpc Unmount(UnmountRequest) returns (UnmountResponse);
 
-  // Create allocates a new object and selects replicas for it.
-  // Returns the object ID and replica locations.
+  // Create allocates a new file in a directory and selects replicas.
+  // Requires the caller to hold a mount for the directory, or the directory
+  // must not be mounted by anyone.
   rpc Create(CreateRequest) returns (CreateResponse);
 
-  // Lookup returns metadata for an existing object.
+  // Lookup returns metadata for an object by ID or (directory_id, name).
+  // Does not require a mount.
   rpc Lookup(LookupRequest) returns (LookupResponse);
 
-  // Delete removes an object from the system.
+  // Delete removes an entry from a directory. If this was the last reference
+  // to the object, the object and its replicas are scheduled for deletion.
+  // Requires mount or unmounted directory.
   rpc Delete(DeleteRequest) returns (DeleteResponse);
 
-  // Seal marks an object as immutable.
+  // Seal marks an object as immutable with its final size.
+  // Requires mount or unmounted directory.
   rpc Seal(SealRequest) returns (SealResponse);
+
+  // Mkdir creates a subdirectory within a directory.
+  // Requires mount or unmounted directory.
+  rpc Mkdir(MkdirRequest) returns (MkdirResponse);
+
+  // Rmdir removes an empty directory.
+  // Requires mount or unmounted directory.
+  rpc Rmdir(RmdirRequest) returns (RmdirResponse);
+
+  // List returns all entries in a directory as a stream.
+  // Does not require a mount.
+  rpc List(ListRequest) returns (stream DirectoryEntry);
+
+  // Link creates a hardlink to an existing object in a directory.
+  // Requires mount or unmounted directory.
+  rpc Link(LinkRequest) returns (LinkResponse);
+
+  // Rename moves an entry within the same directory.
+  // Requires mount or unmounted directory.
+  rpc Rename(RenameRequest) returns (RenameResponse);
 
   // TODO: Add additional RPCs:
   // - Heartbeat for mount liveness
-  // - ListObjects for directory enumeration
   // - ReportFailure for replica health reporting
 }
 
@@ -39,11 +63,19 @@ message MountRequest {
   string instance_id = 1;
   // Availability zone of the mounting node.
   string az = 2;
+  // UUID of the CockroachDB cluster.
+  bytes cluster_id = 3;
+  // UUID of the store within the cluster.
+  bytes store_id = 4;
 }
 
 message MountResponse {
   // Unique mount ID for this session.
   MountID mount_id = 1;
+  // Root directory ID for the mounted store.
+  DirectoryID directory_id = 2;
+  // Write token for authenticating with blob servers.
+  bytes write_token = 3;
 }
 
 message UnmountRequest {
@@ -53,8 +85,9 @@ message UnmountRequest {
 message UnmountResponse {}
 
 message CreateRequest {
-  MountID mount_id = 1;
-  // Logical path/name for the object (e.g., "000001.sst").
+  // Directory in which to create the file.
+  DirectoryID directory_id = 1;
+  // Name for the new file.
   string name = 2;
   // Desired replication factor.
   int32 replication = 3;
@@ -64,31 +97,93 @@ message CreateResponse {
   ObjectMeta meta = 1;
 }
 
+// DirectoryLookup specifies a lookup by (directory_id, name) pair.
+message DirectoryLookup {
+  DirectoryID directory_id = 1;
+  string name = 2;
+}
+
 message LookupRequest {
-  MountID mount_id = 1;
-  // Object to look up by ID or name.
+  // Object to look up by ID or directory entry.
   oneof key {
-    ObjectID id = 2;
-    string name = 3;
+    ObjectID object_id = 1;
+    DirectoryLookup directory_lookup = 2;
   }
 }
 
 message LookupResponse {
   ObjectMeta meta = 1;
+  // Type of the entry (file or directory).
+  EntryType type = 2;
 }
 
 message DeleteRequest {
-  MountID mount_id = 1;
-  ObjectID id = 2;
+  // Directory containing the entry to delete.
+  DirectoryID directory_id = 1;
+  // Name of the entry to delete.
+  string name = 2;
 }
 
-message DeleteResponse {}
+message DeleteResponse {
+  // Object ID that was unlinked (for files only).
+  ObjectID object_id = 1;
+  // True if this was the last reference and the object will be deleted.
+  bool object_deleted = 2;
+}
 
 message SealRequest {
-  MountID mount_id = 1;
-  ObjectID id = 2;
+  // Object to seal.
+  ObjectID object_id = 1;
   // Final size of the object.
-  int64 size = 3;
+  int64 size = 2;
 }
 
 message SealResponse {}
+
+message MkdirRequest {
+  // Parent directory in which to create the subdirectory.
+  DirectoryID parent_id = 1;
+  // Name for the new directory.
+  string name = 2;
+}
+
+message MkdirResponse {
+  // ID of the newly created directory.
+  DirectoryID directory_id = 1;
+}
+
+message RmdirRequest {
+  // Parent directory containing the directory to remove.
+  DirectoryID parent_id = 1;
+  // Name of the directory to remove.
+  string name = 2;
+}
+
+message RmdirResponse {}
+
+message ListRequest {
+  // Directory to list.
+  DirectoryID directory_id = 1;
+}
+
+message LinkRequest {
+  // Directory in which to create the link.
+  DirectoryID directory_id = 1;
+  // Name for the new link.
+  string name = 2;
+  // Existing object to link to.
+  ObjectID object_id = 3;
+}
+
+message LinkResponse {}
+
+message RenameRequest {
+  // Directory containing the entry to rename.
+  DirectoryID directory_id = 1;
+  // Current name of the entry.
+  string old_name = 2;
+  // New name for the entry.
+  string new_name = 3;
+}
+
+message RenameResponse {}

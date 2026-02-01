@@ -21,6 +21,56 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// EntryType distinguishes files from directories in the namespace.
+type EntryType int32
+
+const (
+	EntryType_ENTRY_TYPE_UNSPECIFIED EntryType = 0
+	EntryType_ENTRY_TYPE_FILE        EntryType = 1
+	EntryType_ENTRY_TYPE_DIRECTORY   EntryType = 2
+)
+
+// Enum value maps for EntryType.
+var (
+	EntryType_name = map[int32]string{
+		0: "ENTRY_TYPE_UNSPECIFIED",
+		1: "ENTRY_TYPE_FILE",
+		2: "ENTRY_TYPE_DIRECTORY",
+	}
+	EntryType_value = map[string]int32{
+		"ENTRY_TYPE_UNSPECIFIED": 0,
+		"ENTRY_TYPE_FILE":        1,
+		"ENTRY_TYPE_DIRECTORY":   2,
+	}
+)
+
+func (x EntryType) Enum() *EntryType {
+	p := new(EntryType)
+	*p = x
+	return p
+}
+
+func (x EntryType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (EntryType) Descriptor() protoreflect.EnumDescriptor {
+	return file_basaltpb_common_proto_enumTypes[0].Descriptor()
+}
+
+func (EntryType) Type() protoreflect.EnumType {
+	return &file_basaltpb_common_proto_enumTypes[0]
+}
+
+func (x EntryType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use EntryType.Descriptor instead.
+func (EntryType) EnumDescriptor() ([]byte, []int) {
+	return file_basaltpb_common_proto_rawDescGZIP(), []int{0}
+}
+
 // ObjectID uniquely identifies an object in the Basalt storage system.
 type ObjectID struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -241,6 +291,135 @@ func (x *MountID) GetUuid() []byte {
 	return nil
 }
 
+// DirectoryID identifies a directory in the namespace.
+// The nil UUID represents the namespace root.
+type DirectoryID struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// UUID of the directory as 16 bytes. Nil UUID = namespace root.
+	Uuid          []byte `protobuf:"bytes,1,opt,name=uuid,proto3" json:"uuid,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DirectoryID) Reset() {
+	*x = DirectoryID{}
+	mi := &file_basaltpb_common_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DirectoryID) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DirectoryID) ProtoMessage() {}
+
+func (x *DirectoryID) ProtoReflect() protoreflect.Message {
+	mi := &file_basaltpb_common_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DirectoryID.ProtoReflect.Descriptor instead.
+func (*DirectoryID) Descriptor() ([]byte, []int) {
+	return file_basaltpb_common_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *DirectoryID) GetUuid() []byte {
+	if x != nil {
+		return x.Uuid
+	}
+	return nil
+}
+
+// DirectoryEntry represents an entry in a directory listing.
+type DirectoryEntry struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Name of the entry within its parent directory.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// Type of entry (file or directory).
+	Type EntryType `protobuf:"varint,2,opt,name=type,proto3,enum=basaltpb.EntryType" json:"type,omitempty"`
+	// ID of the target: object_id for files, directory_id for directories.
+	Id []byte `protobuf:"bytes,3,opt,name=id,proto3" json:"id,omitempty"`
+	// Size in bytes (only set for sealed files).
+	Size int64 `protobuf:"varint,4,opt,name=size,proto3" json:"size,omitempty"`
+	// Whether the file is sealed (only applicable to files).
+	Sealed        bool `protobuf:"varint,5,opt,name=sealed,proto3" json:"sealed,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DirectoryEntry) Reset() {
+	*x = DirectoryEntry{}
+	mi := &file_basaltpb_common_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DirectoryEntry) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DirectoryEntry) ProtoMessage() {}
+
+func (x *DirectoryEntry) ProtoReflect() protoreflect.Message {
+	mi := &file_basaltpb_common_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DirectoryEntry.ProtoReflect.Descriptor instead.
+func (*DirectoryEntry) Descriptor() ([]byte, []int) {
+	return file_basaltpb_common_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *DirectoryEntry) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *DirectoryEntry) GetType() EntryType {
+	if x != nil {
+		return x.Type
+	}
+	return EntryType_ENTRY_TYPE_UNSPECIFIED
+}
+
+func (x *DirectoryEntry) GetId() []byte {
+	if x != nil {
+		return x.Id
+	}
+	return nil
+}
+
+func (x *DirectoryEntry) GetSize() int64 {
+	if x != nil {
+		return x.Size
+	}
+	return 0
+}
+
+func (x *DirectoryEntry) GetSealed() bool {
+	if x != nil {
+		return x.Sealed
+	}
+	return false
+}
+
 var File_basaltpb_common_proto protoreflect.FileDescriptor
 
 const file_basaltpb_common_proto_rawDesc = "" +
@@ -258,7 +437,19 @@ const file_basaltpb_common_proto_rawDesc = "" +
 	"\x04size\x18\x03 \x01(\x03R\x04size\x12\x16\n" +
 	"\x06sealed\x18\x04 \x01(\bR\x06sealed\"\x1d\n" +
 	"\aMountID\x12\x12\n" +
-	"\x04uuid\x18\x01 \x01(\fR\x04uuidB.Z,github.com/cockroachdb/basaltclient/basaltpbb\x06proto3"
+	"\x04uuid\x18\x01 \x01(\fR\x04uuid\"!\n" +
+	"\vDirectoryID\x12\x12\n" +
+	"\x04uuid\x18\x01 \x01(\fR\x04uuid\"\x89\x01\n" +
+	"\x0eDirectoryEntry\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12'\n" +
+	"\x04type\x18\x02 \x01(\x0e2\x13.basaltpb.EntryTypeR\x04type\x12\x0e\n" +
+	"\x02id\x18\x03 \x01(\fR\x02id\x12\x12\n" +
+	"\x04size\x18\x04 \x01(\x03R\x04size\x12\x16\n" +
+	"\x06sealed\x18\x05 \x01(\bR\x06sealed*V\n" +
+	"\tEntryType\x12\x1a\n" +
+	"\x16ENTRY_TYPE_UNSPECIFIED\x10\x00\x12\x13\n" +
+	"\x0fENTRY_TYPE_FILE\x10\x01\x12\x18\n" +
+	"\x14ENTRY_TYPE_DIRECTORY\x10\x02B.Z,github.com/cockroachdb/basaltclient/basaltpbb\x06proto3"
 
 var (
 	file_basaltpb_common_proto_rawDescOnce sync.Once
@@ -272,21 +463,26 @@ func file_basaltpb_common_proto_rawDescGZIP() []byte {
 	return file_basaltpb_common_proto_rawDescData
 }
 
-var file_basaltpb_common_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_basaltpb_common_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_basaltpb_common_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_basaltpb_common_proto_goTypes = []any{
-	(*ObjectID)(nil),    // 0: basaltpb.ObjectID
-	(*ReplicaInfo)(nil), // 1: basaltpb.ReplicaInfo
-	(*ObjectMeta)(nil),  // 2: basaltpb.ObjectMeta
-	(*MountID)(nil),     // 3: basaltpb.MountID
+	(EntryType)(0),         // 0: basaltpb.EntryType
+	(*ObjectID)(nil),       // 1: basaltpb.ObjectID
+	(*ReplicaInfo)(nil),    // 2: basaltpb.ReplicaInfo
+	(*ObjectMeta)(nil),     // 3: basaltpb.ObjectMeta
+	(*MountID)(nil),        // 4: basaltpb.MountID
+	(*DirectoryID)(nil),    // 5: basaltpb.DirectoryID
+	(*DirectoryEntry)(nil), // 6: basaltpb.DirectoryEntry
 }
 var file_basaltpb_common_proto_depIdxs = []int32{
-	0, // 0: basaltpb.ObjectMeta.id:type_name -> basaltpb.ObjectID
-	1, // 1: basaltpb.ObjectMeta.replicas:type_name -> basaltpb.ReplicaInfo
-	2, // [2:2] is the sub-list for method output_type
-	2, // [2:2] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	1, // 0: basaltpb.ObjectMeta.id:type_name -> basaltpb.ObjectID
+	2, // 1: basaltpb.ObjectMeta.replicas:type_name -> basaltpb.ReplicaInfo
+	0, // 2: basaltpb.DirectoryEntry.type:type_name -> basaltpb.EntryType
+	3, // [3:3] is the sub-list for method output_type
+	3, // [3:3] is the sub-list for method input_type
+	3, // [3:3] is the sub-list for extension type_name
+	3, // [3:3] is the sub-list for extension extendee
+	0, // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_basaltpb_common_proto_init() }
@@ -299,13 +495,14 @@ func file_basaltpb_common_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_basaltpb_common_proto_rawDesc), len(file_basaltpb_common_proto_rawDesc)),
-			NumEnums:      0,
-			NumMessages:   4,
+			NumEnums:      1,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
 		GoTypes:           file_basaltpb_common_proto_goTypes,
 		DependencyIndexes: file_basaltpb_common_proto_depIdxs,
+		EnumInfos:         file_basaltpb_common_proto_enumTypes,
 		MessageInfos:      file_basaltpb_common_proto_msgTypes,
 	}.Build()
 	File_basaltpb_common_proto = out.File

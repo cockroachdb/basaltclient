@@ -26,7 +26,11 @@ type MountRequest struct {
 	// Identifier for this Pebble instance (e.g., node ID + store ID).
 	InstanceId string `protobuf:"bytes,1,opt,name=instance_id,json=instanceId,proto3" json:"instance_id,omitempty"`
 	// Availability zone of the mounting node.
-	Az            string `protobuf:"bytes,2,opt,name=az,proto3" json:"az,omitempty"`
+	Az string `protobuf:"bytes,2,opt,name=az,proto3" json:"az,omitempty"`
+	// UUID of the CockroachDB cluster.
+	ClusterId []byte `protobuf:"bytes,3,opt,name=cluster_id,json=clusterId,proto3" json:"cluster_id,omitempty"`
+	// UUID of the store within the cluster.
+	StoreId       []byte `protobuf:"bytes,4,opt,name=store_id,json=storeId,proto3" json:"store_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -75,10 +79,28 @@ func (x *MountRequest) GetAz() string {
 	return ""
 }
 
+func (x *MountRequest) GetClusterId() []byte {
+	if x != nil {
+		return x.ClusterId
+	}
+	return nil
+}
+
+func (x *MountRequest) GetStoreId() []byte {
+	if x != nil {
+		return x.StoreId
+	}
+	return nil
+}
+
 type MountResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Unique mount ID for this session.
-	MountId       *MountID `protobuf:"bytes,1,opt,name=mount_id,json=mountId,proto3" json:"mount_id,omitempty"`
+	MountId *MountID `protobuf:"bytes,1,opt,name=mount_id,json=mountId,proto3" json:"mount_id,omitempty"`
+	// Root directory ID for the mounted store.
+	DirectoryId *DirectoryID `protobuf:"bytes,2,opt,name=directory_id,json=directoryId,proto3" json:"directory_id,omitempty"`
+	// Write token for authenticating with blob servers.
+	WriteToken    []byte `protobuf:"bytes,3,opt,name=write_token,json=writeToken,proto3" json:"write_token,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -116,6 +138,20 @@ func (*MountResponse) Descriptor() ([]byte, []int) {
 func (x *MountResponse) GetMountId() *MountID {
 	if x != nil {
 		return x.MountId
+	}
+	return nil
+}
+
+func (x *MountResponse) GetDirectoryId() *DirectoryID {
+	if x != nil {
+		return x.DirectoryId
+	}
+	return nil
+}
+
+func (x *MountResponse) GetWriteToken() []byte {
+	if x != nil {
+		return x.WriteToken
 	}
 	return nil
 }
@@ -201,9 +237,10 @@ func (*UnmountResponse) Descriptor() ([]byte, []int) {
 }
 
 type CreateRequest struct {
-	state   protoimpl.MessageState `protogen:"open.v1"`
-	MountId *MountID               `protobuf:"bytes,1,opt,name=mount_id,json=mountId,proto3" json:"mount_id,omitempty"`
-	// Logical path/name for the object (e.g., "000001.sst").
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Directory in which to create the file.
+	DirectoryId *DirectoryID `protobuf:"bytes,1,opt,name=directory_id,json=directoryId,proto3" json:"directory_id,omitempty"`
+	// Name for the new file.
 	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	// Desired replication factor.
 	Replication   int32 `protobuf:"varint,3,opt,name=replication,proto3" json:"replication,omitempty"`
@@ -241,9 +278,9 @@ func (*CreateRequest) Descriptor() ([]byte, []int) {
 	return file_basaltpb_controller_proto_rawDescGZIP(), []int{4}
 }
 
-func (x *CreateRequest) GetMountId() *MountID {
+func (x *CreateRequest) GetDirectoryId() *DirectoryID {
 	if x != nil {
-		return x.MountId
+		return x.DirectoryId
 	}
 	return nil
 }
@@ -306,15 +343,67 @@ func (x *CreateResponse) GetMeta() *ObjectMeta {
 	return nil
 }
 
+// DirectoryLookup specifies a lookup by (directory_id, name) pair.
+type DirectoryLookup struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	DirectoryId   *DirectoryID           `protobuf:"bytes,1,opt,name=directory_id,json=directoryId,proto3" json:"directory_id,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DirectoryLookup) Reset() {
+	*x = DirectoryLookup{}
+	mi := &file_basaltpb_controller_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DirectoryLookup) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DirectoryLookup) ProtoMessage() {}
+
+func (x *DirectoryLookup) ProtoReflect() protoreflect.Message {
+	mi := &file_basaltpb_controller_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DirectoryLookup.ProtoReflect.Descriptor instead.
+func (*DirectoryLookup) Descriptor() ([]byte, []int) {
+	return file_basaltpb_controller_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *DirectoryLookup) GetDirectoryId() *DirectoryID {
+	if x != nil {
+		return x.DirectoryId
+	}
+	return nil
+}
+
+func (x *DirectoryLookup) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
 type LookupRequest struct {
-	state   protoimpl.MessageState `protogen:"open.v1"`
-	MountId *MountID               `protobuf:"bytes,1,opt,name=mount_id,json=mountId,proto3" json:"mount_id,omitempty"`
-	// Object to look up by ID or name.
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Object to look up by ID or directory entry.
 	//
 	// Types that are valid to be assigned to Key:
 	//
-	//	*LookupRequest_Id
-	//	*LookupRequest_Name
+	//	*LookupRequest_ObjectId
+	//	*LookupRequest_DirectoryLookup
 	Key           isLookupRequest_Key `protobuf_oneof:"key"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -322,7 +411,7 @@ type LookupRequest struct {
 
 func (x *LookupRequest) Reset() {
 	*x = LookupRequest{}
-	mi := &file_basaltpb_controller_proto_msgTypes[6]
+	mi := &file_basaltpb_controller_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -334,7 +423,7 @@ func (x *LookupRequest) String() string {
 func (*LookupRequest) ProtoMessage() {}
 
 func (x *LookupRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_basaltpb_controller_proto_msgTypes[6]
+	mi := &file_basaltpb_controller_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -347,14 +436,7 @@ func (x *LookupRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LookupRequest.ProtoReflect.Descriptor instead.
 func (*LookupRequest) Descriptor() ([]byte, []int) {
-	return file_basaltpb_controller_proto_rawDescGZIP(), []int{6}
-}
-
-func (x *LookupRequest) GetMountId() *MountID {
-	if x != nil {
-		return x.MountId
-	}
-	return nil
+	return file_basaltpb_controller_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *LookupRequest) GetKey() isLookupRequest_Key {
@@ -364,50 +446,52 @@ func (x *LookupRequest) GetKey() isLookupRequest_Key {
 	return nil
 }
 
-func (x *LookupRequest) GetId() *ObjectID {
+func (x *LookupRequest) GetObjectId() *ObjectID {
 	if x != nil {
-		if x, ok := x.Key.(*LookupRequest_Id); ok {
-			return x.Id
+		if x, ok := x.Key.(*LookupRequest_ObjectId); ok {
+			return x.ObjectId
 		}
 	}
 	return nil
 }
 
-func (x *LookupRequest) GetName() string {
+func (x *LookupRequest) GetDirectoryLookup() *DirectoryLookup {
 	if x != nil {
-		if x, ok := x.Key.(*LookupRequest_Name); ok {
-			return x.Name
+		if x, ok := x.Key.(*LookupRequest_DirectoryLookup); ok {
+			return x.DirectoryLookup
 		}
 	}
-	return ""
+	return nil
 }
 
 type isLookupRequest_Key interface {
 	isLookupRequest_Key()
 }
 
-type LookupRequest_Id struct {
-	Id *ObjectID `protobuf:"bytes,2,opt,name=id,proto3,oneof"`
+type LookupRequest_ObjectId struct {
+	ObjectId *ObjectID `protobuf:"bytes,1,opt,name=object_id,json=objectId,proto3,oneof"`
 }
 
-type LookupRequest_Name struct {
-	Name string `protobuf:"bytes,3,opt,name=name,proto3,oneof"`
+type LookupRequest_DirectoryLookup struct {
+	DirectoryLookup *DirectoryLookup `protobuf:"bytes,2,opt,name=directory_lookup,json=directoryLookup,proto3,oneof"`
 }
 
-func (*LookupRequest_Id) isLookupRequest_Key() {}
+func (*LookupRequest_ObjectId) isLookupRequest_Key() {}
 
-func (*LookupRequest_Name) isLookupRequest_Key() {}
+func (*LookupRequest_DirectoryLookup) isLookupRequest_Key() {}
 
 type LookupResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Meta          *ObjectMeta            `protobuf:"bytes,1,opt,name=meta,proto3" json:"meta,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Meta  *ObjectMeta            `protobuf:"bytes,1,opt,name=meta,proto3" json:"meta,omitempty"`
+	// Type of the entry (file or directory).
+	Type          EntryType `protobuf:"varint,2,opt,name=type,proto3,enum=basaltpb.EntryType" json:"type,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *LookupResponse) Reset() {
 	*x = LookupResponse{}
-	mi := &file_basaltpb_controller_proto_msgTypes[7]
+	mi := &file_basaltpb_controller_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -419,7 +503,7 @@ func (x *LookupResponse) String() string {
 func (*LookupResponse) ProtoMessage() {}
 
 func (x *LookupResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_basaltpb_controller_proto_msgTypes[7]
+	mi := &file_basaltpb_controller_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -432,7 +516,7 @@ func (x *LookupResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LookupResponse.ProtoReflect.Descriptor instead.
 func (*LookupResponse) Descriptor() ([]byte, []int) {
-	return file_basaltpb_controller_proto_rawDescGZIP(), []int{7}
+	return file_basaltpb_controller_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *LookupResponse) GetMeta() *ObjectMeta {
@@ -442,17 +526,26 @@ func (x *LookupResponse) GetMeta() *ObjectMeta {
 	return nil
 }
 
+func (x *LookupResponse) GetType() EntryType {
+	if x != nil {
+		return x.Type
+	}
+	return EntryType_ENTRY_TYPE_UNSPECIFIED
+}
+
 type DeleteRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	MountId       *MountID               `protobuf:"bytes,1,opt,name=mount_id,json=mountId,proto3" json:"mount_id,omitempty"`
-	Id            *ObjectID              `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Directory containing the entry to delete.
+	DirectoryId *DirectoryID `protobuf:"bytes,1,opt,name=directory_id,json=directoryId,proto3" json:"directory_id,omitempty"`
+	// Name of the entry to delete.
+	Name          string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *DeleteRequest) Reset() {
 	*x = DeleteRequest{}
-	mi := &file_basaltpb_controller_proto_msgTypes[8]
+	mi := &file_basaltpb_controller_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -464,7 +557,7 @@ func (x *DeleteRequest) String() string {
 func (*DeleteRequest) ProtoMessage() {}
 
 func (x *DeleteRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_basaltpb_controller_proto_msgTypes[8]
+	mi := &file_basaltpb_controller_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -477,32 +570,36 @@ func (x *DeleteRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteRequest.ProtoReflect.Descriptor instead.
 func (*DeleteRequest) Descriptor() ([]byte, []int) {
-	return file_basaltpb_controller_proto_rawDescGZIP(), []int{8}
+	return file_basaltpb_controller_proto_rawDescGZIP(), []int{9}
 }
 
-func (x *DeleteRequest) GetMountId() *MountID {
+func (x *DeleteRequest) GetDirectoryId() *DirectoryID {
 	if x != nil {
-		return x.MountId
+		return x.DirectoryId
 	}
 	return nil
 }
 
-func (x *DeleteRequest) GetId() *ObjectID {
+func (x *DeleteRequest) GetName() string {
 	if x != nil {
-		return x.Id
+		return x.Name
 	}
-	return nil
+	return ""
 }
 
 type DeleteResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Object ID that was unlinked (for files only).
+	ObjectId *ObjectID `protobuf:"bytes,1,opt,name=object_id,json=objectId,proto3" json:"object_id,omitempty"`
+	// True if this was the last reference and the object will be deleted.
+	ObjectDeleted bool `protobuf:"varint,2,opt,name=object_deleted,json=objectDeleted,proto3" json:"object_deleted,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *DeleteResponse) Reset() {
 	*x = DeleteResponse{}
-	mi := &file_basaltpb_controller_proto_msgTypes[9]
+	mi := &file_basaltpb_controller_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -514,7 +611,7 @@ func (x *DeleteResponse) String() string {
 func (*DeleteResponse) ProtoMessage() {}
 
 func (x *DeleteResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_basaltpb_controller_proto_msgTypes[9]
+	mi := &file_basaltpb_controller_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -527,22 +624,36 @@ func (x *DeleteResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteResponse.ProtoReflect.Descriptor instead.
 func (*DeleteResponse) Descriptor() ([]byte, []int) {
-	return file_basaltpb_controller_proto_rawDescGZIP(), []int{9}
+	return file_basaltpb_controller_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *DeleteResponse) GetObjectId() *ObjectID {
+	if x != nil {
+		return x.ObjectId
+	}
+	return nil
+}
+
+func (x *DeleteResponse) GetObjectDeleted() bool {
+	if x != nil {
+		return x.ObjectDeleted
+	}
+	return false
 }
 
 type SealRequest struct {
-	state   protoimpl.MessageState `protogen:"open.v1"`
-	MountId *MountID               `protobuf:"bytes,1,opt,name=mount_id,json=mountId,proto3" json:"mount_id,omitempty"`
-	Id      *ObjectID              `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Object to seal.
+	ObjectId *ObjectID `protobuf:"bytes,1,opt,name=object_id,json=objectId,proto3" json:"object_id,omitempty"`
 	// Final size of the object.
-	Size          int64 `protobuf:"varint,3,opt,name=size,proto3" json:"size,omitempty"`
+	Size          int64 `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *SealRequest) Reset() {
 	*x = SealRequest{}
-	mi := &file_basaltpb_controller_proto_msgTypes[10]
+	mi := &file_basaltpb_controller_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -554,7 +665,7 @@ func (x *SealRequest) String() string {
 func (*SealRequest) ProtoMessage() {}
 
 func (x *SealRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_basaltpb_controller_proto_msgTypes[10]
+	mi := &file_basaltpb_controller_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -567,19 +678,12 @@ func (x *SealRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SealRequest.ProtoReflect.Descriptor instead.
 func (*SealRequest) Descriptor() ([]byte, []int) {
-	return file_basaltpb_controller_proto_rawDescGZIP(), []int{10}
+	return file_basaltpb_controller_proto_rawDescGZIP(), []int{11}
 }
 
-func (x *SealRequest) GetMountId() *MountID {
+func (x *SealRequest) GetObjectId() *ObjectID {
 	if x != nil {
-		return x.MountId
-	}
-	return nil
-}
-
-func (x *SealRequest) GetId() *ObjectID {
-	if x != nil {
-		return x.Id
+		return x.ObjectId
 	}
 	return nil
 }
@@ -599,7 +703,7 @@ type SealResponse struct {
 
 func (x *SealResponse) Reset() {
 	*x = SealResponse{}
-	mi := &file_basaltpb_controller_proto_msgTypes[11]
+	mi := &file_basaltpb_controller_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -611,7 +715,7 @@ func (x *SealResponse) String() string {
 func (*SealResponse) ProtoMessage() {}
 
 func (x *SealResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_basaltpb_controller_proto_msgTypes[11]
+	mi := &file_basaltpb_controller_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -624,45 +728,508 @@ func (x *SealResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SealResponse.ProtoReflect.Descriptor instead.
 func (*SealResponse) Descriptor() ([]byte, []int) {
-	return file_basaltpb_controller_proto_rawDescGZIP(), []int{11}
+	return file_basaltpb_controller_proto_rawDescGZIP(), []int{12}
+}
+
+type MkdirRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Parent directory in which to create the subdirectory.
+	ParentId *DirectoryID `protobuf:"bytes,1,opt,name=parent_id,json=parentId,proto3" json:"parent_id,omitempty"`
+	// Name for the new directory.
+	Name          string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *MkdirRequest) Reset() {
+	*x = MkdirRequest{}
+	mi := &file_basaltpb_controller_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MkdirRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MkdirRequest) ProtoMessage() {}
+
+func (x *MkdirRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_basaltpb_controller_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MkdirRequest.ProtoReflect.Descriptor instead.
+func (*MkdirRequest) Descriptor() ([]byte, []int) {
+	return file_basaltpb_controller_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *MkdirRequest) GetParentId() *DirectoryID {
+	if x != nil {
+		return x.ParentId
+	}
+	return nil
+}
+
+func (x *MkdirRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+type MkdirResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// ID of the newly created directory.
+	DirectoryId   *DirectoryID `protobuf:"bytes,1,opt,name=directory_id,json=directoryId,proto3" json:"directory_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *MkdirResponse) Reset() {
+	*x = MkdirResponse{}
+	mi := &file_basaltpb_controller_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MkdirResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MkdirResponse) ProtoMessage() {}
+
+func (x *MkdirResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_basaltpb_controller_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MkdirResponse.ProtoReflect.Descriptor instead.
+func (*MkdirResponse) Descriptor() ([]byte, []int) {
+	return file_basaltpb_controller_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *MkdirResponse) GetDirectoryId() *DirectoryID {
+	if x != nil {
+		return x.DirectoryId
+	}
+	return nil
+}
+
+type RmdirRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Parent directory containing the directory to remove.
+	ParentId *DirectoryID `protobuf:"bytes,1,opt,name=parent_id,json=parentId,proto3" json:"parent_id,omitempty"`
+	// Name of the directory to remove.
+	Name          string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RmdirRequest) Reset() {
+	*x = RmdirRequest{}
+	mi := &file_basaltpb_controller_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RmdirRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RmdirRequest) ProtoMessage() {}
+
+func (x *RmdirRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_basaltpb_controller_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RmdirRequest.ProtoReflect.Descriptor instead.
+func (*RmdirRequest) Descriptor() ([]byte, []int) {
+	return file_basaltpb_controller_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *RmdirRequest) GetParentId() *DirectoryID {
+	if x != nil {
+		return x.ParentId
+	}
+	return nil
+}
+
+func (x *RmdirRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+type RmdirResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RmdirResponse) Reset() {
+	*x = RmdirResponse{}
+	mi := &file_basaltpb_controller_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RmdirResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RmdirResponse) ProtoMessage() {}
+
+func (x *RmdirResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_basaltpb_controller_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RmdirResponse.ProtoReflect.Descriptor instead.
+func (*RmdirResponse) Descriptor() ([]byte, []int) {
+	return file_basaltpb_controller_proto_rawDescGZIP(), []int{16}
+}
+
+type ListRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Directory to list.
+	DirectoryId   *DirectoryID `protobuf:"bytes,1,opt,name=directory_id,json=directoryId,proto3" json:"directory_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListRequest) Reset() {
+	*x = ListRequest{}
+	mi := &file_basaltpb_controller_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListRequest) ProtoMessage() {}
+
+func (x *ListRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_basaltpb_controller_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListRequest.ProtoReflect.Descriptor instead.
+func (*ListRequest) Descriptor() ([]byte, []int) {
+	return file_basaltpb_controller_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *ListRequest) GetDirectoryId() *DirectoryID {
+	if x != nil {
+		return x.DirectoryId
+	}
+	return nil
+}
+
+type LinkRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Directory in which to create the link.
+	DirectoryId *DirectoryID `protobuf:"bytes,1,opt,name=directory_id,json=directoryId,proto3" json:"directory_id,omitempty"`
+	// Name for the new link.
+	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	// Existing object to link to.
+	ObjectId      *ObjectID `protobuf:"bytes,3,opt,name=object_id,json=objectId,proto3" json:"object_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LinkRequest) Reset() {
+	*x = LinkRequest{}
+	mi := &file_basaltpb_controller_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LinkRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LinkRequest) ProtoMessage() {}
+
+func (x *LinkRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_basaltpb_controller_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LinkRequest.ProtoReflect.Descriptor instead.
+func (*LinkRequest) Descriptor() ([]byte, []int) {
+	return file_basaltpb_controller_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *LinkRequest) GetDirectoryId() *DirectoryID {
+	if x != nil {
+		return x.DirectoryId
+	}
+	return nil
+}
+
+func (x *LinkRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *LinkRequest) GetObjectId() *ObjectID {
+	if x != nil {
+		return x.ObjectId
+	}
+	return nil
+}
+
+type LinkResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LinkResponse) Reset() {
+	*x = LinkResponse{}
+	mi := &file_basaltpb_controller_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LinkResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LinkResponse) ProtoMessage() {}
+
+func (x *LinkResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_basaltpb_controller_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LinkResponse.ProtoReflect.Descriptor instead.
+func (*LinkResponse) Descriptor() ([]byte, []int) {
+	return file_basaltpb_controller_proto_rawDescGZIP(), []int{19}
+}
+
+type RenameRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Directory containing the entry to rename.
+	DirectoryId *DirectoryID `protobuf:"bytes,1,opt,name=directory_id,json=directoryId,proto3" json:"directory_id,omitempty"`
+	// Current name of the entry.
+	OldName string `protobuf:"bytes,2,opt,name=old_name,json=oldName,proto3" json:"old_name,omitempty"`
+	// New name for the entry.
+	NewName       string `protobuf:"bytes,3,opt,name=new_name,json=newName,proto3" json:"new_name,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RenameRequest) Reset() {
+	*x = RenameRequest{}
+	mi := &file_basaltpb_controller_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RenameRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RenameRequest) ProtoMessage() {}
+
+func (x *RenameRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_basaltpb_controller_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RenameRequest.ProtoReflect.Descriptor instead.
+func (*RenameRequest) Descriptor() ([]byte, []int) {
+	return file_basaltpb_controller_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *RenameRequest) GetDirectoryId() *DirectoryID {
+	if x != nil {
+		return x.DirectoryId
+	}
+	return nil
+}
+
+func (x *RenameRequest) GetOldName() string {
+	if x != nil {
+		return x.OldName
+	}
+	return ""
+}
+
+func (x *RenameRequest) GetNewName() string {
+	if x != nil {
+		return x.NewName
+	}
+	return ""
+}
+
+type RenameResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RenameResponse) Reset() {
+	*x = RenameResponse{}
+	mi := &file_basaltpb_controller_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RenameResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RenameResponse) ProtoMessage() {}
+
+func (x *RenameResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_basaltpb_controller_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RenameResponse.ProtoReflect.Descriptor instead.
+func (*RenameResponse) Descriptor() ([]byte, []int) {
+	return file_basaltpb_controller_proto_rawDescGZIP(), []int{21}
 }
 
 var File_basaltpb_controller_proto protoreflect.FileDescriptor
 
 const file_basaltpb_controller_proto_rawDesc = "" +
 	"\n" +
-	"\x19basaltpb/controller.proto\x12\bbasaltpb\x1a\x15basaltpb/common.proto\"?\n" +
+	"\x19basaltpb/controller.proto\x12\bbasaltpb\x1a\x15basaltpb/common.proto\"y\n" +
 	"\fMountRequest\x12\x1f\n" +
 	"\vinstance_id\x18\x01 \x01(\tR\n" +
 	"instanceId\x12\x0e\n" +
-	"\x02az\x18\x02 \x01(\tR\x02az\"=\n" +
+	"\x02az\x18\x02 \x01(\tR\x02az\x12\x1d\n" +
+	"\n" +
+	"cluster_id\x18\x03 \x01(\fR\tclusterId\x12\x19\n" +
+	"\bstore_id\x18\x04 \x01(\fR\astoreId\"\x98\x01\n" +
 	"\rMountResponse\x12,\n" +
-	"\bmount_id\x18\x01 \x01(\v2\x11.basaltpb.MountIDR\amountId\">\n" +
+	"\bmount_id\x18\x01 \x01(\v2\x11.basaltpb.MountIDR\amountId\x128\n" +
+	"\fdirectory_id\x18\x02 \x01(\v2\x15.basaltpb.DirectoryIDR\vdirectoryId\x12\x1f\n" +
+	"\vwrite_token\x18\x03 \x01(\fR\n" +
+	"writeToken\">\n" +
 	"\x0eUnmountRequest\x12,\n" +
 	"\bmount_id\x18\x01 \x01(\v2\x11.basaltpb.MountIDR\amountId\"\x11\n" +
-	"\x0fUnmountResponse\"s\n" +
-	"\rCreateRequest\x12,\n" +
-	"\bmount_id\x18\x01 \x01(\v2\x11.basaltpb.MountIDR\amountId\x12\x12\n" +
+	"\x0fUnmountResponse\"\x7f\n" +
+	"\rCreateRequest\x128\n" +
+	"\fdirectory_id\x18\x01 \x01(\v2\x15.basaltpb.DirectoryIDR\vdirectoryId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
 	"\vreplication\x18\x03 \x01(\x05R\vreplication\":\n" +
 	"\x0eCreateResponse\x12(\n" +
-	"\x04meta\x18\x01 \x01(\v2\x14.basaltpb.ObjectMetaR\x04meta\"\x80\x01\n" +
-	"\rLookupRequest\x12,\n" +
-	"\bmount_id\x18\x01 \x01(\v2\x11.basaltpb.MountIDR\amountId\x12$\n" +
-	"\x02id\x18\x02 \x01(\v2\x12.basaltpb.ObjectIDH\x00R\x02id\x12\x14\n" +
-	"\x04name\x18\x03 \x01(\tH\x00R\x04nameB\x05\n" +
-	"\x03key\":\n" +
+	"\x04meta\x18\x01 \x01(\v2\x14.basaltpb.ObjectMetaR\x04meta\"_\n" +
+	"\x0fDirectoryLookup\x128\n" +
+	"\fdirectory_id\x18\x01 \x01(\v2\x15.basaltpb.DirectoryIDR\vdirectoryId\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\"\x91\x01\n" +
+	"\rLookupRequest\x121\n" +
+	"\tobject_id\x18\x01 \x01(\v2\x12.basaltpb.ObjectIDH\x00R\bobjectId\x12F\n" +
+	"\x10directory_lookup\x18\x02 \x01(\v2\x19.basaltpb.DirectoryLookupH\x00R\x0fdirectoryLookupB\x05\n" +
+	"\x03key\"c\n" +
 	"\x0eLookupResponse\x12(\n" +
-	"\x04meta\x18\x01 \x01(\v2\x14.basaltpb.ObjectMetaR\x04meta\"a\n" +
-	"\rDeleteRequest\x12,\n" +
-	"\bmount_id\x18\x01 \x01(\v2\x11.basaltpb.MountIDR\amountId\x12\"\n" +
-	"\x02id\x18\x02 \x01(\v2\x12.basaltpb.ObjectIDR\x02id\"\x10\n" +
-	"\x0eDeleteResponse\"s\n" +
-	"\vSealRequest\x12,\n" +
-	"\bmount_id\x18\x01 \x01(\v2\x11.basaltpb.MountIDR\amountId\x12\"\n" +
-	"\x02id\x18\x02 \x01(\v2\x12.basaltpb.ObjectIDR\x02id\x12\x12\n" +
-	"\x04size\x18\x03 \x01(\x03R\x04size\"\x0e\n" +
-	"\fSealResponse2\xf4\x02\n" +
+	"\x04meta\x18\x01 \x01(\v2\x14.basaltpb.ObjectMetaR\x04meta\x12'\n" +
+	"\x04type\x18\x02 \x01(\x0e2\x13.basaltpb.EntryTypeR\x04type\"]\n" +
+	"\rDeleteRequest\x128\n" +
+	"\fdirectory_id\x18\x01 \x01(\v2\x15.basaltpb.DirectoryIDR\vdirectoryId\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\"h\n" +
+	"\x0eDeleteResponse\x12/\n" +
+	"\tobject_id\x18\x01 \x01(\v2\x12.basaltpb.ObjectIDR\bobjectId\x12%\n" +
+	"\x0eobject_deleted\x18\x02 \x01(\bR\robjectDeleted\"R\n" +
+	"\vSealRequest\x12/\n" +
+	"\tobject_id\x18\x01 \x01(\v2\x12.basaltpb.ObjectIDR\bobjectId\x12\x12\n" +
+	"\x04size\x18\x02 \x01(\x03R\x04size\"\x0e\n" +
+	"\fSealResponse\"V\n" +
+	"\fMkdirRequest\x122\n" +
+	"\tparent_id\x18\x01 \x01(\v2\x15.basaltpb.DirectoryIDR\bparentId\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\"I\n" +
+	"\rMkdirResponse\x128\n" +
+	"\fdirectory_id\x18\x01 \x01(\v2\x15.basaltpb.DirectoryIDR\vdirectoryId\"V\n" +
+	"\fRmdirRequest\x122\n" +
+	"\tparent_id\x18\x01 \x01(\v2\x15.basaltpb.DirectoryIDR\bparentId\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\"\x0f\n" +
+	"\rRmdirResponse\"G\n" +
+	"\vListRequest\x128\n" +
+	"\fdirectory_id\x18\x01 \x01(\v2\x15.basaltpb.DirectoryIDR\vdirectoryId\"\x8c\x01\n" +
+	"\vLinkRequest\x128\n" +
+	"\fdirectory_id\x18\x01 \x01(\v2\x15.basaltpb.DirectoryIDR\vdirectoryId\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12/\n" +
+	"\tobject_id\x18\x03 \x01(\v2\x12.basaltpb.ObjectIDR\bobjectId\"\x0e\n" +
+	"\fLinkResponse\"\x7f\n" +
+	"\rRenameRequest\x128\n" +
+	"\fdirectory_id\x18\x01 \x01(\v2\x15.basaltpb.DirectoryIDR\vdirectoryId\x12\x19\n" +
+	"\bold_name\x18\x02 \x01(\tR\aoldName\x12\x19\n" +
+	"\bnew_name\x18\x03 \x01(\tR\anewName\"\x10\n" +
+	"\x0eRenameResponse2\x97\x05\n" +
 	"\n" +
 	"Controller\x128\n" +
 	"\x05Mount\x12\x16.basaltpb.MountRequest\x1a\x17.basaltpb.MountResponse\x12>\n" +
@@ -670,7 +1237,12 @@ const file_basaltpb_controller_proto_rawDesc = "" +
 	"\x06Create\x12\x17.basaltpb.CreateRequest\x1a\x18.basaltpb.CreateResponse\x12;\n" +
 	"\x06Lookup\x12\x17.basaltpb.LookupRequest\x1a\x18.basaltpb.LookupResponse\x12;\n" +
 	"\x06Delete\x12\x17.basaltpb.DeleteRequest\x1a\x18.basaltpb.DeleteResponse\x125\n" +
-	"\x04Seal\x12\x15.basaltpb.SealRequest\x1a\x16.basaltpb.SealResponseB.Z,github.com/cockroachdb/basaltclient/basaltpbb\x06proto3"
+	"\x04Seal\x12\x15.basaltpb.SealRequest\x1a\x16.basaltpb.SealResponse\x128\n" +
+	"\x05Mkdir\x12\x16.basaltpb.MkdirRequest\x1a\x17.basaltpb.MkdirResponse\x128\n" +
+	"\x05Rmdir\x12\x16.basaltpb.RmdirRequest\x1a\x17.basaltpb.RmdirResponse\x129\n" +
+	"\x04List\x12\x15.basaltpb.ListRequest\x1a\x18.basaltpb.DirectoryEntry0\x01\x125\n" +
+	"\x04Link\x12\x15.basaltpb.LinkRequest\x1a\x16.basaltpb.LinkResponse\x12;\n" +
+	"\x06Rename\x12\x17.basaltpb.RenameRequest\x1a\x18.basaltpb.RenameResponseB.Z,github.com/cockroachdb/basaltclient/basaltpbb\x06proto3"
 
 var (
 	file_basaltpb_controller_proto_rawDescOnce sync.Once
@@ -684,7 +1256,7 @@ func file_basaltpb_controller_proto_rawDescGZIP() []byte {
 	return file_basaltpb_controller_proto_rawDescData
 }
 
-var file_basaltpb_controller_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
+var file_basaltpb_controller_proto_msgTypes = make([]protoimpl.MessageInfo, 22)
 var file_basaltpb_controller_proto_goTypes = []any{
 	(*MountRequest)(nil),    // 0: basaltpb.MountRequest
 	(*MountResponse)(nil),   // 1: basaltpb.MountResponse
@@ -692,45 +1264,77 @@ var file_basaltpb_controller_proto_goTypes = []any{
 	(*UnmountResponse)(nil), // 3: basaltpb.UnmountResponse
 	(*CreateRequest)(nil),   // 4: basaltpb.CreateRequest
 	(*CreateResponse)(nil),  // 5: basaltpb.CreateResponse
-	(*LookupRequest)(nil),   // 6: basaltpb.LookupRequest
-	(*LookupResponse)(nil),  // 7: basaltpb.LookupResponse
-	(*DeleteRequest)(nil),   // 8: basaltpb.DeleteRequest
-	(*DeleteResponse)(nil),  // 9: basaltpb.DeleteResponse
-	(*SealRequest)(nil),     // 10: basaltpb.SealRequest
-	(*SealResponse)(nil),    // 11: basaltpb.SealResponse
-	(*MountID)(nil),         // 12: basaltpb.MountID
-	(*ObjectMeta)(nil),      // 13: basaltpb.ObjectMeta
-	(*ObjectID)(nil),        // 14: basaltpb.ObjectID
+	(*DirectoryLookup)(nil), // 6: basaltpb.DirectoryLookup
+	(*LookupRequest)(nil),   // 7: basaltpb.LookupRequest
+	(*LookupResponse)(nil),  // 8: basaltpb.LookupResponse
+	(*DeleteRequest)(nil),   // 9: basaltpb.DeleteRequest
+	(*DeleteResponse)(nil),  // 10: basaltpb.DeleteResponse
+	(*SealRequest)(nil),     // 11: basaltpb.SealRequest
+	(*SealResponse)(nil),    // 12: basaltpb.SealResponse
+	(*MkdirRequest)(nil),    // 13: basaltpb.MkdirRequest
+	(*MkdirResponse)(nil),   // 14: basaltpb.MkdirResponse
+	(*RmdirRequest)(nil),    // 15: basaltpb.RmdirRequest
+	(*RmdirResponse)(nil),   // 16: basaltpb.RmdirResponse
+	(*ListRequest)(nil),     // 17: basaltpb.ListRequest
+	(*LinkRequest)(nil),     // 18: basaltpb.LinkRequest
+	(*LinkResponse)(nil),    // 19: basaltpb.LinkResponse
+	(*RenameRequest)(nil),   // 20: basaltpb.RenameRequest
+	(*RenameResponse)(nil),  // 21: basaltpb.RenameResponse
+	(*MountID)(nil),         // 22: basaltpb.MountID
+	(*DirectoryID)(nil),     // 23: basaltpb.DirectoryID
+	(*ObjectMeta)(nil),      // 24: basaltpb.ObjectMeta
+	(*ObjectID)(nil),        // 25: basaltpb.ObjectID
+	(EntryType)(0),          // 26: basaltpb.EntryType
+	(*DirectoryEntry)(nil),  // 27: basaltpb.DirectoryEntry
 }
 var file_basaltpb_controller_proto_depIdxs = []int32{
-	12, // 0: basaltpb.MountResponse.mount_id:type_name -> basaltpb.MountID
-	12, // 1: basaltpb.UnmountRequest.mount_id:type_name -> basaltpb.MountID
-	12, // 2: basaltpb.CreateRequest.mount_id:type_name -> basaltpb.MountID
-	13, // 3: basaltpb.CreateResponse.meta:type_name -> basaltpb.ObjectMeta
-	12, // 4: basaltpb.LookupRequest.mount_id:type_name -> basaltpb.MountID
-	14, // 5: basaltpb.LookupRequest.id:type_name -> basaltpb.ObjectID
-	13, // 6: basaltpb.LookupResponse.meta:type_name -> basaltpb.ObjectMeta
-	12, // 7: basaltpb.DeleteRequest.mount_id:type_name -> basaltpb.MountID
-	14, // 8: basaltpb.DeleteRequest.id:type_name -> basaltpb.ObjectID
-	12, // 9: basaltpb.SealRequest.mount_id:type_name -> basaltpb.MountID
-	14, // 10: basaltpb.SealRequest.id:type_name -> basaltpb.ObjectID
-	0,  // 11: basaltpb.Controller.Mount:input_type -> basaltpb.MountRequest
-	2,  // 12: basaltpb.Controller.Unmount:input_type -> basaltpb.UnmountRequest
-	4,  // 13: basaltpb.Controller.Create:input_type -> basaltpb.CreateRequest
-	6,  // 14: basaltpb.Controller.Lookup:input_type -> basaltpb.LookupRequest
-	8,  // 15: basaltpb.Controller.Delete:input_type -> basaltpb.DeleteRequest
-	10, // 16: basaltpb.Controller.Seal:input_type -> basaltpb.SealRequest
-	1,  // 17: basaltpb.Controller.Mount:output_type -> basaltpb.MountResponse
-	3,  // 18: basaltpb.Controller.Unmount:output_type -> basaltpb.UnmountResponse
-	5,  // 19: basaltpb.Controller.Create:output_type -> basaltpb.CreateResponse
-	7,  // 20: basaltpb.Controller.Lookup:output_type -> basaltpb.LookupResponse
-	9,  // 21: basaltpb.Controller.Delete:output_type -> basaltpb.DeleteResponse
-	11, // 22: basaltpb.Controller.Seal:output_type -> basaltpb.SealResponse
-	17, // [17:23] is the sub-list for method output_type
-	11, // [11:17] is the sub-list for method input_type
-	11, // [11:11] is the sub-list for extension type_name
-	11, // [11:11] is the sub-list for extension extendee
-	0,  // [0:11] is the sub-list for field type_name
+	22, // 0: basaltpb.MountResponse.mount_id:type_name -> basaltpb.MountID
+	23, // 1: basaltpb.MountResponse.directory_id:type_name -> basaltpb.DirectoryID
+	22, // 2: basaltpb.UnmountRequest.mount_id:type_name -> basaltpb.MountID
+	23, // 3: basaltpb.CreateRequest.directory_id:type_name -> basaltpb.DirectoryID
+	24, // 4: basaltpb.CreateResponse.meta:type_name -> basaltpb.ObjectMeta
+	23, // 5: basaltpb.DirectoryLookup.directory_id:type_name -> basaltpb.DirectoryID
+	25, // 6: basaltpb.LookupRequest.object_id:type_name -> basaltpb.ObjectID
+	6,  // 7: basaltpb.LookupRequest.directory_lookup:type_name -> basaltpb.DirectoryLookup
+	24, // 8: basaltpb.LookupResponse.meta:type_name -> basaltpb.ObjectMeta
+	26, // 9: basaltpb.LookupResponse.type:type_name -> basaltpb.EntryType
+	23, // 10: basaltpb.DeleteRequest.directory_id:type_name -> basaltpb.DirectoryID
+	25, // 11: basaltpb.DeleteResponse.object_id:type_name -> basaltpb.ObjectID
+	25, // 12: basaltpb.SealRequest.object_id:type_name -> basaltpb.ObjectID
+	23, // 13: basaltpb.MkdirRequest.parent_id:type_name -> basaltpb.DirectoryID
+	23, // 14: basaltpb.MkdirResponse.directory_id:type_name -> basaltpb.DirectoryID
+	23, // 15: basaltpb.RmdirRequest.parent_id:type_name -> basaltpb.DirectoryID
+	23, // 16: basaltpb.ListRequest.directory_id:type_name -> basaltpb.DirectoryID
+	23, // 17: basaltpb.LinkRequest.directory_id:type_name -> basaltpb.DirectoryID
+	25, // 18: basaltpb.LinkRequest.object_id:type_name -> basaltpb.ObjectID
+	23, // 19: basaltpb.RenameRequest.directory_id:type_name -> basaltpb.DirectoryID
+	0,  // 20: basaltpb.Controller.Mount:input_type -> basaltpb.MountRequest
+	2,  // 21: basaltpb.Controller.Unmount:input_type -> basaltpb.UnmountRequest
+	4,  // 22: basaltpb.Controller.Create:input_type -> basaltpb.CreateRequest
+	7,  // 23: basaltpb.Controller.Lookup:input_type -> basaltpb.LookupRequest
+	9,  // 24: basaltpb.Controller.Delete:input_type -> basaltpb.DeleteRequest
+	11, // 25: basaltpb.Controller.Seal:input_type -> basaltpb.SealRequest
+	13, // 26: basaltpb.Controller.Mkdir:input_type -> basaltpb.MkdirRequest
+	15, // 27: basaltpb.Controller.Rmdir:input_type -> basaltpb.RmdirRequest
+	17, // 28: basaltpb.Controller.List:input_type -> basaltpb.ListRequest
+	18, // 29: basaltpb.Controller.Link:input_type -> basaltpb.LinkRequest
+	20, // 30: basaltpb.Controller.Rename:input_type -> basaltpb.RenameRequest
+	1,  // 31: basaltpb.Controller.Mount:output_type -> basaltpb.MountResponse
+	3,  // 32: basaltpb.Controller.Unmount:output_type -> basaltpb.UnmountResponse
+	5,  // 33: basaltpb.Controller.Create:output_type -> basaltpb.CreateResponse
+	8,  // 34: basaltpb.Controller.Lookup:output_type -> basaltpb.LookupResponse
+	10, // 35: basaltpb.Controller.Delete:output_type -> basaltpb.DeleteResponse
+	12, // 36: basaltpb.Controller.Seal:output_type -> basaltpb.SealResponse
+	14, // 37: basaltpb.Controller.Mkdir:output_type -> basaltpb.MkdirResponse
+	16, // 38: basaltpb.Controller.Rmdir:output_type -> basaltpb.RmdirResponse
+	27, // 39: basaltpb.Controller.List:output_type -> basaltpb.DirectoryEntry
+	19, // 40: basaltpb.Controller.Link:output_type -> basaltpb.LinkResponse
+	21, // 41: basaltpb.Controller.Rename:output_type -> basaltpb.RenameResponse
+	31, // [31:42] is the sub-list for method output_type
+	20, // [20:31] is the sub-list for method input_type
+	20, // [20:20] is the sub-list for extension type_name
+	20, // [20:20] is the sub-list for extension extendee
+	0,  // [0:20] is the sub-list for field type_name
 }
 
 func init() { file_basaltpb_controller_proto_init() }
@@ -739,9 +1343,9 @@ func file_basaltpb_controller_proto_init() {
 		return
 	}
 	file_basaltpb_common_proto_init()
-	file_basaltpb_controller_proto_msgTypes[6].OneofWrappers = []any{
-		(*LookupRequest_Id)(nil),
-		(*LookupRequest_Name)(nil),
+	file_basaltpb_controller_proto_msgTypes[7].OneofWrappers = []any{
+		(*LookupRequest_ObjectId)(nil),
+		(*LookupRequest_DirectoryLookup)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -749,7 +1353,7 @@ func file_basaltpb_controller_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_basaltpb_controller_proto_rawDesc), len(file_basaltpb_controller_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   12,
+			NumMessages:   22,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

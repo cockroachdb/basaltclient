@@ -25,6 +25,11 @@ const (
 	Controller_Lookup_FullMethodName  = "/basaltpb.Controller/Lookup"
 	Controller_Delete_FullMethodName  = "/basaltpb.Controller/Delete"
 	Controller_Seal_FullMethodName    = "/basaltpb.Controller/Seal"
+	Controller_Mkdir_FullMethodName   = "/basaltpb.Controller/Mkdir"
+	Controller_Rmdir_FullMethodName   = "/basaltpb.Controller/Rmdir"
+	Controller_List_FullMethodName    = "/basaltpb.Controller/List"
+	Controller_Link_FullMethodName    = "/basaltpb.Controller/Link"
+	Controller_Rename_FullMethodName  = "/basaltpb.Controller/Rename"
 )
 
 // ControllerClient is the client API for Controller service.
@@ -33,20 +38,40 @@ const (
 //
 // Controller coordinates object placement, mounts, and repairs in Basalt.
 type ControllerClient interface {
-	// Mount registers a new Pebble instance and returns its mount ID.
-	// The mount ID is used to fence operations and coordinate with compactors.
+	// Mount registers a Pebble instance and acquires exclusive write access
+	// to its store directory. Returns the mount ID and directory ID.
 	Mount(ctx context.Context, in *MountRequest, opts ...grpc.CallOption) (*MountResponse, error)
-	// Unmount deregisters a Pebble instance.
+	// Unmount releases the write lock on a store directory.
 	Unmount(ctx context.Context, in *UnmountRequest, opts ...grpc.CallOption) (*UnmountResponse, error)
-	// Create allocates a new object and selects replicas for it.
-	// Returns the object ID and replica locations.
+	// Create allocates a new file in a directory and selects replicas.
+	// Requires the caller to hold a mount for the directory, or the directory
+	// must not be mounted by anyone.
 	Create(ctx context.Context, in *CreateRequest, opts ...grpc.CallOption) (*CreateResponse, error)
-	// Lookup returns metadata for an existing object.
+	// Lookup returns metadata for an object by ID or (directory_id, name).
+	// Does not require a mount.
 	Lookup(ctx context.Context, in *LookupRequest, opts ...grpc.CallOption) (*LookupResponse, error)
-	// Delete removes an object from the system.
+	// Delete removes an entry from a directory. If this was the last reference
+	// to the object, the object and its replicas are scheduled for deletion.
+	// Requires mount or unmounted directory.
 	Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*DeleteResponse, error)
-	// Seal marks an object as immutable.
+	// Seal marks an object as immutable with its final size.
+	// Requires mount or unmounted directory.
 	Seal(ctx context.Context, in *SealRequest, opts ...grpc.CallOption) (*SealResponse, error)
+	// Mkdir creates a subdirectory within a directory.
+	// Requires mount or unmounted directory.
+	Mkdir(ctx context.Context, in *MkdirRequest, opts ...grpc.CallOption) (*MkdirResponse, error)
+	// Rmdir removes an empty directory.
+	// Requires mount or unmounted directory.
+	Rmdir(ctx context.Context, in *RmdirRequest, opts ...grpc.CallOption) (*RmdirResponse, error)
+	// List returns all entries in a directory as a stream.
+	// Does not require a mount.
+	List(ctx context.Context, in *ListRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[DirectoryEntry], error)
+	// Link creates a hardlink to an existing object in a directory.
+	// Requires mount or unmounted directory.
+	Link(ctx context.Context, in *LinkRequest, opts ...grpc.CallOption) (*LinkResponse, error)
+	// Rename moves an entry within the same directory.
+	// Requires mount or unmounted directory.
+	Rename(ctx context.Context, in *RenameRequest, opts ...grpc.CallOption) (*RenameResponse, error)
 }
 
 type controllerClient struct {
@@ -117,26 +142,105 @@ func (c *controllerClient) Seal(ctx context.Context, in *SealRequest, opts ...gr
 	return out, nil
 }
 
+func (c *controllerClient) Mkdir(ctx context.Context, in *MkdirRequest, opts ...grpc.CallOption) (*MkdirResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MkdirResponse)
+	err := c.cc.Invoke(ctx, Controller_Mkdir_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *controllerClient) Rmdir(ctx context.Context, in *RmdirRequest, opts ...grpc.CallOption) (*RmdirResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RmdirResponse)
+	err := c.cc.Invoke(ctx, Controller_Rmdir_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *controllerClient) List(ctx context.Context, in *ListRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[DirectoryEntry], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &Controller_ServiceDesc.Streams[0], Controller_List_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[ListRequest, DirectoryEntry]{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type Controller_ListClient = grpc.ServerStreamingClient[DirectoryEntry]
+
+func (c *controllerClient) Link(ctx context.Context, in *LinkRequest, opts ...grpc.CallOption) (*LinkResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(LinkResponse)
+	err := c.cc.Invoke(ctx, Controller_Link_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *controllerClient) Rename(ctx context.Context, in *RenameRequest, opts ...grpc.CallOption) (*RenameResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RenameResponse)
+	err := c.cc.Invoke(ctx, Controller_Rename_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ControllerServer is the server API for Controller service.
 // All implementations must embed UnimplementedControllerServer
 // for forward compatibility.
 //
 // Controller coordinates object placement, mounts, and repairs in Basalt.
 type ControllerServer interface {
-	// Mount registers a new Pebble instance and returns its mount ID.
-	// The mount ID is used to fence operations and coordinate with compactors.
+	// Mount registers a Pebble instance and acquires exclusive write access
+	// to its store directory. Returns the mount ID and directory ID.
 	Mount(context.Context, *MountRequest) (*MountResponse, error)
-	// Unmount deregisters a Pebble instance.
+	// Unmount releases the write lock on a store directory.
 	Unmount(context.Context, *UnmountRequest) (*UnmountResponse, error)
-	// Create allocates a new object and selects replicas for it.
-	// Returns the object ID and replica locations.
+	// Create allocates a new file in a directory and selects replicas.
+	// Requires the caller to hold a mount for the directory, or the directory
+	// must not be mounted by anyone.
 	Create(context.Context, *CreateRequest) (*CreateResponse, error)
-	// Lookup returns metadata for an existing object.
+	// Lookup returns metadata for an object by ID or (directory_id, name).
+	// Does not require a mount.
 	Lookup(context.Context, *LookupRequest) (*LookupResponse, error)
-	// Delete removes an object from the system.
+	// Delete removes an entry from a directory. If this was the last reference
+	// to the object, the object and its replicas are scheduled for deletion.
+	// Requires mount or unmounted directory.
 	Delete(context.Context, *DeleteRequest) (*DeleteResponse, error)
-	// Seal marks an object as immutable.
+	// Seal marks an object as immutable with its final size.
+	// Requires mount or unmounted directory.
 	Seal(context.Context, *SealRequest) (*SealResponse, error)
+	// Mkdir creates a subdirectory within a directory.
+	// Requires mount or unmounted directory.
+	Mkdir(context.Context, *MkdirRequest) (*MkdirResponse, error)
+	// Rmdir removes an empty directory.
+	// Requires mount or unmounted directory.
+	Rmdir(context.Context, *RmdirRequest) (*RmdirResponse, error)
+	// List returns all entries in a directory as a stream.
+	// Does not require a mount.
+	List(*ListRequest, grpc.ServerStreamingServer[DirectoryEntry]) error
+	// Link creates a hardlink to an existing object in a directory.
+	// Requires mount or unmounted directory.
+	Link(context.Context, *LinkRequest) (*LinkResponse, error)
+	// Rename moves an entry within the same directory.
+	// Requires mount or unmounted directory.
+	Rename(context.Context, *RenameRequest) (*RenameResponse, error)
 	mustEmbedUnimplementedControllerServer()
 }
 
@@ -164,6 +268,21 @@ func (UnimplementedControllerServer) Delete(context.Context, *DeleteRequest) (*D
 }
 func (UnimplementedControllerServer) Seal(context.Context, *SealRequest) (*SealResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Seal not implemented")
+}
+func (UnimplementedControllerServer) Mkdir(context.Context, *MkdirRequest) (*MkdirResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method Mkdir not implemented")
+}
+func (UnimplementedControllerServer) Rmdir(context.Context, *RmdirRequest) (*RmdirResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method Rmdir not implemented")
+}
+func (UnimplementedControllerServer) List(*ListRequest, grpc.ServerStreamingServer[DirectoryEntry]) error {
+	return status.Error(codes.Unimplemented, "method List not implemented")
+}
+func (UnimplementedControllerServer) Link(context.Context, *LinkRequest) (*LinkResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method Link not implemented")
+}
+func (UnimplementedControllerServer) Rename(context.Context, *RenameRequest) (*RenameResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method Rename not implemented")
 }
 func (UnimplementedControllerServer) mustEmbedUnimplementedControllerServer() {}
 func (UnimplementedControllerServer) testEmbeddedByValue()                    {}
@@ -294,6 +413,89 @@ func _Controller_Seal_Handler(srv interface{}, ctx context.Context, dec func(int
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Controller_Mkdir_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MkdirRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ControllerServer).Mkdir(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Controller_Mkdir_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ControllerServer).Mkdir(ctx, req.(*MkdirRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Controller_Rmdir_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RmdirRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ControllerServer).Rmdir(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Controller_Rmdir_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ControllerServer).Rmdir(ctx, req.(*RmdirRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Controller_List_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(ListRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(ControllerServer).List(m, &grpc.GenericServerStream[ListRequest, DirectoryEntry]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type Controller_ListServer = grpc.ServerStreamingServer[DirectoryEntry]
+
+func _Controller_Link_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LinkRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ControllerServer).Link(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Controller_Link_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ControllerServer).Link(ctx, req.(*LinkRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Controller_Rename_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RenameRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ControllerServer).Rename(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Controller_Rename_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ControllerServer).Rename(ctx, req.(*RenameRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Controller_ServiceDesc is the grpc.ServiceDesc for Controller service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -325,7 +527,29 @@ var Controller_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "Seal",
 			Handler:    _Controller_Seal_Handler,
 		},
+		{
+			MethodName: "Mkdir",
+			Handler:    _Controller_Mkdir_Handler,
+		},
+		{
+			MethodName: "Rmdir",
+			Handler:    _Controller_Rmdir_Handler,
+		},
+		{
+			MethodName: "Link",
+			Handler:    _Controller_Link_Handler,
+		},
+		{
+			MethodName: "Rename",
+			Handler:    _Controller_Rename_Handler,
+		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "List",
+			Handler:       _Controller_List_Handler,
+			ServerStreams: true,
+		},
+	},
 	Metadata: "basaltpb/controller.proto",
 }

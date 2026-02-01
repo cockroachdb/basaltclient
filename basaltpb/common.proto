@@ -36,6 +36,34 @@ message MountID {
   bytes uuid = 1;
 }
 
+// DirectoryID identifies a directory in the namespace.
+// The nil UUID represents the namespace root.
+message DirectoryID {
+  // UUID of the directory as 16 bytes. Nil UUID = namespace root.
+  bytes uuid = 1;
+}
+
+// EntryType distinguishes files from directories in the namespace.
+enum EntryType {
+  ENTRY_TYPE_UNSPECIFIED = 0;
+  ENTRY_TYPE_FILE = 1;
+  ENTRY_TYPE_DIRECTORY = 2;
+}
+
+// DirectoryEntry represents an entry in a directory listing.
+message DirectoryEntry {
+  // Name of the entry within its parent directory.
+  string name = 1;
+  // Type of entry (file or directory).
+  EntryType type = 2;
+  // ID of the target: object_id for files, directory_id for directories.
+  bytes id = 3;
+  // Size in bytes (only set for sealed files).
+  int64 size = 4;
+  // Whether the file is sealed (only applicable to files).
+  bool sealed = 5;
+}
+
 // TODO: Add additional shared types as needed:
 // - RangeID for per-range materialization
 // - Epoch for fencing
