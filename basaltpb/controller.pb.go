@@ -1163,6 +1163,123 @@ func (*RenameResponse) Descriptor() ([]byte, []int) {
 	return file_basaltpb_controller_proto_rawDescGZIP(), []int{21}
 }
 
+type RegisterBlobServerRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// UUID generated and persisted by the blob server.
+	ServerId []byte `protobuf:"bytes,1,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`
+	// Address (host:port) for the data protocol.
+	Address string `protobuf:"bytes,2,opt,name=address,proto3" json:"address,omitempty"`
+	// Availability zone of the blob server.
+	Az string `protobuf:"bytes,3,opt,name=az,proto3" json:"az,omitempty"`
+	// Total storage capacity in bytes.
+	CapacityBytes int64 `protobuf:"varint,4,opt,name=capacity_bytes,json=capacityBytes,proto3" json:"capacity_bytes,omitempty"`
+	// Currently used storage in bytes.
+	UsedBytes     int64 `protobuf:"varint,5,opt,name=used_bytes,json=usedBytes,proto3" json:"used_bytes,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RegisterBlobServerRequest) Reset() {
+	*x = RegisterBlobServerRequest{}
+	mi := &file_basaltpb_controller_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RegisterBlobServerRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RegisterBlobServerRequest) ProtoMessage() {}
+
+func (x *RegisterBlobServerRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_basaltpb_controller_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RegisterBlobServerRequest.ProtoReflect.Descriptor instead.
+func (*RegisterBlobServerRequest) Descriptor() ([]byte, []int) {
+	return file_basaltpb_controller_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *RegisterBlobServerRequest) GetServerId() []byte {
+	if x != nil {
+		return x.ServerId
+	}
+	return nil
+}
+
+func (x *RegisterBlobServerRequest) GetAddress() string {
+	if x != nil {
+		return x.Address
+	}
+	return ""
+}
+
+func (x *RegisterBlobServerRequest) GetAz() string {
+	if x != nil {
+		return x.Az
+	}
+	return ""
+}
+
+func (x *RegisterBlobServerRequest) GetCapacityBytes() int64 {
+	if x != nil {
+		return x.CapacityBytes
+	}
+	return 0
+}
+
+func (x *RegisterBlobServerRequest) GetUsedBytes() int64 {
+	if x != nil {
+		return x.UsedBytes
+	}
+	return 0
+}
+
+type RegisterBlobServerResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RegisterBlobServerResponse) Reset() {
+	*x = RegisterBlobServerResponse{}
+	mi := &file_basaltpb_controller_proto_msgTypes[23]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RegisterBlobServerResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RegisterBlobServerResponse) ProtoMessage() {}
+
+func (x *RegisterBlobServerResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_basaltpb_controller_proto_msgTypes[23]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RegisterBlobServerResponse.ProtoReflect.Descriptor instead.
+func (*RegisterBlobServerResponse) Descriptor() ([]byte, []int) {
+	return file_basaltpb_controller_proto_rawDescGZIP(), []int{23}
+}
+
 var File_basaltpb_controller_proto protoreflect.FileDescriptor
 
 const file_basaltpb_controller_proto_rawDesc = "" +
@@ -1229,7 +1346,15 @@ const file_basaltpb_controller_proto_rawDesc = "" +
 	"\fdirectory_id\x18\x01 \x01(\v2\x15.basaltpb.DirectoryIDR\vdirectoryId\x12\x19\n" +
 	"\bold_name\x18\x02 \x01(\tR\aoldName\x12\x19\n" +
 	"\bnew_name\x18\x03 \x01(\tR\anewName\"\x10\n" +
-	"\x0eRenameResponse2\x97\x05\n" +
+	"\x0eRenameResponse\"\xa8\x01\n" +
+	"\x19RegisterBlobServerRequest\x12\x1b\n" +
+	"\tserver_id\x18\x01 \x01(\fR\bserverId\x12\x18\n" +
+	"\aaddress\x18\x02 \x01(\tR\aaddress\x12\x0e\n" +
+	"\x02az\x18\x03 \x01(\tR\x02az\x12%\n" +
+	"\x0ecapacity_bytes\x18\x04 \x01(\x03R\rcapacityBytes\x12\x1d\n" +
+	"\n" +
+	"used_bytes\x18\x05 \x01(\x03R\tusedBytes\"\x1c\n" +
+	"\x1aRegisterBlobServerResponse2\xf8\x05\n" +
 	"\n" +
 	"Controller\x128\n" +
 	"\x05Mount\x12\x16.basaltpb.MountRequest\x1a\x17.basaltpb.MountResponse\x12>\n" +
@@ -1242,7 +1367,8 @@ const file_basaltpb_controller_proto_rawDesc = "" +
 	"\x05Rmdir\x12\x16.basaltpb.RmdirRequest\x1a\x17.basaltpb.RmdirResponse\x129\n" +
 	"\x04List\x12\x15.basaltpb.ListRequest\x1a\x18.basaltpb.DirectoryEntry0\x01\x125\n" +
 	"\x04Link\x12\x15.basaltpb.LinkRequest\x1a\x16.basaltpb.LinkResponse\x12;\n" +
-	"\x06Rename\x12\x17.basaltpb.RenameRequest\x1a\x18.basaltpb.RenameResponseB.Z,github.com/cockroachdb/basaltclient/basaltpbb\x06proto3"
+	"\x06Rename\x12\x17.basaltpb.RenameRequest\x1a\x18.basaltpb.RenameResponse\x12_\n" +
+	"\x12RegisterBlobServer\x12#.basaltpb.RegisterBlobServerRequest\x1a$.basaltpb.RegisterBlobServerResponseB.Z,github.com/cockroachdb/basaltclient/basaltpbb\x06proto3"
 
 var (
 	file_basaltpb_controller_proto_rawDescOnce sync.Once
@@ -1256,60 +1382,62 @@ func file_basaltpb_controller_proto_rawDescGZIP() []byte {
 	return file_basaltpb_controller_proto_rawDescData
 }
 
-var file_basaltpb_controller_proto_msgTypes = make([]protoimpl.MessageInfo, 22)
+var file_basaltpb_controller_proto_msgTypes = make([]protoimpl.MessageInfo, 24)
 var file_basaltpb_controller_proto_goTypes = []any{
-	(*MountRequest)(nil),      // 0: basaltpb.MountRequest
-	(*MountResponse)(nil),     // 1: basaltpb.MountResponse
-	(*UnmountRequest)(nil),    // 2: basaltpb.UnmountRequest
-	(*UnmountResponse)(nil),   // 3: basaltpb.UnmountResponse
-	(*CreateRequest)(nil),     // 4: basaltpb.CreateRequest
-	(*CreateResponse)(nil),    // 5: basaltpb.CreateResponse
-	(*DirectoryLookup)(nil),   // 6: basaltpb.DirectoryLookup
-	(*LookupRequest)(nil),     // 7: basaltpb.LookupRequest
-	(*LookupResponse)(nil),    // 8: basaltpb.LookupResponse
-	(*DeleteRequest)(nil),     // 9: basaltpb.DeleteRequest
-	(*DeleteResponse)(nil),    // 10: basaltpb.DeleteResponse
-	(*SealRequest)(nil),       // 11: basaltpb.SealRequest
-	(*SealResponse)(nil),      // 12: basaltpb.SealResponse
-	(*MkdirRequest)(nil),      // 13: basaltpb.MkdirRequest
-	(*MkdirResponse)(nil),     // 14: basaltpb.MkdirResponse
-	(*RmdirRequest)(nil),      // 15: basaltpb.RmdirRequest
-	(*RmdirResponse)(nil),     // 16: basaltpb.RmdirResponse
-	(*ListRequest)(nil),       // 17: basaltpb.ListRequest
-	(*LinkRequest)(nil),       // 18: basaltpb.LinkRequest
-	(*LinkResponse)(nil),      // 19: basaltpb.LinkResponse
-	(*RenameRequest)(nil),     // 20: basaltpb.RenameRequest
-	(*RenameResponse)(nil),    // 21: basaltpb.RenameResponse
-	(*MountID)(nil),           // 22: basaltpb.MountID
-	(*DirectoryID)(nil),       // 23: basaltpb.DirectoryID
-	(*ReplicationConfig)(nil), // 24: basaltpb.ReplicationConfig
-	(*ObjectMeta)(nil),        // 25: basaltpb.ObjectMeta
-	(*ObjectID)(nil),          // 26: basaltpb.ObjectID
-	(EntryType)(0),            // 27: basaltpb.EntryType
-	(*DirectoryEntry)(nil),    // 28: basaltpb.DirectoryEntry
+	(*MountRequest)(nil),               // 0: basaltpb.MountRequest
+	(*MountResponse)(nil),              // 1: basaltpb.MountResponse
+	(*UnmountRequest)(nil),             // 2: basaltpb.UnmountRequest
+	(*UnmountResponse)(nil),            // 3: basaltpb.UnmountResponse
+	(*CreateRequest)(nil),              // 4: basaltpb.CreateRequest
+	(*CreateResponse)(nil),             // 5: basaltpb.CreateResponse
+	(*DirectoryLookup)(nil),            // 6: basaltpb.DirectoryLookup
+	(*LookupRequest)(nil),              // 7: basaltpb.LookupRequest
+	(*LookupResponse)(nil),             // 8: basaltpb.LookupResponse
+	(*DeleteRequest)(nil),              // 9: basaltpb.DeleteRequest
+	(*DeleteResponse)(nil),             // 10: basaltpb.DeleteResponse
+	(*SealRequest)(nil),                // 11: basaltpb.SealRequest
+	(*SealResponse)(nil),               // 12: basaltpb.SealResponse
+	(*MkdirRequest)(nil),               // 13: basaltpb.MkdirRequest
+	(*MkdirResponse)(nil),              // 14: basaltpb.MkdirResponse
+	(*RmdirRequest)(nil),               // 15: basaltpb.RmdirRequest
+	(*RmdirResponse)(nil),              // 16: basaltpb.RmdirResponse
+	(*ListRequest)(nil),                // 17: basaltpb.ListRequest
+	(*LinkRequest)(nil),                // 18: basaltpb.LinkRequest
+	(*LinkResponse)(nil),               // 19: basaltpb.LinkResponse
+	(*RenameRequest)(nil),              // 20: basaltpb.RenameRequest
+	(*RenameResponse)(nil),             // 21: basaltpb.RenameResponse
+	(*RegisterBlobServerRequest)(nil),  // 22: basaltpb.RegisterBlobServerRequest
+	(*RegisterBlobServerResponse)(nil), // 23: basaltpb.RegisterBlobServerResponse
+	(*MountID)(nil),                    // 24: basaltpb.MountID
+	(*DirectoryID)(nil),                // 25: basaltpb.DirectoryID
+	(*ReplicationConfig)(nil),          // 26: basaltpb.ReplicationConfig
+	(*ObjectMeta)(nil),                 // 27: basaltpb.ObjectMeta
+	(*ObjectID)(nil),                   // 28: basaltpb.ObjectID
+	(EntryType)(0),                     // 29: basaltpb.EntryType
+	(*DirectoryEntry)(nil),             // 30: basaltpb.DirectoryEntry
 }
 var file_basaltpb_controller_proto_depIdxs = []int32{
-	22, // 0: basaltpb.MountResponse.mount_id:type_name -> basaltpb.MountID
-	23, // 1: basaltpb.MountResponse.directory_id:type_name -> basaltpb.DirectoryID
-	22, // 2: basaltpb.UnmountRequest.mount_id:type_name -> basaltpb.MountID
-	23, // 3: basaltpb.CreateRequest.directory_id:type_name -> basaltpb.DirectoryID
-	24, // 4: basaltpb.CreateRequest.config:type_name -> basaltpb.ReplicationConfig
-	25, // 5: basaltpb.CreateResponse.meta:type_name -> basaltpb.ObjectMeta
-	23, // 6: basaltpb.DirectoryLookup.directory_id:type_name -> basaltpb.DirectoryID
-	26, // 7: basaltpb.LookupRequest.object_id:type_name -> basaltpb.ObjectID
+	24, // 0: basaltpb.MountResponse.mount_id:type_name -> basaltpb.MountID
+	25, // 1: basaltpb.MountResponse.directory_id:type_name -> basaltpb.DirectoryID
+	24, // 2: basaltpb.UnmountRequest.mount_id:type_name -> basaltpb.MountID
+	25, // 3: basaltpb.CreateRequest.directory_id:type_name -> basaltpb.DirectoryID
+	26, // 4: basaltpb.CreateRequest.config:type_name -> basaltpb.ReplicationConfig
+	27, // 5: basaltpb.CreateResponse.meta:type_name -> basaltpb.ObjectMeta
+	25, // 6: basaltpb.DirectoryLookup.directory_id:type_name -> basaltpb.DirectoryID
+	28, // 7: basaltpb.LookupRequest.object_id:type_name -> basaltpb.ObjectID
 	6,  // 8: basaltpb.LookupRequest.directory_lookup:type_name -> basaltpb.DirectoryLookup
-	25, // 9: basaltpb.LookupResponse.meta:type_name -> basaltpb.ObjectMeta
-	27, // 10: basaltpb.LookupResponse.type:type_name -> basaltpb.EntryType
-	23, // 11: basaltpb.DeleteRequest.directory_id:type_name -> basaltpb.DirectoryID
-	26, // 12: basaltpb.DeleteResponse.object_id:type_name -> basaltpb.ObjectID
-	26, // 13: basaltpb.SealRequest.object_id:type_name -> basaltpb.ObjectID
-	23, // 14: basaltpb.MkdirRequest.parent_id:type_name -> basaltpb.DirectoryID
-	23, // 15: basaltpb.MkdirResponse.directory_id:type_name -> basaltpb.DirectoryID
-	23, // 16: basaltpb.RmdirRequest.parent_id:type_name -> basaltpb.DirectoryID
-	23, // 17: basaltpb.ListRequest.directory_id:type_name -> basaltpb.DirectoryID
-	23, // 18: basaltpb.LinkRequest.directory_id:type_name -> basaltpb.DirectoryID
-	26, // 19: basaltpb.LinkRequest.object_id:type_name -> basaltpb.ObjectID
-	23, // 20: basaltpb.RenameRequest.directory_id:type_name -> basaltpb.DirectoryID
+	27, // 9: basaltpb.LookupResponse.meta:type_name -> basaltpb.ObjectMeta
+	29, // 10: basaltpb.LookupResponse.type:type_name -> basaltpb.EntryType
+	25, // 11: basaltpb.DeleteRequest.directory_id:type_name -> basaltpb.DirectoryID
+	28, // 12: basaltpb.DeleteResponse.object_id:type_name -> basaltpb.ObjectID
+	28, // 13: basaltpb.SealRequest.object_id:type_name -> basaltpb.ObjectID
+	25, // 14: basaltpb.MkdirRequest.parent_id:type_name -> basaltpb.DirectoryID
+	25, // 15: basaltpb.MkdirResponse.directory_id:type_name -> basaltpb.DirectoryID
+	25, // 16: basaltpb.RmdirRequest.parent_id:type_name -> basaltpb.DirectoryID
+	25, // 17: basaltpb.ListRequest.directory_id:type_name -> basaltpb.DirectoryID
+	25, // 18: basaltpb.LinkRequest.directory_id:type_name -> basaltpb.DirectoryID
+	28, // 19: basaltpb.LinkRequest.object_id:type_name -> basaltpb.ObjectID
+	25, // 20: basaltpb.RenameRequest.directory_id:type_name -> basaltpb.DirectoryID
 	0,  // 21: basaltpb.Controller.Mount:input_type -> basaltpb.MountRequest
 	2,  // 22: basaltpb.Controller.Unmount:input_type -> basaltpb.UnmountRequest
 	4,  // 23: basaltpb.Controller.Create:input_type -> basaltpb.CreateRequest
@@ -1321,19 +1449,21 @@ var file_basaltpb_controller_proto_depIdxs = []int32{
 	17, // 29: basaltpb.Controller.List:input_type -> basaltpb.ListRequest
 	18, // 30: basaltpb.Controller.Link:input_type -> basaltpb.LinkRequest
 	20, // 31: basaltpb.Controller.Rename:input_type -> basaltpb.RenameRequest
-	1,  // 32: basaltpb.Controller.Mount:output_type -> basaltpb.MountResponse
-	3,  // 33: basaltpb.Controller.Unmount:output_type -> basaltpb.UnmountResponse
-	5,  // 34: basaltpb.Controller.Create:output_type -> basaltpb.CreateResponse
-	8,  // 35: basaltpb.Controller.Lookup:output_type -> basaltpb.LookupResponse
-	10, // 36: basaltpb.Controller.Delete:output_type -> basaltpb.DeleteResponse
-	12, // 37: basaltpb.Controller.Seal:output_type -> basaltpb.SealResponse
-	14, // 38: basaltpb.Controller.Mkdir:output_type -> basaltpb.MkdirResponse
-	16, // 39: basaltpb.Controller.Rmdir:output_type -> basaltpb.RmdirResponse
-	28, // 40: basaltpb.Controller.List:output_type -> basaltpb.DirectoryEntry
-	19, // 41: basaltpb.Controller.Link:output_type -> basaltpb.LinkResponse
-	21, // 42: basaltpb.Controller.Rename:output_type -> basaltpb.RenameResponse
-	32, // [32:43] is the sub-list for method output_type
-	21, // [21:32] is the sub-list for method input_type
+	22, // 32: basaltpb.Controller.RegisterBlobServer:input_type -> basaltpb.RegisterBlobServerRequest
+	1,  // 33: basaltpb.Controller.Mount:output_type -> basaltpb.MountResponse
+	3,  // 34: basaltpb.Controller.Unmount:output_type -> basaltpb.UnmountResponse
+	5,  // 35: basaltpb.Controller.Create:output_type -> basaltpb.CreateResponse
+	8,  // 36: basaltpb.Controller.Lookup:output_type -> basaltpb.LookupResponse
+	10, // 37: basaltpb.Controller.Delete:output_type -> basaltpb.DeleteResponse
+	12, // 38: basaltpb.Controller.Seal:output_type -> basaltpb.SealResponse
+	14, // 39: basaltpb.Controller.Mkdir:output_type -> basaltpb.MkdirResponse
+	16, // 40: basaltpb.Controller.Rmdir:output_type -> basaltpb.RmdirResponse
+	30, // 41: basaltpb.Controller.List:output_type -> basaltpb.DirectoryEntry
+	19, // 42: basaltpb.Controller.Link:output_type -> basaltpb.LinkResponse
+	21, // 43: basaltpb.Controller.Rename:output_type -> basaltpb.RenameResponse
+	23, // 44: basaltpb.Controller.RegisterBlobServer:output_type -> basaltpb.RegisterBlobServerResponse
+	33, // [33:45] is the sub-list for method output_type
+	21, // [21:33] is the sub-list for method input_type
 	21, // [21:21] is the sub-list for extension type_name
 	21, // [21:21] is the sub-list for extension extendee
 	0,  // [0:21] is the sub-list for field type_name
@@ -1355,7 +1485,7 @@ func file_basaltpb_controller_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_basaltpb_controller_proto_rawDesc), len(file_basaltpb_controller_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   22,
+			NumMessages:   24,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

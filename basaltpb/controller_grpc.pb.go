@@ -19,17 +19,18 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Controller_Mount_FullMethodName   = "/basaltpb.Controller/Mount"
-	Controller_Unmount_FullMethodName = "/basaltpb.Controller/Unmount"
-	Controller_Create_FullMethodName  = "/basaltpb.Controller/Create"
-	Controller_Lookup_FullMethodName  = "/basaltpb.Controller/Lookup"
-	Controller_Delete_FullMethodName  = "/basaltpb.Controller/Delete"
-	Controller_Seal_FullMethodName    = "/basaltpb.Controller/Seal"
-	Controller_Mkdir_FullMethodName   = "/basaltpb.Controller/Mkdir"
-	Controller_Rmdir_FullMethodName   = "/basaltpb.Controller/Rmdir"
-	Controller_List_FullMethodName    = "/basaltpb.Controller/List"
-	Controller_Link_FullMethodName    = "/basaltpb.Controller/Link"
-	Controller_Rename_FullMethodName  = "/basaltpb.Controller/Rename"
+	Controller_Mount_FullMethodName              = "/basaltpb.Controller/Mount"
+	Controller_Unmount_FullMethodName            = "/basaltpb.Controller/Unmount"
+	Controller_Create_FullMethodName             = "/basaltpb.Controller/Create"
+	Controller_Lookup_FullMethodName             = "/basaltpb.Controller/Lookup"
+	Controller_Delete_FullMethodName             = "/basaltpb.Controller/Delete"
+	Controller_Seal_FullMethodName               = "/basaltpb.Controller/Seal"
+	Controller_Mkdir_FullMethodName              = "/basaltpb.Controller/Mkdir"
+	Controller_Rmdir_FullMethodName              = "/basaltpb.Controller/Rmdir"
+	Controller_List_FullMethodName               = "/basaltpb.Controller/List"
+	Controller_Link_FullMethodName               = "/basaltpb.Controller/Link"
+	Controller_Rename_FullMethodName             = "/basaltpb.Controller/Rename"
+	Controller_RegisterBlobServer_FullMethodName = "/basaltpb.Controller/RegisterBlobServer"
 )
 
 // ControllerClient is the client API for Controller service.
@@ -72,6 +73,11 @@ type ControllerClient interface {
 	// Rename moves an entry within the same directory.
 	// Requires mount or unmounted directory.
 	Rename(ctx context.Context, in *RenameRequest, opts ...grpc.CallOption) (*RenameResponse, error)
+	// RegisterBlobServer registers a blob server with the controller.
+	// Uses UPSERT semantics: handles initial registration, heartbeats, and
+	// capacity updates. Blob servers should call this periodically to maintain
+	// liveness.
+	RegisterBlobServer(ctx context.Context, in *RegisterBlobServerRequest, opts ...grpc.CallOption) (*RegisterBlobServerResponse, error)
 }
 
 type controllerClient struct {
@@ -201,6 +207,16 @@ func (c *controllerClient) Rename(ctx context.Context, in *RenameRequest, opts .
 	return out, nil
 }
 
+func (c *controllerClient) RegisterBlobServer(ctx context.Context, in *RegisterBlobServerRequest, opts ...grpc.CallOption) (*RegisterBlobServerResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RegisterBlobServerResponse)
+	err := c.cc.Invoke(ctx, Controller_RegisterBlobServer_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ControllerServer is the server API for Controller service.
 // All implementations must embed UnimplementedControllerServer
 // for forward compatibility.
@@ -241,6 +257,11 @@ type ControllerServer interface {
 	// Rename moves an entry within the same directory.
 	// Requires mount or unmounted directory.
 	Rename(context.Context, *RenameRequest) (*RenameResponse, error)
+	// RegisterBlobServer registers a blob server with the controller.
+	// Uses UPSERT semantics: handles initial registration, heartbeats, and
+	// capacity updates. Blob servers should call this periodically to maintain
+	// liveness.
+	RegisterBlobServer(context.Context, *RegisterBlobServerRequest) (*RegisterBlobServerResponse, error)
 	mustEmbedUnimplementedControllerServer()
 }
 
@@ -283,6 +304,9 @@ func (UnimplementedControllerServer) Link(context.Context, *LinkRequest) (*LinkR
 }
 func (UnimplementedControllerServer) Rename(context.Context, *RenameRequest) (*RenameResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Rename not implemented")
+}
+func (UnimplementedControllerServer) RegisterBlobServer(context.Context, *RegisterBlobServerRequest) (*RegisterBlobServerResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method RegisterBlobServer not implemented")
 }
 func (UnimplementedControllerServer) mustEmbedUnimplementedControllerServer() {}
 func (UnimplementedControllerServer) testEmbeddedByValue()                    {}
@@ -496,6 +520,24 @@ func _Controller_Rename_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Controller_RegisterBlobServer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RegisterBlobServerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ControllerServer).RegisterBlobServer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Controller_RegisterBlobServer_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ControllerServer).RegisterBlobServer(ctx, req.(*RegisterBlobServerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Controller_ServiceDesc is the grpc.ServiceDesc for Controller service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -542,6 +584,10 @@ var Controller_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Rename",
 			Handler:    _Controller_Rename_Handler,
+		},
+		{
+			MethodName: "RegisterBlobServer",
+			Handler:    _Controller_RegisterBlobServer_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
