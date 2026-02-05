@@ -1,11 +1,17 @@
 .PHONY: generate clean
 
-# Generate Go code from proto files
+GOGOPROTO := $(shell go list -m -f '{{.Dir}}' github.com/gogo/protobuf)
+
+# Generate Go code from proto files using gogoproto
 generate:
 	protoc \
-		--go_out=. --go_opt=module=github.com/cockroachdb/basaltclient \
-		--go-grpc_out=. --go-grpc_opt=module=github.com/cockroachdb/basaltclient \
-		-I. \
+		--gogofast_out=plugins=grpc,\
+Mgogoproto/gogo.proto=github.com/gogo/protobuf/gogoproto,\
+Mbasaltpb/common.proto=github.com/cockroachdb/basaltclient/basaltpb,\
+Mbasaltpb/controller.proto=github.com/cockroachdb/basaltclient/basaltpb,\
+Mbasaltpb/blob.proto=github.com/cockroachdb/basaltclient/basaltpb,\
+paths=source_relative:. \
+		-I. -I$(GOGOPROTO) \
 		basaltpb/*.proto
 
 clean:

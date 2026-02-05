@@ -38,7 +38,7 @@ func (c *ControlClient) Close() error {
 // Create initializes a new object on this blob server.
 func (c *ControlClient) Create(ctx context.Context, id ObjectID) error {
 	_, err := c.client.Create(ctx, &basaltpb.BlobCreateRequest{
-		Id: &basaltpb.ObjectID{Uuid: id[:]},
+		Id: basaltpb.UUID(id),
 	})
 	return err
 }
@@ -47,7 +47,7 @@ func (c *ControlClient) Create(ctx context.Context, id ObjectID) error {
 // Returns the final size of the sealed object.
 func (c *ControlClient) Seal(ctx context.Context, id ObjectID) (int64, error) {
 	resp, err := c.client.Seal(ctx, &basaltpb.BlobSealRequest{
-		Id: &basaltpb.ObjectID{Uuid: id[:]},
+		Id: basaltpb.UUID(id),
 	})
 	if err != nil {
 		return 0, err
@@ -58,7 +58,7 @@ func (c *ControlClient) Seal(ctx context.Context, id ObjectID) (int64, error) {
 // Delete removes an object from this blob server.
 func (c *ControlClient) Delete(ctx context.Context, id ObjectID) error {
 	_, err := c.client.Delete(ctx, &basaltpb.BlobDeleteRequest{
-		Id: &basaltpb.ObjectID{Uuid: id[:]},
+		Id: basaltpb.UUID(id),
 	})
 	return err
 }
@@ -67,10 +67,10 @@ func (c *ControlClient) Delete(ctx context.Context, id ObjectID) error {
 // Returns (size, sealed, error).
 func (c *ControlClient) Stat(ctx context.Context, id ObjectID) (int64, bool, error) {
 	resp, err := c.client.Stat(ctx, &basaltpb.BlobStatRequest{
-		Id: &basaltpb.ObjectID{Uuid: id[:]},
+		Id: basaltpb.UUID(id),
 	})
 	if err != nil {
 		return 0, false, err
 	}
-	return resp.Size, resp.Sealed, nil
+	return resp.Size_, resp.Sealed, nil
 }

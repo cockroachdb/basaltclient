@@ -4,7 +4,7 @@ package basaltpb;
 
 option go_package = "github.com/cockroachdb/basaltclient/basaltpb";
 
-import "basaltpb/common.proto";
+import "gogoproto/gogo.proto";
 
 // Blob handles control operations on a single blob server.
 // Each blob server stores object replicas on local disks.
@@ -48,13 +48,13 @@ service Blob {
 }
 
 message BlobCreateRequest {
-  ObjectID id = 1;
+  bytes id = 1 [(gogoproto.customtype) = "UUID", (gogoproto.nullable) = false];
 }
 
 message BlobCreateResponse {}
 
 message BlobSealRequest {
-  ObjectID id = 1;
+  bytes id = 1 [(gogoproto.customtype) = "UUID", (gogoproto.nullable) = false];
 }
 
 message BlobSealResponse {
@@ -63,13 +63,13 @@ message BlobSealResponse {
 }
 
 message BlobDeleteRequest {
-  ObjectID id = 1;
+  bytes id = 1 [(gogoproto.customtype) = "UUID", (gogoproto.nullable) = false];
 }
 
 message BlobDeleteResponse {}
 
 message BlobStatRequest {
-  ObjectID id = 1;
+  bytes id = 1 [(gogoproto.customtype) = "UUID", (gogoproto.nullable) = false];
 }
 
 message BlobStatResponse {
@@ -81,7 +81,7 @@ message BlobStatResponse {
 
 message BlobCopyToRequest {
   // Object ID to upload from local storage.
-  ObjectID id = 1;
+  bytes id = 1 [(gogoproto.customtype) = "UUID", (gogoproto.nullable) = false];
   // Destination URL in object storage:
   // - "s3://bucket/object-id"
   // - "gcs://bucket/object-id"
@@ -100,7 +100,7 @@ message BlobCopyToResponse {
 
 message BlobCopyFromRequest {
   // Target object ID for local storage.
-  ObjectID id = 1;
+  bytes id = 1 [(gogoproto.customtype) = "UUID", (gogoproto.nullable) = false];
   // Fully self-describing source URL:
   // - "s3://bucket/object-id?etag=xxx" (S3 with integrity check)
   // - "gcs://bucket/object-id" (GCS)
