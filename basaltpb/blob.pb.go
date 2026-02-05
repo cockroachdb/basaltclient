@@ -368,6 +368,222 @@ func (x *BlobStatResponse) GetSealed() bool {
 	return false
 }
 
+type BlobCopyToRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Object ID to upload from local storage.
+	Id *ObjectID `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// Destination URL in object storage:
+	// - "s3://bucket/object-id"
+	// - "gcs://bucket/object-id"
+	// - "azure://container/object-id"
+	Destination   string `protobuf:"bytes,2,opt,name=destination,proto3" json:"destination,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BlobCopyToRequest) Reset() {
+	*x = BlobCopyToRequest{}
+	mi := &file_basaltpb_blob_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BlobCopyToRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BlobCopyToRequest) ProtoMessage() {}
+
+func (x *BlobCopyToRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_basaltpb_blob_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BlobCopyToRequest.ProtoReflect.Descriptor instead.
+func (*BlobCopyToRequest) Descriptor() ([]byte, []int) {
+	return file_basaltpb_blob_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *BlobCopyToRequest) GetId() *ObjectID {
+	if x != nil {
+		return x.Id
+	}
+	return nil
+}
+
+func (x *BlobCopyToRequest) GetDestination() string {
+	if x != nil {
+		return x.Destination
+	}
+	return ""
+}
+
+type BlobCopyToResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Archive reference URL with integrity check.
+	// For S3: "s3://bucket/object-id?etag=xxx"
+	// For GCS: "gcs://bucket/object-id#generation=xxx"
+	ArchiveRef string `protobuf:"bytes,1,opt,name=archive_ref,json=archiveRef,proto3" json:"archive_ref,omitempty"`
+	// Size of the uploaded object in bytes.
+	Size          int64 `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BlobCopyToResponse) Reset() {
+	*x = BlobCopyToResponse{}
+	mi := &file_basaltpb_blob_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BlobCopyToResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BlobCopyToResponse) ProtoMessage() {}
+
+func (x *BlobCopyToResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_basaltpb_blob_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BlobCopyToResponse.ProtoReflect.Descriptor instead.
+func (*BlobCopyToResponse) Descriptor() ([]byte, []int) {
+	return file_basaltpb_blob_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *BlobCopyToResponse) GetArchiveRef() string {
+	if x != nil {
+		return x.ArchiveRef
+	}
+	return ""
+}
+
+func (x *BlobCopyToResponse) GetSize() int64 {
+	if x != nil {
+		return x.Size
+	}
+	return 0
+}
+
+type BlobCopyFromRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Target object ID for local storage.
+	Id *ObjectID `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// Fully self-describing source URL:
+	// - "s3://bucket/object-id?etag=xxx" (S3 with integrity check)
+	// - "gcs://bucket/object-id" (GCS)
+	// - "azure://container/object-id" (Azure Blob)
+	// - "blob://host:port/object-id" (another blob server)
+	Source        string `protobuf:"bytes,2,opt,name=source,proto3" json:"source,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BlobCopyFromRequest) Reset() {
+	*x = BlobCopyFromRequest{}
+	mi := &file_basaltpb_blob_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BlobCopyFromRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BlobCopyFromRequest) ProtoMessage() {}
+
+func (x *BlobCopyFromRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_basaltpb_blob_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BlobCopyFromRequest.ProtoReflect.Descriptor instead.
+func (*BlobCopyFromRequest) Descriptor() ([]byte, []int) {
+	return file_basaltpb_blob_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *BlobCopyFromRequest) GetId() *ObjectID {
+	if x != nil {
+		return x.Id
+	}
+	return nil
+}
+
+func (x *BlobCopyFromRequest) GetSource() string {
+	if x != nil {
+		return x.Source
+	}
+	return ""
+}
+
+type BlobCopyFromResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Size of the copied object in bytes.
+	Size          int64 `protobuf:"varint,1,opt,name=size,proto3" json:"size,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BlobCopyFromResponse) Reset() {
+	*x = BlobCopyFromResponse{}
+	mi := &file_basaltpb_blob_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BlobCopyFromResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BlobCopyFromResponse) ProtoMessage() {}
+
+func (x *BlobCopyFromResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_basaltpb_blob_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BlobCopyFromResponse.ProtoReflect.Descriptor instead.
+func (*BlobCopyFromResponse) Descriptor() ([]byte, []int) {
+	return file_basaltpb_blob_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *BlobCopyFromResponse) GetSize() int64 {
+	if x != nil {
+		return x.Size
+	}
+	return 0
+}
+
 var File_basaltpb_blob_proto protoreflect.FileDescriptor
 
 const file_basaltpb_blob_proto_rawDesc = "" +
@@ -388,12 +604,26 @@ const file_basaltpb_blob_proto_rawDesc = "" +
 	"\x02id\x18\x01 \x01(\v2\x12.basaltpb.ObjectIDR\x02id\">\n" +
 	"\x10BlobStatResponse\x12\x12\n" +
 	"\x04size\x18\x01 \x01(\x03R\x04size\x12\x16\n" +
-	"\x06sealed\x18\x02 \x01(\bR\x06sealed2\x8e\x02\n" +
+	"\x06sealed\x18\x02 \x01(\bR\x06sealed\"Y\n" +
+	"\x11BlobCopyToRequest\x12\"\n" +
+	"\x02id\x18\x01 \x01(\v2\x12.basaltpb.ObjectIDR\x02id\x12 \n" +
+	"\vdestination\x18\x02 \x01(\tR\vdestination\"I\n" +
+	"\x12BlobCopyToResponse\x12\x1f\n" +
+	"\varchive_ref\x18\x01 \x01(\tR\n" +
+	"archiveRef\x12\x12\n" +
+	"\x04size\x18\x02 \x01(\x03R\x04size\"Q\n" +
+	"\x13BlobCopyFromRequest\x12\"\n" +
+	"\x02id\x18\x01 \x01(\v2\x12.basaltpb.ObjectIDR\x02id\x12\x16\n" +
+	"\x06source\x18\x02 \x01(\tR\x06source\"*\n" +
+	"\x14BlobCopyFromResponse\x12\x12\n" +
+	"\x04size\x18\x01 \x01(\x03R\x04size2\x9e\x03\n" +
 	"\x04Blob\x12C\n" +
 	"\x06Create\x12\x1b.basaltpb.BlobCreateRequest\x1a\x1c.basaltpb.BlobCreateResponse\x12=\n" +
 	"\x04Seal\x12\x19.basaltpb.BlobSealRequest\x1a\x1a.basaltpb.BlobSealResponse\x12C\n" +
 	"\x06Delete\x12\x1b.basaltpb.BlobDeleteRequest\x1a\x1c.basaltpb.BlobDeleteResponse\x12=\n" +
-	"\x04Stat\x12\x19.basaltpb.BlobStatRequest\x1a\x1a.basaltpb.BlobStatResponseB.Z,github.com/cockroachdb/basaltclient/basaltpbb\x06proto3"
+	"\x04Stat\x12\x19.basaltpb.BlobStatRequest\x1a\x1a.basaltpb.BlobStatResponse\x12C\n" +
+	"\x06CopyTo\x12\x1b.basaltpb.BlobCopyToRequest\x1a\x1c.basaltpb.BlobCopyToResponse\x12I\n" +
+	"\bCopyFrom\x12\x1d.basaltpb.BlobCopyFromRequest\x1a\x1e.basaltpb.BlobCopyFromResponseB.Z,github.com/cockroachdb/basaltclient/basaltpbb\x06proto3"
 
 var (
 	file_basaltpb_blob_proto_rawDescOnce sync.Once
@@ -407,36 +637,46 @@ func file_basaltpb_blob_proto_rawDescGZIP() []byte {
 	return file_basaltpb_blob_proto_rawDescData
 }
 
-var file_basaltpb_blob_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_basaltpb_blob_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
 var file_basaltpb_blob_proto_goTypes = []any{
-	(*BlobCreateRequest)(nil),  // 0: basaltpb.BlobCreateRequest
-	(*BlobCreateResponse)(nil), // 1: basaltpb.BlobCreateResponse
-	(*BlobSealRequest)(nil),    // 2: basaltpb.BlobSealRequest
-	(*BlobSealResponse)(nil),   // 3: basaltpb.BlobSealResponse
-	(*BlobDeleteRequest)(nil),  // 4: basaltpb.BlobDeleteRequest
-	(*BlobDeleteResponse)(nil), // 5: basaltpb.BlobDeleteResponse
-	(*BlobStatRequest)(nil),    // 6: basaltpb.BlobStatRequest
-	(*BlobStatResponse)(nil),   // 7: basaltpb.BlobStatResponse
-	(*ObjectID)(nil),           // 8: basaltpb.ObjectID
+	(*BlobCreateRequest)(nil),    // 0: basaltpb.BlobCreateRequest
+	(*BlobCreateResponse)(nil),   // 1: basaltpb.BlobCreateResponse
+	(*BlobSealRequest)(nil),      // 2: basaltpb.BlobSealRequest
+	(*BlobSealResponse)(nil),     // 3: basaltpb.BlobSealResponse
+	(*BlobDeleteRequest)(nil),    // 4: basaltpb.BlobDeleteRequest
+	(*BlobDeleteResponse)(nil),   // 5: basaltpb.BlobDeleteResponse
+	(*BlobStatRequest)(nil),      // 6: basaltpb.BlobStatRequest
+	(*BlobStatResponse)(nil),     // 7: basaltpb.BlobStatResponse
+	(*BlobCopyToRequest)(nil),    // 8: basaltpb.BlobCopyToRequest
+	(*BlobCopyToResponse)(nil),   // 9: basaltpb.BlobCopyToResponse
+	(*BlobCopyFromRequest)(nil),  // 10: basaltpb.BlobCopyFromRequest
+	(*BlobCopyFromResponse)(nil), // 11: basaltpb.BlobCopyFromResponse
+	(*ObjectID)(nil),             // 12: basaltpb.ObjectID
 }
 var file_basaltpb_blob_proto_depIdxs = []int32{
-	8, // 0: basaltpb.BlobCreateRequest.id:type_name -> basaltpb.ObjectID
-	8, // 1: basaltpb.BlobSealRequest.id:type_name -> basaltpb.ObjectID
-	8, // 2: basaltpb.BlobDeleteRequest.id:type_name -> basaltpb.ObjectID
-	8, // 3: basaltpb.BlobStatRequest.id:type_name -> basaltpb.ObjectID
-	0, // 4: basaltpb.Blob.Create:input_type -> basaltpb.BlobCreateRequest
-	2, // 5: basaltpb.Blob.Seal:input_type -> basaltpb.BlobSealRequest
-	4, // 6: basaltpb.Blob.Delete:input_type -> basaltpb.BlobDeleteRequest
-	6, // 7: basaltpb.Blob.Stat:input_type -> basaltpb.BlobStatRequest
-	1, // 8: basaltpb.Blob.Create:output_type -> basaltpb.BlobCreateResponse
-	3, // 9: basaltpb.Blob.Seal:output_type -> basaltpb.BlobSealResponse
-	5, // 10: basaltpb.Blob.Delete:output_type -> basaltpb.BlobDeleteResponse
-	7, // 11: basaltpb.Blob.Stat:output_type -> basaltpb.BlobStatResponse
-	8, // [8:12] is the sub-list for method output_type
-	4, // [4:8] is the sub-list for method input_type
-	4, // [4:4] is the sub-list for extension type_name
-	4, // [4:4] is the sub-list for extension extendee
-	0, // [0:4] is the sub-list for field type_name
+	12, // 0: basaltpb.BlobCreateRequest.id:type_name -> basaltpb.ObjectID
+	12, // 1: basaltpb.BlobSealRequest.id:type_name -> basaltpb.ObjectID
+	12, // 2: basaltpb.BlobDeleteRequest.id:type_name -> basaltpb.ObjectID
+	12, // 3: basaltpb.BlobStatRequest.id:type_name -> basaltpb.ObjectID
+	12, // 4: basaltpb.BlobCopyToRequest.id:type_name -> basaltpb.ObjectID
+	12, // 5: basaltpb.BlobCopyFromRequest.id:type_name -> basaltpb.ObjectID
+	0,  // 6: basaltpb.Blob.Create:input_type -> basaltpb.BlobCreateRequest
+	2,  // 7: basaltpb.Blob.Seal:input_type -> basaltpb.BlobSealRequest
+	4,  // 8: basaltpb.Blob.Delete:input_type -> basaltpb.BlobDeleteRequest
+	6,  // 9: basaltpb.Blob.Stat:input_type -> basaltpb.BlobStatRequest
+	8,  // 10: basaltpb.Blob.CopyTo:input_type -> basaltpb.BlobCopyToRequest
+	10, // 11: basaltpb.Blob.CopyFrom:input_type -> basaltpb.BlobCopyFromRequest
+	1,  // 12: basaltpb.Blob.Create:output_type -> basaltpb.BlobCreateResponse
+	3,  // 13: basaltpb.Blob.Seal:output_type -> basaltpb.BlobSealResponse
+	5,  // 14: basaltpb.Blob.Delete:output_type -> basaltpb.BlobDeleteResponse
+	7,  // 15: basaltpb.Blob.Stat:output_type -> basaltpb.BlobStatResponse
+	9,  // 16: basaltpb.Blob.CopyTo:output_type -> basaltpb.BlobCopyToResponse
+	11, // 17: basaltpb.Blob.CopyFrom:output_type -> basaltpb.BlobCopyFromResponse
+	12, // [12:18] is the sub-list for method output_type
+	6,  // [6:12] is the sub-list for method input_type
+	6,  // [6:6] is the sub-list for extension type_name
+	6,  // [6:6] is the sub-list for extension extendee
+	0,  // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_basaltpb_blob_proto_init() }
@@ -451,7 +691,7 @@ func file_basaltpb_blob_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_basaltpb_blob_proto_rawDesc), len(file_basaltpb_blob_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   8,
+			NumMessages:   12,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

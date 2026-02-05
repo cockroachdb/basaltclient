@@ -19,10 +19,12 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Blob_Create_FullMethodName = "/basaltpb.Blob/Create"
-	Blob_Seal_FullMethodName   = "/basaltpb.Blob/Seal"
-	Blob_Delete_FullMethodName = "/basaltpb.Blob/Delete"
-	Blob_Stat_FullMethodName   = "/basaltpb.Blob/Stat"
+	Blob_Create_FullMethodName   = "/basaltpb.Blob/Create"
+	Blob_Seal_FullMethodName     = "/basaltpb.Blob/Seal"
+	Blob_Delete_FullMethodName   = "/basaltpb.Blob/Delete"
+	Blob_Stat_FullMethodName     = "/basaltpb.Blob/Stat"
+	Blob_CopyTo_FullMethodName   = "/basaltpb.Blob/CopyTo"
+	Blob_CopyFrom_FullMethodName = "/basaltpb.Blob/CopyFrom"
 )
 
 // BlobClient is the client API for Blob service.
@@ -43,6 +45,26 @@ type BlobClient interface {
 	Delete(ctx context.Context, in *BlobDeleteRequest, opts ...grpc.CallOption) (*BlobDeleteResponse, error)
 	// Stat returns metadata about an object.
 	Stat(ctx context.Context, in *BlobStatRequest, opts ...grpc.CallOption) (*BlobStatResponse, error)
+	// CopyTo uploads a local object to object storage.
+	// Used after SSTable creation to archive to S3/GCS/Azure for cross-AZ
+	// replication and continuous backup.
+	//
+	// Destination URL format: "s3://bucket/object-id", "gcs://bucket/object-id"
+	//
+	// The blob server uploads directly to object storage and returns an
+	// archive_ref with integrity check (etag for S3).
+	CopyTo(ctx context.Context, in *BlobCopyToRequest, opts ...grpc.CallOption) (*BlobCopyToResponse, error)
+	// CopyFrom copies an object from a source URL to this blob server.
+	// Used for cross-AZ materialization (from object storage) and repair
+	// (from object storage or another blob server).
+	//
+	// Source URL formats:
+	// - Object storage: "s3://bucket/object-id?etag=xxx", "gcs://bucket/object-id"
+	// - Blob server: "blob://host:port/object-id"
+	//
+	// The blob server downloads from the source, verifies integrity (etag for S3),
+	// and stores locally with the specified object ID.
+	CopyFrom(ctx context.Context, in *BlobCopyFromRequest, opts ...grpc.CallOption) (*BlobCopyFromResponse, error)
 }
 
 type blobClient struct {
@@ -93,6 +115,26 @@ func (c *blobClient) Stat(ctx context.Context, in *BlobStatRequest, opts ...grpc
 	return out, nil
 }
 
+func (c *blobClient) CopyTo(ctx context.Context, in *BlobCopyToRequest, opts ...grpc.CallOption) (*BlobCopyToResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BlobCopyToResponse)
+	err := c.cc.Invoke(ctx, Blob_CopyTo_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *blobClient) CopyFrom(ctx context.Context, in *BlobCopyFromRequest, opts ...grpc.CallOption) (*BlobCopyFromResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BlobCopyFromResponse)
+	err := c.cc.Invoke(ctx, Blob_CopyFrom_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // BlobServer is the server API for Blob service.
 // All implementations must embed UnimplementedBlobServer
 // for forward compatibility.
@@ -111,6 +153,26 @@ type BlobServer interface {
 	Delete(context.Context, *BlobDeleteRequest) (*BlobDeleteResponse, error)
 	// Stat returns metadata about an object.
 	Stat(context.Context, *BlobStatRequest) (*BlobStatResponse, error)
+	// CopyTo uploads a local object to object storage.
+	// Used after SSTable creation to archive to S3/GCS/Azure for cross-AZ
+	// replication and continuous backup.
+	//
+	// Destination URL format: "s3://bucket/object-id", "gcs://bucket/object-id"
+	//
+	// The blob server uploads directly to object storage and returns an
+	// archive_ref with integrity check (etag for S3).
+	CopyTo(context.Context, *BlobCopyToRequest) (*BlobCopyToResponse, error)
+	// CopyFrom copies an object from a source URL to this blob server.
+	// Used for cross-AZ materialization (from object storage) and repair
+	// (from object storage or another blob server).
+	//
+	// Source URL formats:
+	// - Object storage: "s3://bucket/object-id?etag=xxx", "gcs://bucket/object-id"
+	// - Blob server: "blob://host:port/object-id"
+	//
+	// The blob server downloads from the source, verifies integrity (etag for S3),
+	// and stores locally with the specified object ID.
+	CopyFrom(context.Context, *BlobCopyFromRequest) (*BlobCopyFromResponse, error)
 	mustEmbedUnimplementedBlobServer()
 }
 
@@ -132,6 +194,12 @@ func (UnimplementedBlobServer) Delete(context.Context, *BlobDeleteRequest) (*Blo
 }
 func (UnimplementedBlobServer) Stat(context.Context, *BlobStatRequest) (*BlobStatResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Stat not implemented")
+}
+func (UnimplementedBlobServer) CopyTo(context.Context, *BlobCopyToRequest) (*BlobCopyToResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CopyTo not implemented")
+}
+func (UnimplementedBlobServer) CopyFrom(context.Context, *BlobCopyFromRequest) (*BlobCopyFromResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CopyFrom not implemented")
 }
 func (UnimplementedBlobServer) mustEmbedUnimplementedBlobServer() {}
 func (UnimplementedBlobServer) testEmbeddedByValue()              {}
@@ -226,6 +294,42 @@ func _Blob_Stat_Handler(srv interface{}, ctx context.Context, dec func(interface
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Blob_CopyTo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BlobCopyToRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BlobServer).CopyTo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Blob_CopyTo_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BlobServer).CopyTo(ctx, req.(*BlobCopyToRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Blob_CopyFrom_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BlobCopyFromRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BlobServer).CopyFrom(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Blob_CopyFrom_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BlobServer).CopyFrom(ctx, req.(*BlobCopyFromRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Blob_ServiceDesc is the grpc.ServiceDesc for Blob service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -248,6 +352,14 @@ var Blob_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Stat",
 			Handler:    _Blob_Stat_Handler,
+		},
+		{
+			MethodName: "CopyTo",
+			Handler:    _Blob_CopyTo_Handler,
+		},
+		{
+			MethodName: "CopyFrom",
+			Handler:    _Blob_CopyFrom_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
