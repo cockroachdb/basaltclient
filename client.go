@@ -3,19 +3,16 @@
 // Basalt is a disaggregated storage layer for Pebble, consisting of:
 //   - Controller: Coordinates object placement, mounts, and repairs
 //   - Blob: Stores object data on local disks
-//   - Compactor: Performs flush and compaction operations
 //
 // Usage:
 //
 //	ctrl := basaltclient.NewControllerClient(addr)
 //	blobCtrl := basaltclient.NewBlobControlClient(grpcAddr)
 //	blobData := basaltclient.NewBlobDataClient(dataAddr)
-//	compactor := basaltclient.NewCompactorClient(addr)
 package basaltclient
 
 import (
 	"github.com/cockroachdb/basaltclient/internal/blob"
-	"github.com/cockroachdb/basaltclient/internal/compactor"
 	"github.com/cockroachdb/basaltclient/internal/controller"
 )
 
@@ -97,24 +94,4 @@ type QuorumWriter = blob.QuorumWriter
 // NewQuorumWriter creates a new quorum writer for the given object and replicas.
 func NewQuorumWriter(objectID ObjectID, replicas []string) *QuorumWriter {
 	return blob.NewQuorumWriter(objectID, replicas)
-}
-
-// CompactorClient provides access to a Basalt compactor service.
-// Compactors perform flush and compaction operations on behalf of mounts.
-type CompactorClient struct {
-	client *compactor.Client
-}
-
-// NewCompactorClient creates a new client connected to the compactor at addr.
-func NewCompactorClient(addr string) (*CompactorClient, error) {
-	c, err := compactor.New(addr)
-	if err != nil {
-		return nil, err
-	}
-	return &CompactorClient{client: c}, nil
-}
-
-// Close closes the compactor client connection.
-func (c *CompactorClient) Close() error {
-	return c.client.Close()
 }
