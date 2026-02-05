@@ -64,6 +64,18 @@ message DirectoryEntry {
   bool sealed = 5;
 }
 
+// ReplicationConfig specifies how an object should be replicated.
+message ReplicationConfig {
+  // Number of SSD blob replicas. Default is 3 if no parameters specified.
+  int32 ssd_replicas = 1;
+  // Number of HDD blob replicas. Default is 0.
+  int32 hdd_replicas = 2;
+  // Enable cloud object storage tier (S3/GCS).
+  bool archive = 3;
+  // If set, all replicas placed in this AZ; if empty, cross-AZ placement.
+  string local_az = 4;
+}
+
 // TODO: Add additional shared types as needed:
 // - RangeID for per-range materialization
 // - Epoch for fencing

@@ -89,8 +89,8 @@ message CreateRequest {
   DirectoryID directory_id = 1;
   // Name for the new file.
   string name = 2;
-  // Desired replication factor.
-  int32 replication = 3;
+  // Replication configuration for the new file.
+  ReplicationConfig config = 3;
 }
 
 message CreateResponse {

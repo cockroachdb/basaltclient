@@ -69,9 +69,9 @@ func (c *ControllerClient) Rmdir(ctx context.Context, parentID []byte, name stri
 
 // Create allocates a new file in a directory and selects replicas.
 func (c *ControllerClient) Create(
-	ctx context.Context, directoryID []byte, name string, replication int32,
+	ctx context.Context, directoryID []byte, name string, config *basaltpb.ReplicationConfig,
 ) (*basaltpb.ObjectMeta, error) {
-	return c.client.Create(ctx, directoryID, name, replication)
+	return c.client.Create(ctx, directoryID, name, config)
 }
 
 // LookupByID returns metadata for an object by ID.

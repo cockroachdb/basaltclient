@@ -1,0 +1,373 @@
+# Test Basalt path parsing
+
+# Local paths return nil
+parse
+/local/path
+----
+nil (local path)
+
+parse
+relative/path
+----
+nil (local path)
+
+# Direct controller address
+parse
+//localhost:26257/
+----
+controllers: localhost:26257
+path: /
+dir: ""
+base: ""
+ssd: 3
+hdd: 0
+archive: false
+local_az: ""
+
+parse
+//localhost:26257/dir/file.sst
+----
+controllers: localhost:26257
+path: /dir/file.sst
+dir: "/dir"
+base: "file.sst"
+ssd: 3
+hdd: 0
+archive: false
+local_az: ""
+
+parse
+//host:1234/a/b/c
+----
+controllers: host:1234
+path: /a/b/c
+dir: "/a/b"
+base: "c"
+ssd: 3
+hdd: 0
+archive: false
+local_az: ""
+
+# Multiple controllers (comma-separated)
+parse
+//host1:1234,host2:1234/path
+----
+controllers: host1:1234, host2:1234
+path: /path
+dir: ""
+base: "path"
+ssd: 3
+hdd: 0
+archive: false
+local_az: ""
+
+# Trailing slash means the path is a directory (empty base)
+parse
+//a:1,b:2,c:3/dir/
+----
+controllers: a:1, b:2, c:3
+path: /dir/
+dir: "/dir"
+base: ""
+ssd: 3
+hdd: 0
+archive: false
+local_az: ""
+
+# Alias format (three slashes) - resolved via AliasResolver
+
+# Register aliases for testing
+alias
+prod controller1:26257,controller2:26257
+----
+ok
+
+alias
+dev localhost:26257
+----
+ok
+
+parse
+///prod/cluster/store/file.sst
+----
+controllers: controller1:26257, controller2:26257
+path: /cluster/store/file.sst
+dir: "/cluster/store"
+base: "file.sst"
+ssd: 3
+hdd: 0
+archive: false
+local_az: ""
+
+parse
+///prod/
+----
+controllers: controller1:26257, controller2:26257
+path: /
+dir: ""
+base: ""
+ssd: 3
+hdd: 0
+archive: false
+local_az: ""
+
+parse
+///dev/myfile
+----
+controllers: localhost:26257
+path: /myfile
+dir: ""
+base: "myfile"
+ssd: 3
+hdd: 0
+archive: false
+local_az: ""
+
+# basalt: scheme prefix (for copy-paste URLs)
+parse
+basalt://localhost:26257/dir/file.sst
+----
+controllers: localhost:26257
+path: /dir/file.sst
+dir: "/dir"
+base: "file.sst"
+ssd: 3
+hdd: 0
+archive: false
+local_az: ""
+
+parse
+basalt://host1:1234,host2:1234/path
+----
+controllers: host1:1234, host2:1234
+path: /path
+dir: ""
+base: "path"
+ssd: 3
+hdd: 0
+archive: false
+local_az: ""
+
+parse
+basalt:///prod/cluster/store/file.sst
+----
+controllers: controller1:26257, controller2:26257
+path: /cluster/store/file.sst
+dir: "/cluster/store"
+base: "file.sst"
+ssd: 3
+hdd: 0
+archive: false
+local_az: ""
+
+# basalt: without // is a local path
+parse
+basalt:localfile
+----
+nil (local path)
+
+# Replication config via query parameters
+
+parse
+//host:1234/path?ssd=2
+----
+controllers: host:1234
+path: /path
+dir: ""
+base: "path"
+ssd: 2
+hdd: 0
+archive: false
+local_az: ""
+
+parse
+//host:1234/path?hdd=1
+----
+controllers: host:1234
+path: /path
+dir: ""
+base: "path"
+ssd: 3
+hdd: 1
+archive: false
+local_az: ""
+
+parse
+//host:1234/path?ssd=2&hdd=1
+----
+controllers: host:1234
+path: /path
+dir: ""
+base: "path"
+ssd: 2
+hdd: 1
+archive: false
+local_az: ""
+
+parse
+//host:1234/path?archive
+----
+controllers: host:1234
+path: /path
+dir: ""
+base: "path"
+ssd: 3
+hdd: 0
+archive: true
+local_az: ""
+
+parse
+//host:1234/path?az=cross
+----
+controllers: host:1234
+path: /path
+dir: ""
+base: "path"
+ssd: 3
+hdd: 0
+archive: false
+local_az: ""
+
+# az=local requires local-az to be set
+local-az
+us-east-1a
+----
+ok
+
+parse
+//host:1234/path?az=local
+----
+controllers: host:1234
+path: /path
+dir: ""
+base: "path"
+ssd: 3
+hdd: 0
+archive: false
+local_az: "us-east-1a"
+
+# All parameters combined
+local-az
+us-west-2b
+----
+ok
+
+parse
+//host:1234/path?ssd=2&hdd=1&archive&az=local
+----
+controllers: host:1234
+path: /path
+dir: ""
+base: "path"
+ssd: 2
+hdd: 1
+archive: true
+local_az: "us-west-2b"
+
+# Config works with aliases too
+parse
+///prod/file?ssd=1&archive
+----
+controllers: controller1:26257, controller2:26257
+path: /file
+dir: ""
+base: "file"
+ssd: 1
+hdd: 0
+archive: true
+local_az: ""
+
+# archive-only with ssd=0 hdd=0 is valid
+parse
+//host:1234/path?ssd=0&hdd=0&archive
+----
+controllers: host:1234
+path: /path
+dir: ""
+base: "path"
+ssd: 0
+hdd: 0
+archive: true
+local_az: ""
+
+# Reset local-az for error tests
+local-az
+
+----
+ok
+
+# Error cases
+
+parse
+//
+----
+error: empty controller address
+
+parse
+///
+----
+error: empty alias name
+
+parse
+basalt://
+----
+error: empty controller address
+
+parse
+basalt:///
+----
+error: empty alias name
+
+# Unknown alias
+parse
+///unknown/path
+----
+error: resolving alias "unknown": unknown alias: unknown
+
+# Unknown query parameter (catches typos)
+parse
+//host:1234/path?sssd=3
+----
+error: unknown query parameter: "sssd"
+
+# Invalid ssd value
+parse
+//host:1234/path?ssd=abc
+----
+error: invalid ssd value "abc": strconv.ParseInt: parsing "abc": invalid syntax
+
+# Negative ssd value
+parse
+//host:1234/path?ssd=-1
+----
+error: ssd must be non-negative, got -1
+
+# Invalid hdd value
+parse
+//host:1234/path?hdd=xyz
+----
+error: invalid hdd value "xyz": strconv.ParseInt: parsing "xyz": invalid syntax
+
+# Negative hdd value
+parse
+//host:1234/path?hdd=-2
+----
+error: hdd must be non-negative, got -2
+
+# Invalid az value
+parse
+//host:1234/path?az=invalid
+----
+error: invalid az value "invalid": must be "cross" or "local"
+
+# az=local without local-az set
+parse
+//host:1234/path?az=local
+----
+error: az=local requires localAZ parameter
+
+# Zero replicas without archive is an error
+parse
+//host:1234/path?ssd=0&hdd=0
+----
+error: at least one replica required (ssd + hdd >= 1) unless archive is enabled

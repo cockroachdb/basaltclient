@@ -420,6 +420,79 @@ func (x *DirectoryEntry) GetSealed() bool {
 	return false
 }
 
+// ReplicationConfig specifies how an object should be replicated.
+type ReplicationConfig struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Number of SSD blob replicas. Default is 3 if no parameters specified.
+	SsdReplicas int32 `protobuf:"varint,1,opt,name=ssd_replicas,json=ssdReplicas,proto3" json:"ssd_replicas,omitempty"`
+	// Number of HDD blob replicas. Default is 0.
+	HddReplicas int32 `protobuf:"varint,2,opt,name=hdd_replicas,json=hddReplicas,proto3" json:"hdd_replicas,omitempty"`
+	// Enable cloud object storage tier (S3/GCS).
+	Archive bool `protobuf:"varint,3,opt,name=archive,proto3" json:"archive,omitempty"`
+	// If set, all replicas placed in this AZ; if empty, cross-AZ placement.
+	LocalAz       string `protobuf:"bytes,4,opt,name=local_az,json=localAz,proto3" json:"local_az,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ReplicationConfig) Reset() {
+	*x = ReplicationConfig{}
+	mi := &file_basaltpb_common_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ReplicationConfig) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ReplicationConfig) ProtoMessage() {}
+
+func (x *ReplicationConfig) ProtoReflect() protoreflect.Message {
+	mi := &file_basaltpb_common_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ReplicationConfig.ProtoReflect.Descriptor instead.
+func (*ReplicationConfig) Descriptor() ([]byte, []int) {
+	return file_basaltpb_common_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *ReplicationConfig) GetSsdReplicas() int32 {
+	if x != nil {
+		return x.SsdReplicas
+	}
+	return 0
+}
+
+func (x *ReplicationConfig) GetHddReplicas() int32 {
+	if x != nil {
+		return x.HddReplicas
+	}
+	return 0
+}
+
+func (x *ReplicationConfig) GetArchive() bool {
+	if x != nil {
+		return x.Archive
+	}
+	return false
+}
+
+func (x *ReplicationConfig) GetLocalAz() string {
+	if x != nil {
+		return x.LocalAz
+	}
+	return ""
+}
+
 var File_basaltpb_common_proto protoreflect.FileDescriptor
 
 const file_basaltpb_common_proto_rawDesc = "" +
@@ -445,7 +518,12 @@ const file_basaltpb_common_proto_rawDesc = "" +
 	"\x04type\x18\x02 \x01(\x0e2\x13.basaltpb.EntryTypeR\x04type\x12\x0e\n" +
 	"\x02id\x18\x03 \x01(\fR\x02id\x12\x12\n" +
 	"\x04size\x18\x04 \x01(\x03R\x04size\x12\x16\n" +
-	"\x06sealed\x18\x05 \x01(\bR\x06sealed*V\n" +
+	"\x06sealed\x18\x05 \x01(\bR\x06sealed\"\x8e\x01\n" +
+	"\x11ReplicationConfig\x12!\n" +
+	"\fssd_replicas\x18\x01 \x01(\x05R\vssdReplicas\x12!\n" +
+	"\fhdd_replicas\x18\x02 \x01(\x05R\vhddReplicas\x12\x18\n" +
+	"\aarchive\x18\x03 \x01(\bR\aarchive\x12\x19\n" +
+	"\blocal_az\x18\x04 \x01(\tR\alocalAz*V\n" +
 	"\tEntryType\x12\x1a\n" +
 	"\x16ENTRY_TYPE_UNSPECIFIED\x10\x00\x12\x13\n" +
 	"\x0fENTRY_TYPE_FILE\x10\x01\x12\x18\n" +
@@ -464,15 +542,16 @@ func file_basaltpb_common_proto_rawDescGZIP() []byte {
 }
 
 var file_basaltpb_common_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_basaltpb_common_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_basaltpb_common_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_basaltpb_common_proto_goTypes = []any{
-	(EntryType)(0),         // 0: basaltpb.EntryType
-	(*ObjectID)(nil),       // 1: basaltpb.ObjectID
-	(*ReplicaInfo)(nil),    // 2: basaltpb.ReplicaInfo
-	(*ObjectMeta)(nil),     // 3: basaltpb.ObjectMeta
-	(*MountID)(nil),        // 4: basaltpb.MountID
-	(*DirectoryID)(nil),    // 5: basaltpb.DirectoryID
-	(*DirectoryEntry)(nil), // 6: basaltpb.DirectoryEntry
+	(EntryType)(0),            // 0: basaltpb.EntryType
+	(*ObjectID)(nil),          // 1: basaltpb.ObjectID
+	(*ReplicaInfo)(nil),       // 2: basaltpb.ReplicaInfo
+	(*ObjectMeta)(nil),        // 3: basaltpb.ObjectMeta
+	(*MountID)(nil),           // 4: basaltpb.MountID
+	(*DirectoryID)(nil),       // 5: basaltpb.DirectoryID
+	(*DirectoryEntry)(nil),    // 6: basaltpb.DirectoryEntry
+	(*ReplicationConfig)(nil), // 7: basaltpb.ReplicationConfig
 }
 var file_basaltpb_common_proto_depIdxs = []int32{
 	1, // 0: basaltpb.ObjectMeta.id:type_name -> basaltpb.ObjectID
@@ -496,7 +575,7 @@ func file_basaltpb_common_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_basaltpb_common_proto_rawDesc), len(file_basaltpb_common_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   6,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

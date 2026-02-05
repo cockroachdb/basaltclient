@@ -80,12 +80,12 @@ func (c *Client) Rmdir(ctx context.Context, parentID []byte, name string) error 
 
 // Create allocates a new file in a directory and selects replicas.
 func (c *Client) Create(
-	ctx context.Context, directoryID []byte, name string, replication int32,
+	ctx context.Context, directoryID []byte, name string, config *basaltpb.ReplicationConfig,
 ) (*basaltpb.ObjectMeta, error) {
 	resp, err := c.client.Create(ctx, &basaltpb.CreateRequest{
 		DirectoryId: &basaltpb.DirectoryID{Uuid: directoryID},
 		Name:        name,
-		Replication: replication,
+		Config:      config,
 	})
 	if err != nil {
 		return nil, err

@@ -242,8 +242,8 @@ type CreateRequest struct {
 	DirectoryId *DirectoryID `protobuf:"bytes,1,opt,name=directory_id,json=directoryId,proto3" json:"directory_id,omitempty"`
 	// Name for the new file.
 	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	// Desired replication factor.
-	Replication   int32 `protobuf:"varint,3,opt,name=replication,proto3" json:"replication,omitempty"`
+	// Replication configuration for the new file.
+	Config        *ReplicationConfig `protobuf:"bytes,3,opt,name=config,proto3" json:"config,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -292,11 +292,11 @@ func (x *CreateRequest) GetName() string {
 	return ""
 }
 
-func (x *CreateRequest) GetReplication() int32 {
+func (x *CreateRequest) GetConfig() *ReplicationConfig {
 	if x != nil {
-		return x.Replication
+		return x.Config
 	}
-	return 0
+	return nil
 }
 
 type CreateResponse struct {
@@ -1182,11 +1182,11 @@ const file_basaltpb_controller_proto_rawDesc = "" +
 	"writeToken\">\n" +
 	"\x0eUnmountRequest\x12,\n" +
 	"\bmount_id\x18\x01 \x01(\v2\x11.basaltpb.MountIDR\amountId\"\x11\n" +
-	"\x0fUnmountResponse\"\x7f\n" +
+	"\x0fUnmountResponse\"\x92\x01\n" +
 	"\rCreateRequest\x128\n" +
 	"\fdirectory_id\x18\x01 \x01(\v2\x15.basaltpb.DirectoryIDR\vdirectoryId\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
-	"\vreplication\x18\x03 \x01(\x05R\vreplication\":\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x123\n" +
+	"\x06config\x18\x03 \x01(\v2\x1b.basaltpb.ReplicationConfigR\x06config\":\n" +
 	"\x0eCreateResponse\x12(\n" +
 	"\x04meta\x18\x01 \x01(\v2\x14.basaltpb.ObjectMetaR\x04meta\"_\n" +
 	"\x0fDirectoryLookup\x128\n" +
@@ -1258,83 +1258,85 @@ func file_basaltpb_controller_proto_rawDescGZIP() []byte {
 
 var file_basaltpb_controller_proto_msgTypes = make([]protoimpl.MessageInfo, 22)
 var file_basaltpb_controller_proto_goTypes = []any{
-	(*MountRequest)(nil),    // 0: basaltpb.MountRequest
-	(*MountResponse)(nil),   // 1: basaltpb.MountResponse
-	(*UnmountRequest)(nil),  // 2: basaltpb.UnmountRequest
-	(*UnmountResponse)(nil), // 3: basaltpb.UnmountResponse
-	(*CreateRequest)(nil),   // 4: basaltpb.CreateRequest
-	(*CreateResponse)(nil),  // 5: basaltpb.CreateResponse
-	(*DirectoryLookup)(nil), // 6: basaltpb.DirectoryLookup
-	(*LookupRequest)(nil),   // 7: basaltpb.LookupRequest
-	(*LookupResponse)(nil),  // 8: basaltpb.LookupResponse
-	(*DeleteRequest)(nil),   // 9: basaltpb.DeleteRequest
-	(*DeleteResponse)(nil),  // 10: basaltpb.DeleteResponse
-	(*SealRequest)(nil),     // 11: basaltpb.SealRequest
-	(*SealResponse)(nil),    // 12: basaltpb.SealResponse
-	(*MkdirRequest)(nil),    // 13: basaltpb.MkdirRequest
-	(*MkdirResponse)(nil),   // 14: basaltpb.MkdirResponse
-	(*RmdirRequest)(nil),    // 15: basaltpb.RmdirRequest
-	(*RmdirResponse)(nil),   // 16: basaltpb.RmdirResponse
-	(*ListRequest)(nil),     // 17: basaltpb.ListRequest
-	(*LinkRequest)(nil),     // 18: basaltpb.LinkRequest
-	(*LinkResponse)(nil),    // 19: basaltpb.LinkResponse
-	(*RenameRequest)(nil),   // 20: basaltpb.RenameRequest
-	(*RenameResponse)(nil),  // 21: basaltpb.RenameResponse
-	(*MountID)(nil),         // 22: basaltpb.MountID
-	(*DirectoryID)(nil),     // 23: basaltpb.DirectoryID
-	(*ObjectMeta)(nil),      // 24: basaltpb.ObjectMeta
-	(*ObjectID)(nil),        // 25: basaltpb.ObjectID
-	(EntryType)(0),          // 26: basaltpb.EntryType
-	(*DirectoryEntry)(nil),  // 27: basaltpb.DirectoryEntry
+	(*MountRequest)(nil),      // 0: basaltpb.MountRequest
+	(*MountResponse)(nil),     // 1: basaltpb.MountResponse
+	(*UnmountRequest)(nil),    // 2: basaltpb.UnmountRequest
+	(*UnmountResponse)(nil),   // 3: basaltpb.UnmountResponse
+	(*CreateRequest)(nil),     // 4: basaltpb.CreateRequest
+	(*CreateResponse)(nil),    // 5: basaltpb.CreateResponse
+	(*DirectoryLookup)(nil),   // 6: basaltpb.DirectoryLookup
+	(*LookupRequest)(nil),     // 7: basaltpb.LookupRequest
+	(*LookupResponse)(nil),    // 8: basaltpb.LookupResponse
+	(*DeleteRequest)(nil),     // 9: basaltpb.DeleteRequest
+	(*DeleteResponse)(nil),    // 10: basaltpb.DeleteResponse
+	(*SealRequest)(nil),       // 11: basaltpb.SealRequest
+	(*SealResponse)(nil),      // 12: basaltpb.SealResponse
+	(*MkdirRequest)(nil),      // 13: basaltpb.MkdirRequest
+	(*MkdirResponse)(nil),     // 14: basaltpb.MkdirResponse
+	(*RmdirRequest)(nil),      // 15: basaltpb.RmdirRequest
+	(*RmdirResponse)(nil),     // 16: basaltpb.RmdirResponse
+	(*ListRequest)(nil),       // 17: basaltpb.ListRequest
+	(*LinkRequest)(nil),       // 18: basaltpb.LinkRequest
+	(*LinkResponse)(nil),      // 19: basaltpb.LinkResponse
+	(*RenameRequest)(nil),     // 20: basaltpb.RenameRequest
+	(*RenameResponse)(nil),    // 21: basaltpb.RenameResponse
+	(*MountID)(nil),           // 22: basaltpb.MountID
+	(*DirectoryID)(nil),       // 23: basaltpb.DirectoryID
+	(*ReplicationConfig)(nil), // 24: basaltpb.ReplicationConfig
+	(*ObjectMeta)(nil),        // 25: basaltpb.ObjectMeta
+	(*ObjectID)(nil),          // 26: basaltpb.ObjectID
+	(EntryType)(0),            // 27: basaltpb.EntryType
+	(*DirectoryEntry)(nil),    // 28: basaltpb.DirectoryEntry
 }
 var file_basaltpb_controller_proto_depIdxs = []int32{
 	22, // 0: basaltpb.MountResponse.mount_id:type_name -> basaltpb.MountID
 	23, // 1: basaltpb.MountResponse.directory_id:type_name -> basaltpb.DirectoryID
 	22, // 2: basaltpb.UnmountRequest.mount_id:type_name -> basaltpb.MountID
 	23, // 3: basaltpb.CreateRequest.directory_id:type_name -> basaltpb.DirectoryID
-	24, // 4: basaltpb.CreateResponse.meta:type_name -> basaltpb.ObjectMeta
-	23, // 5: basaltpb.DirectoryLookup.directory_id:type_name -> basaltpb.DirectoryID
-	25, // 6: basaltpb.LookupRequest.object_id:type_name -> basaltpb.ObjectID
-	6,  // 7: basaltpb.LookupRequest.directory_lookup:type_name -> basaltpb.DirectoryLookup
-	24, // 8: basaltpb.LookupResponse.meta:type_name -> basaltpb.ObjectMeta
-	26, // 9: basaltpb.LookupResponse.type:type_name -> basaltpb.EntryType
-	23, // 10: basaltpb.DeleteRequest.directory_id:type_name -> basaltpb.DirectoryID
-	25, // 11: basaltpb.DeleteResponse.object_id:type_name -> basaltpb.ObjectID
-	25, // 12: basaltpb.SealRequest.object_id:type_name -> basaltpb.ObjectID
-	23, // 13: basaltpb.MkdirRequest.parent_id:type_name -> basaltpb.DirectoryID
-	23, // 14: basaltpb.MkdirResponse.directory_id:type_name -> basaltpb.DirectoryID
-	23, // 15: basaltpb.RmdirRequest.parent_id:type_name -> basaltpb.DirectoryID
-	23, // 16: basaltpb.ListRequest.directory_id:type_name -> basaltpb.DirectoryID
-	23, // 17: basaltpb.LinkRequest.directory_id:type_name -> basaltpb.DirectoryID
-	25, // 18: basaltpb.LinkRequest.object_id:type_name -> basaltpb.ObjectID
-	23, // 19: basaltpb.RenameRequest.directory_id:type_name -> basaltpb.DirectoryID
-	0,  // 20: basaltpb.Controller.Mount:input_type -> basaltpb.MountRequest
-	2,  // 21: basaltpb.Controller.Unmount:input_type -> basaltpb.UnmountRequest
-	4,  // 22: basaltpb.Controller.Create:input_type -> basaltpb.CreateRequest
-	7,  // 23: basaltpb.Controller.Lookup:input_type -> basaltpb.LookupRequest
-	9,  // 24: basaltpb.Controller.Delete:input_type -> basaltpb.DeleteRequest
-	11, // 25: basaltpb.Controller.Seal:input_type -> basaltpb.SealRequest
-	13, // 26: basaltpb.Controller.Mkdir:input_type -> basaltpb.MkdirRequest
-	15, // 27: basaltpb.Controller.Rmdir:input_type -> basaltpb.RmdirRequest
-	17, // 28: basaltpb.Controller.List:input_type -> basaltpb.ListRequest
-	18, // 29: basaltpb.Controller.Link:input_type -> basaltpb.LinkRequest
-	20, // 30: basaltpb.Controller.Rename:input_type -> basaltpb.RenameRequest
-	1,  // 31: basaltpb.Controller.Mount:output_type -> basaltpb.MountResponse
-	3,  // 32: basaltpb.Controller.Unmount:output_type -> basaltpb.UnmountResponse
-	5,  // 33: basaltpb.Controller.Create:output_type -> basaltpb.CreateResponse
-	8,  // 34: basaltpb.Controller.Lookup:output_type -> basaltpb.LookupResponse
-	10, // 35: basaltpb.Controller.Delete:output_type -> basaltpb.DeleteResponse
-	12, // 36: basaltpb.Controller.Seal:output_type -> basaltpb.SealResponse
-	14, // 37: basaltpb.Controller.Mkdir:output_type -> basaltpb.MkdirResponse
-	16, // 38: basaltpb.Controller.Rmdir:output_type -> basaltpb.RmdirResponse
-	27, // 39: basaltpb.Controller.List:output_type -> basaltpb.DirectoryEntry
-	19, // 40: basaltpb.Controller.Link:output_type -> basaltpb.LinkResponse
-	21, // 41: basaltpb.Controller.Rename:output_type -> basaltpb.RenameResponse
-	31, // [31:42] is the sub-list for method output_type
-	20, // [20:31] is the sub-list for method input_type
-	20, // [20:20] is the sub-list for extension type_name
-	20, // [20:20] is the sub-list for extension extendee
-	0,  // [0:20] is the sub-list for field type_name
+	24, // 4: basaltpb.CreateRequest.config:type_name -> basaltpb.ReplicationConfig
+	25, // 5: basaltpb.CreateResponse.meta:type_name -> basaltpb.ObjectMeta
+	23, // 6: basaltpb.DirectoryLookup.directory_id:type_name -> basaltpb.DirectoryID
+	26, // 7: basaltpb.LookupRequest.object_id:type_name -> basaltpb.ObjectID
+	6,  // 8: basaltpb.LookupRequest.directory_lookup:type_name -> basaltpb.DirectoryLookup
+	25, // 9: basaltpb.LookupResponse.meta:type_name -> basaltpb.ObjectMeta
+	27, // 10: basaltpb.LookupResponse.type:type_name -> basaltpb.EntryType
+	23, // 11: basaltpb.DeleteRequest.directory_id:type_name -> basaltpb.DirectoryID
+	26, // 12: basaltpb.DeleteResponse.object_id:type_name -> basaltpb.ObjectID
+	26, // 13: basaltpb.SealRequest.object_id:type_name -> basaltpb.ObjectID
+	23, // 14: basaltpb.MkdirRequest.parent_id:type_name -> basaltpb.DirectoryID
+	23, // 15: basaltpb.MkdirResponse.directory_id:type_name -> basaltpb.DirectoryID
+	23, // 16: basaltpb.RmdirRequest.parent_id:type_name -> basaltpb.DirectoryID
+	23, // 17: basaltpb.ListRequest.directory_id:type_name -> basaltpb.DirectoryID
+	23, // 18: basaltpb.LinkRequest.directory_id:type_name -> basaltpb.DirectoryID
+	26, // 19: basaltpb.LinkRequest.object_id:type_name -> basaltpb.ObjectID
+	23, // 20: basaltpb.RenameRequest.directory_id:type_name -> basaltpb.DirectoryID
+	0,  // 21: basaltpb.Controller.Mount:input_type -> basaltpb.MountRequest
+	2,  // 22: basaltpb.Controller.Unmount:input_type -> basaltpb.UnmountRequest
+	4,  // 23: basaltpb.Controller.Create:input_type -> basaltpb.CreateRequest
+	7,  // 24: basaltpb.Controller.Lookup:input_type -> basaltpb.LookupRequest
+	9,  // 25: basaltpb.Controller.Delete:input_type -> basaltpb.DeleteRequest
+	11, // 26: basaltpb.Controller.Seal:input_type -> basaltpb.SealRequest
+	13, // 27: basaltpb.Controller.Mkdir:input_type -> basaltpb.MkdirRequest
+	15, // 28: basaltpb.Controller.Rmdir:input_type -> basaltpb.RmdirRequest
+	17, // 29: basaltpb.Controller.List:input_type -> basaltpb.ListRequest
+	18, // 30: basaltpb.Controller.Link:input_type -> basaltpb.LinkRequest
+	20, // 31: basaltpb.Controller.Rename:input_type -> basaltpb.RenameRequest
+	1,  // 32: basaltpb.Controller.Mount:output_type -> basaltpb.MountResponse
+	3,  // 33: basaltpb.Controller.Unmount:output_type -> basaltpb.UnmountResponse
+	5,  // 34: basaltpb.Controller.Create:output_type -> basaltpb.CreateResponse
+	8,  // 35: basaltpb.Controller.Lookup:output_type -> basaltpb.LookupResponse
+	10, // 36: basaltpb.Controller.Delete:output_type -> basaltpb.DeleteResponse
+	12, // 37: basaltpb.Controller.Seal:output_type -> basaltpb.SealResponse
+	14, // 38: basaltpb.Controller.Mkdir:output_type -> basaltpb.MkdirResponse
+	16, // 39: basaltpb.Controller.Rmdir:output_type -> basaltpb.RmdirResponse
+	28, // 40: basaltpb.Controller.List:output_type -> basaltpb.DirectoryEntry
+	19, // 41: basaltpb.Controller.Link:output_type -> basaltpb.LinkResponse
+	21, // 42: basaltpb.Controller.Rename:output_type -> basaltpb.RenameResponse
+	32, // [32:43] is the sub-list for method output_type
+	21, // [21:32] is the sub-list for method input_type
+	21, // [21:21] is the sub-list for extension type_name
+	21, // [21:21] is the sub-list for extension extendee
+	0,  // [0:21] is the sub-list for field type_name
 }
 
 func init() { file_basaltpb_controller_proto_init() }
