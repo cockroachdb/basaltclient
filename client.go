@@ -12,6 +12,9 @@
 package basaltclient
 
 import (
+	"context"
+
+	"github.com/cockroachdb/basaltclient/basaltpb"
 	"github.com/cockroachdb/basaltclient/internal/blob"
 	"github.com/cockroachdb/basaltclient/internal/controller"
 )
@@ -38,6 +41,84 @@ func NewControllerClient(addr string) (*ControllerClient, error) {
 // Close closes the controller client connection.
 func (c *ControllerClient) Close() error {
 	return c.client.Close()
+}
+
+// Mount registers a Pebble instance and acquires exclusive write access to its store directory.
+func (c *ControllerClient) Mount(
+	ctx context.Context, instanceID string, az string, clusterID []byte, storeID []byte,
+) (*basaltpb.MountResponse, error) {
+	return c.client.Mount(ctx, instanceID, az, clusterID, storeID)
+}
+
+// Unmount releases the write lock on a store directory.
+func (c *ControllerClient) Unmount(ctx context.Context, mountID []byte) error {
+	return c.client.Unmount(ctx, mountID)
+}
+
+// Mkdir creates a subdirectory within a directory.
+func (c *ControllerClient) Mkdir(
+	ctx context.Context, parentID []byte, name string,
+) (*basaltpb.DirectoryID, error) {
+	return c.client.Mkdir(ctx, parentID, name)
+}
+
+// Rmdir removes an empty directory.
+func (c *ControllerClient) Rmdir(ctx context.Context, parentID []byte, name string) error {
+	return c.client.Rmdir(ctx, parentID, name)
+}
+
+// Create allocates a new file in a directory and selects replicas.
+func (c *ControllerClient) Create(
+	ctx context.Context, directoryID []byte, name string, replication int32,
+) (*basaltpb.ObjectMeta, error) {
+	return c.client.Create(ctx, directoryID, name, replication)
+}
+
+// LookupByID returns metadata for an object by ID.
+func (c *ControllerClient) LookupByID(
+	ctx context.Context, objectID []byte,
+) (*basaltpb.LookupResponse, error) {
+	return c.client.LookupByID(ctx, objectID)
+}
+
+// LookupByPath returns metadata for an object by (directory_id, name).
+func (c *ControllerClient) LookupByPath(
+	ctx context.Context, directoryID []byte, name string,
+) (*basaltpb.LookupResponse, error) {
+	return c.client.LookupByPath(ctx, directoryID, name)
+}
+
+// Delete removes an entry from a directory.
+func (c *ControllerClient) Delete(
+	ctx context.Context, directoryID []byte, name string,
+) (*basaltpb.DeleteResponse, error) {
+	return c.client.Delete(ctx, directoryID, name)
+}
+
+// Seal marks an object as immutable with its final size.
+func (c *ControllerClient) Seal(ctx context.Context, objectID []byte, size int64) error {
+	return c.client.Seal(ctx, objectID, size)
+}
+
+// Link creates a hardlink to an existing object in a directory.
+func (c *ControllerClient) Link(
+	ctx context.Context, directoryID []byte, name string, objectID []byte,
+) error {
+	return c.client.Link(ctx, directoryID, name, objectID)
+}
+
+// Rename moves an entry within the same directory.
+func (c *ControllerClient) Rename(
+	ctx context.Context, directoryID []byte, oldName string, newName string,
+) error {
+	return c.client.Rename(ctx, directoryID, oldName, newName)
+}
+
+// List returns all entries in a directory.
+func (c *ControllerClient) List(
+	ctx context.Context, directoryID []byte,
+) ([]*basaltpb.DirectoryEntry, error) {
+	return c.client.List(ctx, directoryID)
 }
 
 // BlobControlClient provides gRPC access to blob server control operations
