@@ -19,8 +19,8 @@ type ParsedPath struct {
 	Controllers []string
 	// Path is the namespace path (e.g., "/dir/file") without query string.
 	Path string
-	// Config is the parsed replication configuration with defaults applied.
-	Config basaltpb.ReplicationConfig
+	// Config is the parsed replication policy with defaults applied.
+	Config basaltpb.ReplicationPolicy
 }
 
 // IsLocal returns true if this represents a local filesystem path.

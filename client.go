@@ -56,9 +56,10 @@ func (c *ControllerClient) Unmount(ctx context.Context, mountID []byte) error {
 }
 
 // Mkdir creates a subdirectory within a directory.
+// Returns the UUID of the newly created directory.
 func (c *ControllerClient) Mkdir(
 	ctx context.Context, parentID []byte, name string,
-) (*basaltpb.DirectoryID, error) {
+) (basaltpb.UUID, error) {
 	return c.client.Mkdir(ctx, parentID, name)
 }
 
@@ -69,23 +70,23 @@ func (c *ControllerClient) Rmdir(ctx context.Context, parentID []byte, name stri
 
 // Create allocates a new file in a directory and selects replicas.
 func (c *ControllerClient) Create(
-	ctx context.Context, directoryID []byte, name string, config *basaltpb.ReplicationConfig,
+	ctx context.Context, directoryID []byte, name string, policy *basaltpb.ReplicationPolicy,
 ) (*basaltpb.ObjectMeta, error) {
-	return c.client.Create(ctx, directoryID, name, config)
+	return c.client.Create(ctx, directoryID, name, policy)
 }
 
-// LookupByID returns metadata for an object by ID.
-func (c *ControllerClient) LookupByID(
+// StatByID returns metadata for an object by ID.
+func (c *ControllerClient) StatByID(
 	ctx context.Context, objectID []byte,
-) (*basaltpb.LookupResponse, error) {
-	return c.client.LookupByID(ctx, objectID)
+) (*basaltpb.StatResponse, error) {
+	return c.client.StatByID(ctx, objectID)
 }
 
-// LookupByPath returns metadata for an object by (directory_id, name).
-func (c *ControllerClient) LookupByPath(
+// StatByPath returns metadata for an object by (directory_id, name).
+func (c *ControllerClient) StatByPath(
 	ctx context.Context, directoryID []byte, name string,
-) (*basaltpb.LookupResponse, error) {
-	return c.client.LookupByPath(ctx, directoryID, name)
+) (*basaltpb.StatResponse, error) {
+	return c.client.StatByPath(ctx, directoryID, name)
 }
 
 // Delete removes an entry from a directory.

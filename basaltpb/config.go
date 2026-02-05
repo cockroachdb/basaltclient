@@ -6,7 +6,7 @@ import (
 	"strconv"
 )
 
-// Parse parses a query string into the ReplicationConfig.
+// Parse parses a query string into a ReplicationPolicy.
 // It zeros out the receiver and applies defaults before parsing.
 //
 // Supported parameters:
@@ -16,9 +16,9 @@ import (
 //   - az=cross|local: Placement strategy (default cross)
 //
 // When az=local is specified, localAZ must be provided.
-func (c *ReplicationConfig) Parse(queryStr, localAZ string) error {
+func (c *ReplicationPolicy) Parse(queryStr, localAZ string) error {
 	// Zero out and apply defaults.
-	*c = ReplicationConfig{
+	*c = ReplicationPolicy{
 		SsdReplicas: 3,
 		HddReplicas: 0,
 		Archive:     false,

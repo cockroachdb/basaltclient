@@ -5,6 +5,7 @@ package basaltpb;
 option go_package = "github.com/cockroachdb/basaltclient/basaltpb";
 
 import "basaltpb/common.proto";
+import "gogoproto/gogo.proto";
 
 // Controller coordinates object placement, mounts, and repairs in Basalt.
 service Controller {
@@ -20,9 +21,13 @@ service Controller {
   // must not be mounted by anyone.
   rpc Create(CreateRequest) returns (CreateResponse);
 
-  // Lookup returns metadata for an object by ID or (directory_id, name).
+  // StatByPath returns metadata for an entry by (directory_id, name).
   // Does not require a mount.
-  rpc Lookup(LookupRequest) returns (LookupResponse);
+  rpc StatByPath(StatByPathRequest) returns (StatResponse);
+
+  // StatByID returns metadata for an object by ID.
+  // Does not require a mount.
+  rpc StatByID(StatByIDRequest) returns (StatResponse);
 
   // Delete removes an entry from a directory. If this was the last reference
   // to the object, the object and its replicas are scheduled for deletion.
@@ -70,54 +75,52 @@ message MountRequest {
   // Availability zone of the mounting node.
   string az = 2;
   // UUID of the CockroachDB cluster.
-  bytes cluster_id = 3;
+  bytes cluster_id = 3 [(gogoproto.customtype) = "UUID", (gogoproto.nullable) = false];
   // UUID of the store within the cluster.
-  bytes store_id = 4;
+  bytes store_id = 4 [(gogoproto.customtype) = "UUID", (gogoproto.nullable) = false];
 }
 
 message MountResponse {
   // Unique mount ID for this session.
-  MountID mount_id = 1;
+  bytes mount_id = 1 [(gogoproto.customtype) = "UUID", (gogoproto.nullable) = false];
   // Root directory ID for the mounted store.
-  DirectoryID directory_id = 2;
+  bytes directory_id = 2 [(gogoproto.customtype) = "UUID", (gogoproto.nullable) = false];
   // Write token for authenticating with blob servers.
   bytes write_token = 3;
 }
 
 message UnmountRequest {
-  MountID mount_id = 1;
+  bytes mount_id = 1 [(gogoproto.customtype) = "UUID", (gogoproto.nullable) = false];
 }
 
 message UnmountResponse {}
 
 message CreateRequest {
   // Directory in which to create the file.
-  DirectoryID directory_id = 1;
+  bytes directory_id = 1 [(gogoproto.customtype) = "UUID", (gogoproto.nullable) = false];
   // Name for the new file.
   string name = 2;
-  // Replication configuration for the new file.
-  ReplicationConfig config = 3;
+  // Replication policy for the new file.
+  ReplicationPolicy policy = 3;
 }
 
 message CreateResponse {
   ObjectMeta meta = 1;
 }
 
-// DirectoryLookup specifies a lookup by (directory_id, name) pair.
-message DirectoryLookup {
-  DirectoryID directory_id = 1;
+message StatByPathRequest {
+  // Directory containing the entry.
+  bytes directory_id = 1 [(gogoproto.customtype) = "UUID", (gogoproto.nullable) = false];
+  // Name of the entry to stat.
   string name = 2;
 }
 
-message LookupRequest {
-  // Object to look up by ID or directory entry.
-  oneof key {
-    ObjectID object_id = 1;
-    DirectoryLookup directory_lookup = 2;
-  }
+message StatByIDRequest {
+  // Object ID to stat.
+  bytes object_id = 1 [(gogoproto.customtype) = "UUID", (gogoproto.nullable) = false];
 }
 
-message LookupResponse {
+message StatResponse {
   ObjectMeta meta = 1;
   // Type of the entry (file or directory).
   EntryType type = 2;
@@ -125,21 +128,21 @@ message LookupResponse {
 
 message DeleteRequest {
   // Directory containing the entry to delete.
-  DirectoryID directory_id = 1;
+  bytes directory_id = 1 [(gogoproto.customtype) = "UUID", (gogoproto.nullable) = false];
   // Name of the entry to delete.
   string name = 2;
 }
 
 message DeleteResponse {
   // Object ID that was unlinked (for files only).
-  ObjectID object_id = 1;
+  bytes object_id = 1 [(gogoproto.customtype) = "UUID", (gogoproto.nullable) = false];
   // True if this was the last reference and the object will be deleted.
   bool object_deleted = 2;
 }
 
 message SealRequest {
   // Object to seal.
-  ObjectID object_id = 1;
+  bytes object_id = 1 [(gogoproto.customtype) = "UUID", (gogoproto.nullable) = false];
   // Final size of the object.
   int64 size = 2;
 }
@@ -148,19 +151,19 @@ message SealResponse {}
 
 message MkdirRequest {
   // Parent directory in which to create the subdirectory.
-  DirectoryID parent_id = 1;
+  bytes parent_id = 1 [(gogoproto.customtype) = "UUID", (gogoproto.nullable) = false];
   // Name for the new directory.
   string name = 2;
 }
 
 message MkdirResponse {
   // ID of the newly created directory.
-  DirectoryID directory_id = 1;
+  bytes directory_id = 1 [(gogoproto.customtype) = "UUID", (gogoproto.nullable) = false];
 }
 
 message RmdirRequest {
   // Parent directory containing the directory to remove.
-  DirectoryID parent_id = 1;
+  bytes parent_id = 1 [(gogoproto.customtype) = "UUID", (gogoproto.nullable) = false];
   // Name of the directory to remove.
   string name = 2;
 }
@@ -169,23 +172,23 @@ message RmdirResponse {}
 
 message ListRequest {
   // Directory to list.
-  DirectoryID directory_id = 1;
+  bytes directory_id = 1 [(gogoproto.customtype) = "UUID", (gogoproto.nullable) = false];
 }
 
 message LinkRequest {
   // Directory in which to create the link.
-  DirectoryID directory_id = 1;
+  bytes directory_id = 1 [(gogoproto.customtype) = "UUID", (gogoproto.nullable) = false];
   // Name for the new link.
   string name = 2;
   // Existing object to link to.
-  ObjectID object_id = 3;
+  bytes object_id = 3 [(gogoproto.customtype) = "UUID", (gogoproto.nullable) = false];
 }
 
 message LinkResponse {}
 
 message RenameRequest {
   // Directory containing the entry to rename.
-  DirectoryID directory_id = 1;
+  bytes directory_id = 1 [(gogoproto.customtype) = "UUID", (gogoproto.nullable) = false];
   // Current name of the entry.
   string old_name = 2;
   // New name for the entry.
@@ -196,7 +199,7 @@ message RenameResponse {}
 
 message RegisterBlobServerRequest {
   // UUID generated and persisted by the blob server.
-  bytes server_id = 1;
+  bytes server_id = 1 [(gogoproto.customtype) = "UUID", (gogoproto.nullable) = false];
   // Address (host:port) for the data protocol.
   string address = 2;
   // Availability zone of the blob server.

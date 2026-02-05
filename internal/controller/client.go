@@ -42,29 +42,27 @@ func (c *Client) Mount(
 	return c.client.Mount(ctx, &basaltpb.MountRequest{
 		InstanceId: instanceID,
 		Az:         az,
-		ClusterId:  clusterID,
-		StoreId:    storeID,
+		ClusterId:  basaltpb.UUIDFromBytes(clusterID),
+		StoreId:    basaltpb.UUIDFromBytes(storeID),
 	})
 }
 
 // Unmount releases the write lock on a store directory.
 func (c *Client) Unmount(ctx context.Context, mountID []byte) error {
 	_, err := c.client.Unmount(ctx, &basaltpb.UnmountRequest{
-		MountId: &basaltpb.MountID{Uuid: mountID},
+		MountId: basaltpb.UUIDFromBytes(mountID),
 	})
 	return err
 }
 
 // Mkdir creates a subdirectory within a directory.
-func (c *Client) Mkdir(
-	ctx context.Context, parentID []byte, name string,
-) (*basaltpb.DirectoryID, error) {
+func (c *Client) Mkdir(ctx context.Context, parentID []byte, name string) (basaltpb.UUID, error) {
 	resp, err := c.client.Mkdir(ctx, &basaltpb.MkdirRequest{
-		ParentId: &basaltpb.DirectoryID{Uuid: parentID},
+		ParentId: basaltpb.UUIDFromBytes(parentID),
 		Name:     name,
 	})
 	if err != nil {
-		return nil, err
+		return basaltpb.UUID{}, err
 	}
 	return resp.DirectoryId, nil
 }
@@ -72,7 +70,7 @@ func (c *Client) Mkdir(
 // Rmdir removes an empty directory.
 func (c *Client) Rmdir(ctx context.Context, parentID []byte, name string) error {
 	_, err := c.client.Rmdir(ctx, &basaltpb.RmdirRequest{
-		ParentId: &basaltpb.DirectoryID{Uuid: parentID},
+		ParentId: basaltpb.UUIDFromBytes(parentID),
 		Name:     name,
 	})
 	return err
@@ -80,12 +78,12 @@ func (c *Client) Rmdir(ctx context.Context, parentID []byte, name string) error 
 
 // Create allocates a new file in a directory and selects replicas.
 func (c *Client) Create(
-	ctx context.Context, directoryID []byte, name string, config *basaltpb.ReplicationConfig,
+	ctx context.Context, directoryID []byte, name string, policy *basaltpb.ReplicationPolicy,
 ) (*basaltpb.ObjectMeta, error) {
 	resp, err := c.client.Create(ctx, &basaltpb.CreateRequest{
-		DirectoryId: &basaltpb.DirectoryID{Uuid: directoryID},
+		DirectoryId: basaltpb.UUIDFromBytes(directoryID),
 		Name:        name,
-		Config:      config,
+		Policy:      policy,
 	})
 	if err != nil {
 		return nil, err
@@ -93,28 +91,20 @@ func (c *Client) Create(
 	return resp.Meta, nil
 }
 
-// LookupByID returns metadata for an object by ID.
-func (c *Client) LookupByID(
-	ctx context.Context, objectID []byte,
-) (*basaltpb.LookupResponse, error) {
-	return c.client.Lookup(ctx, &basaltpb.LookupRequest{
-		Key: &basaltpb.LookupRequest_ObjectId{
-			ObjectId: &basaltpb.ObjectID{Uuid: objectID},
-		},
+// StatByID returns metadata for an object by ID.
+func (c *Client) StatByID(ctx context.Context, objectID []byte) (*basaltpb.StatResponse, error) {
+	return c.client.StatByID(ctx, &basaltpb.StatByIDRequest{
+		ObjectId: basaltpb.UUIDFromBytes(objectID),
 	})
 }
 
-// LookupByPath returns metadata for an object by (directory_id, name).
-func (c *Client) LookupByPath(
+// StatByPath returns metadata for an object by (directory_id, name).
+func (c *Client) StatByPath(
 	ctx context.Context, directoryID []byte, name string,
-) (*basaltpb.LookupResponse, error) {
-	return c.client.Lookup(ctx, &basaltpb.LookupRequest{
-		Key: &basaltpb.LookupRequest_DirectoryLookup{
-			DirectoryLookup: &basaltpb.DirectoryLookup{
-				DirectoryId: &basaltpb.DirectoryID{Uuid: directoryID},
-				Name:        name,
-			},
-		},
+) (*basaltpb.StatResponse, error) {
+	return c.client.StatByPath(ctx, &basaltpb.StatByPathRequest{
+		DirectoryId: basaltpb.UUIDFromBytes(directoryID),
+		Name:        name,
 	})
 }
 
@@ -123,7 +113,7 @@ func (c *Client) Delete(
 	ctx context.Context, directoryID []byte, name string,
 ) (*basaltpb.DeleteResponse, error) {
 	return c.client.Delete(ctx, &basaltpb.DeleteRequest{
-		DirectoryId: &basaltpb.DirectoryID{Uuid: directoryID},
+		DirectoryId: basaltpb.UUIDFromBytes(directoryID),
 		Name:        name,
 	})
 }
@@ -131,8 +121,8 @@ func (c *Client) Delete(
 // Seal marks an object as immutable with its final size.
 func (c *Client) Seal(ctx context.Context, objectID []byte, size int64) error {
 	_, err := c.client.Seal(ctx, &basaltpb.SealRequest{
-		ObjectId: &basaltpb.ObjectID{Uuid: objectID},
-		Size:     size,
+		ObjectId: basaltpb.UUIDFromBytes(objectID),
+		Size_:    size,
 	})
 	return err
 }
@@ -140,9 +130,9 @@ func (c *Client) Seal(ctx context.Context, objectID []byte, size int64) error {
 // Link creates a hardlink to an existing object in a directory.
 func (c *Client) Link(ctx context.Context, directoryID []byte, name string, objectID []byte) error {
 	_, err := c.client.Link(ctx, &basaltpb.LinkRequest{
-		DirectoryId: &basaltpb.DirectoryID{Uuid: directoryID},
+		DirectoryId: basaltpb.UUIDFromBytes(directoryID),
 		Name:        name,
-		ObjectId:    &basaltpb.ObjectID{Uuid: objectID},
+		ObjectId:    basaltpb.UUIDFromBytes(objectID),
 	})
 	return err
 }
@@ -152,7 +142,7 @@ func (c *Client) Rename(
 	ctx context.Context, directoryID []byte, oldName string, newName string,
 ) error {
 	_, err := c.client.Rename(ctx, &basaltpb.RenameRequest{
-		DirectoryId: &basaltpb.DirectoryID{Uuid: directoryID},
+		DirectoryId: basaltpb.UUIDFromBytes(directoryID),
 		OldName:     oldName,
 		NewName:     newName,
 	})
@@ -162,7 +152,7 @@ func (c *Client) Rename(
 // List returns all entries in a directory.
 func (c *Client) List(ctx context.Context, directoryID []byte) ([]*basaltpb.DirectoryEntry, error) {
 	stream, err := c.client.List(ctx, &basaltpb.ListRequest{
-		DirectoryId: &basaltpb.DirectoryID{Uuid: directoryID},
+		DirectoryId: basaltpb.UUIDFromBytes(directoryID),
 	})
 	if err != nil {
 		return nil, err

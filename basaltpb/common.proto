@@ -4,10 +4,22 @@ package basaltpb;
 
 option go_package = "github.com/cockroachdb/basaltclient/basaltpb";
 
-// ObjectID uniquely identifies an object in the Basalt storage system.
-message ObjectID {
-  // UUID of the object as 16 bytes.
-  bytes uuid = 1;
+import "gogoproto/gogo.proto";
+
+// ObjectMeta contains metadata about an object.
+message ObjectMeta {
+  // Unique identifier for this object.
+  bytes id = 1 [(gogoproto.customtype) = "UUID", (gogoproto.nullable) = false];
+  // List of replicas storing this object.
+  repeated ReplicaInfo replicas = 2;
+  // Current size of the object in bytes. -1 for directories, NULL for unsealed files.
+  int64 size = 3;
+  // Whether the object has been sealed (immutable).
+  bool sealed = 4;
+  // Replication policy for the object (NULL for directories).
+  ReplicationPolicy policy = 5;
+  // Reference to archive location (e.g., S3/GCS path) if archived.
+  string archive_ref = 6;
 }
 
 // ReplicaInfo describes a replica of an object stored on a blob server.
@@ -16,31 +28,6 @@ message ReplicaInfo {
   string address = 1;
   // Availability zone of the blob server.
   string az = 2;
-}
-
-// ObjectMeta contains metadata about an object.
-message ObjectMeta {
-  // Unique identifier for this object.
-  ObjectID id = 1;
-  // List of replicas storing this object.
-  repeated ReplicaInfo replicas = 2;
-  // Current size of the object in bytes.
-  int64 size = 3;
-  // Whether the object has been sealed (immutable).
-  bool sealed = 4;
-}
-
-// MountID uniquely identifies an active mount of a Pebble instance.
-message MountID {
-  // UUID of the mount as 16 bytes.
-  bytes uuid = 1;
-}
-
-// DirectoryID identifies a directory in the namespace.
-// The nil UUID represents the namespace root.
-message DirectoryID {
-  // UUID of the directory as 16 bytes. Nil UUID = namespace root.
-  bytes uuid = 1;
 }
 
 // EntryType distinguishes files from directories in the namespace.
@@ -57,26 +44,22 @@ message DirectoryEntry {
   // Type of entry (file or directory).
   EntryType type = 2;
   // ID of the target: object_id for files, directory_id for directories.
-  bytes id = 3;
+  bytes id = 3 [(gogoproto.customtype) = "UUID", (gogoproto.nullable) = false];
   // Size in bytes (only set for sealed files).
   int64 size = 4;
   // Whether the file is sealed (only applicable to files).
   bool sealed = 5;
 }
 
-// ReplicationConfig specifies how an object should be replicated.
-message ReplicationConfig {
-  // Number of SSD blob replicas. Default is 3 if no parameters specified.
+// ReplicationPolicy specifies the target/requested replication configuration for an object.
+// This represents the desired state; actual replica placement may differ temporarily.
+message ReplicationPolicy {
+  // Target number of SSD blob replicas. Default is 3 if no parameters specified.
   int32 ssd_replicas = 1;
-  // Number of HDD blob replicas. Default is 0.
+  // Target number of HDD blob replicas. Default is 0.
   int32 hdd_replicas = 2;
-  // Enable cloud object storage tier (S3/GCS).
+  // Whether to archive to cloud object storage (S3/GCS).
   bool archive = 3;
   // If set, all replicas placed in this AZ; if empty, cross-AZ placement.
   string local_az = 4;
 }
-
-// TODO: Add additional shared types as needed:
-// - RangeID for per-range materialization
-// - Epoch for fencing
-// - Error codes and status types
