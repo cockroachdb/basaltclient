@@ -124,6 +124,8 @@ message StatResponse {
   ObjectMeta meta = 1;
   // Type of the entry (file or directory).
   EntryType type = 2;
+  // All namespace references (hardlinks) to this object.
+  repeated Reference references = 3;
 }
 
 message DeleteRequest {

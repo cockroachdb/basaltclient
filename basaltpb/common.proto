@@ -51,6 +51,14 @@ message DirectoryEntry {
   bool sealed = 5;
 }
 
+// Reference represents a namespace reference (hardlink) to an object.
+message Reference {
+  // Directory containing this reference.
+  bytes directory_id = 1 [(gogoproto.customtype) = "UUID", (gogoproto.nullable) = false];
+  // Name of the entry within the directory.
+  string name = 2;
+}
+
 // ReplicationPolicy specifies the target/requested replication configuration for an object.
 // This represents the desired state; actual replica placement may differ temporarily.
 message ReplicationPolicy {
