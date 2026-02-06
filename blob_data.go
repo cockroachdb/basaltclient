@@ -1,4 +1,4 @@
-package blob
+package basaltclient
 
 import (
 	"bufio"
@@ -8,14 +8,14 @@ import (
 	"github.com/cockroachdb/errors"
 )
 
-// DataClient is a client for communicating with a blob server's data endpoint.
+// BlobDataClient is a client for communicating with a blob server's data endpoint.
 // It uses net.Buffers (writev) for efficient zero-copy writes and
 // a buffered reader for responses.
 //
-// DataClient is NOT safe for concurrent use. Callers must ensure exclusive
+// BlobDataClient is NOT safe for concurrent use. Callers must ensure exclusive
 // access, either by using a pool (which provides exclusive access via
 // acquire/release semantics) or by using a dedicated client per goroutine.
-type DataClient struct {
+type BlobDataClient struct {
 	addr   string
 	conn   net.Conn
 	r      *bufio.Reader
@@ -27,14 +27,14 @@ type DataClient struct {
 	tmpBufs net.Buffers
 }
 
-// NewDataClient creates a new data client for the given server address.
+// NewBlobDataClient creates a new data client for the given server address.
 // The connection is established lazily on the first operation.
-func NewDataClient(addr string) *DataClient {
-	return &DataClient{addr: addr}
+func NewBlobDataClient(addr string) *BlobDataClient {
+	return &BlobDataClient{addr: addr}
 }
 
 // Close closes the connection to the server.
-func (c *DataClient) Close() error {
+func (c *BlobDataClient) Close() error {
 	if c.conn != nil {
 		err := c.conn.Close()
 		c.conn = nil
@@ -44,7 +44,7 @@ func (c *DataClient) Close() error {
 	return nil
 }
 
-func (c *DataClient) ensureConnected() error {
+func (c *BlobDataClient) ensureConnected() error {
 	if c.conn != nil {
 		return nil
 	}
@@ -61,7 +61,7 @@ func (c *DataClient) ensureConnected() error {
 // with the request (may be nil). dst is the buffer to read response data into
 // (may be nil if no response data is expected). Returns the number of bytes
 // read into dst.
-func (c *DataClient) doRequest(hdr RequestHeader, src, dst []byte) (int, error) {
+func (c *BlobDataClient) doRequest(hdr RequestHeader, src, dst []byte) (int, error) {
 	if err := c.ensureConnected(); err != nil {
 		return 0, err
 	}
@@ -135,7 +135,7 @@ func (c *DataClient) doRequest(hdr RequestHeader, src, dst []byte) (int, error) 
 }
 
 // Append appends data to an object at the specified offset.
-func (c *DataClient) Append(id ObjectID, offset uint64, data []byte) error {
+func (c *BlobDataClient) Append(id ObjectID, offset uint64, data []byte) error {
 	_, err := c.doRequest(RequestHeader{
 		OpCode:   OpAppend,
 		ObjectID: id,
@@ -146,7 +146,7 @@ func (c *DataClient) Append(id ObjectID, offset uint64, data []byte) error {
 }
 
 // AppendSync appends data to an object and syncs to disk in one round-trip.
-func (c *DataClient) AppendSync(id ObjectID, offset uint64, data []byte) error {
+func (c *BlobDataClient) AppendSync(id ObjectID, offset uint64, data []byte) error {
 	_, err := c.doRequest(RequestHeader{
 		OpCode:   OpAppendSync,
 		ObjectID: id,
@@ -157,14 +157,14 @@ func (c *DataClient) AppendSync(id ObjectID, offset uint64, data []byte) error {
 }
 
 // Sync syncs an object's data to disk.
-func (c *DataClient) Sync(id ObjectID) error {
+func (c *BlobDataClient) Sync(id ObjectID) error {
 	// Sync is implemented as AppendSync with empty data.
 	return c.AppendSync(id, 0, nil)
 }
 
 // Read reads data from an object at the specified offset into the provided
 // buffer. Returns the number of bytes read.
-func (c *DataClient) Read(id ObjectID, offset uint64, p []byte) (int, error) {
+func (c *BlobDataClient) Read(id ObjectID, offset uint64, p []byte) (int, error) {
 	return c.doRequest(RequestHeader{
 		OpCode:   OpRead,
 		ObjectID: id,
@@ -174,6 +174,6 @@ func (c *DataClient) Read(id ObjectID, offset uint64, p []byte) (int, error) {
 }
 
 // Addr returns the server address this client connects to.
-func (c *DataClient) Addr() string {
+func (c *BlobDataClient) Addr() string {
 	return c.addr
 }

@@ -1,4 +1,4 @@
-package blob
+package basaltclient
 
 import (
 	"sync"
@@ -7,8 +7,8 @@ import (
 	"time"
 )
 
-func TestDataClientPool_AcquireRelease(t *testing.T) {
-	pool := NewDataClientPool()
+func TestBlobDataClientPool_AcquireRelease(t *testing.T) {
+	pool := NewBlobDataClientPool()
 	defer pool.Close()
 
 	addr := "localhost:26259"
@@ -30,15 +30,15 @@ func TestDataClientPool_AcquireRelease(t *testing.T) {
 	pool.Release(client2)
 }
 
-func TestDataClientPool_PoolSizeLimit(t *testing.T) {
+func TestBlobDataClientPool_PoolSizeLimit(t *testing.T) {
 	poolSize := 2
-	pool := NewDataClientPool(WithPoolSize(poolSize))
+	pool := NewBlobDataClientPool(WithBlobPoolSize(poolSize))
 	defer pool.Close()
 
 	addr := "localhost:26259"
 
 	// Acquire all clients.
-	clients := make([]*DataClient, poolSize)
+	clients := make([]*BlobDataClient, poolSize)
 	for i := range clients {
 		clients[i] = pool.Acquire(addr)
 		if clients[i] == nil {
@@ -47,7 +47,7 @@ func TestDataClientPool_PoolSizeLimit(t *testing.T) {
 	}
 
 	// Next acquire should block. Use a goroutine and channel to verify.
-	acquired := make(chan *DataClient, 1)
+	acquired := make(chan *BlobDataClient, 1)
 	go func() {
 		acquired <- pool.Acquire(addr)
 	}()
@@ -80,9 +80,9 @@ func TestDataClientPool_PoolSizeLimit(t *testing.T) {
 	}
 }
 
-func TestDataClientPool_ReleaseWithError(t *testing.T) {
+func TestBlobDataClientPool_ReleaseWithError(t *testing.T) {
 	poolSize := 2
-	pool := NewDataClientPool(WithPoolSize(poolSize))
+	pool := NewBlobDataClientPool(WithBlobPoolSize(poolSize))
 	defer pool.Close()
 
 	addr := "localhost:26259"
@@ -108,8 +108,8 @@ func TestDataClientPool_ReleaseWithError(t *testing.T) {
 	pool.Release(client3)
 }
 
-func TestDataClientPool_MultipleServers(t *testing.T) {
-	pool := NewDataClientPool(WithPoolSize(2))
+func TestBlobDataClientPool_MultipleServers(t *testing.T) {
+	pool := NewBlobDataClientPool(WithBlobPoolSize(2))
 	defer pool.Close()
 
 	addr1 := "server1:26259"
@@ -129,9 +129,9 @@ func TestDataClientPool_MultipleServers(t *testing.T) {
 	pool.Release(client2)
 }
 
-func TestDataClientPool_ConcurrentAccess(t *testing.T) {
+func TestBlobDataClientPool_ConcurrentAccess(t *testing.T) {
 	poolSize := 4
-	pool := NewDataClientPool(WithPoolSize(poolSize))
+	pool := NewBlobDataClientPool(WithBlobPoolSize(poolSize))
 	defer pool.Close()
 
 	addr := "localhost:26259"
@@ -167,8 +167,8 @@ func TestDataClientPool_ConcurrentAccess(t *testing.T) {
 	}
 }
 
-func TestDataClientPool_Close(t *testing.T) {
-	pool := NewDataClientPool(WithPoolSize(2))
+func TestBlobDataClientPool_Close(t *testing.T) {
+	pool := NewBlobDataClientPool(WithBlobPoolSize(2))
 
 	addr := "localhost:26259"
 	client := pool.Acquire(addr)
@@ -191,14 +191,14 @@ func TestDataClientPool_Close(t *testing.T) {
 	}
 }
 
-func TestDataClientPool_CloseUnblocksWaiters(t *testing.T) {
-	pool := NewDataClientPool(WithPoolSize(1))
+func TestBlobDataClientPool_CloseUnblocksWaiters(t *testing.T) {
+	pool := NewBlobDataClientPool(WithBlobPoolSize(1))
 
 	addr := "localhost:26259"
 	client := pool.Acquire(addr)
 
 	// Start a goroutine that will block on acquire.
-	acquired := make(chan *DataClient, 1)
+	acquired := make(chan *BlobDataClient, 1)
 	go func() {
 		acquired <- pool.Acquire(addr)
 	}()
@@ -223,8 +223,8 @@ func TestDataClientPool_CloseUnblocksWaiters(t *testing.T) {
 	}
 }
 
-func TestDataClientPool_ReleaseNil(t *testing.T) {
-	pool := NewDataClientPool()
+func TestBlobDataClientPool_ReleaseNil(t *testing.T) {
+	pool := NewBlobDataClientPool()
 	defer pool.Close()
 
 	// Should not panic.
@@ -232,8 +232,8 @@ func TestDataClientPool_ReleaseNil(t *testing.T) {
 	pool.ReleaseWithError(nil)
 }
 
-func TestDataClientPool_DefaultPoolSize(t *testing.T) {
-	pool := NewDataClientPool()
+func TestBlobDataClientPool_DefaultPoolSize(t *testing.T) {
+	pool := NewBlobDataClientPool()
 	defer pool.Close()
 
 	if pool.poolSize != defaultPoolSize {
@@ -241,16 +241,16 @@ func TestDataClientPool_DefaultPoolSize(t *testing.T) {
 	}
 }
 
-func TestDataClientPool_InvalidPoolSize(t *testing.T) {
+func TestBlobDataClientPool_InvalidPoolSize(t *testing.T) {
 	// Zero and negative sizes should use default.
-	pool := NewDataClientPool(WithPoolSize(0))
+	pool := NewBlobDataClientPool(WithBlobPoolSize(0))
 	defer pool.Close()
 
 	if pool.poolSize != defaultPoolSize {
 		t.Fatalf("expected default pool size %d for size=0, got %d", defaultPoolSize, pool.poolSize)
 	}
 
-	pool2 := NewDataClientPool(WithPoolSize(-5))
+	pool2 := NewBlobDataClientPool(WithBlobPoolSize(-5))
 	defer pool2.Close()
 
 	if pool2.poolSize != defaultPoolSize {

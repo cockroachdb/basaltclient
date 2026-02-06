@@ -1,5 +1,4 @@
-// Package blob provides the internal implementation of the blob client.
-package blob
+package basaltclient
 
 import (
 	"context"
@@ -9,21 +8,21 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-// ControlClient provides gRPC access to blob server control operations
-// (Create, Seal, Delete, Stat). Data operations (Append, Read) use DataClient.
-type ControlClient struct {
+// BlobControlClient provides gRPC access to blob server control operations
+// (Create, Seal, Delete, Stat). Data operations (Append, Read) use BlobDataClient.
+type BlobControlClient struct {
 	addr   string
 	conn   *grpc.ClientConn
 	client basaltpb.BlobClient
 }
 
-// NewControlClient creates a new control client connected to the blob server at addr.
-func NewControlClient(addr string) (*ControlClient, error) {
+// NewBlobControlClient creates a new control client connected to the blob server at addr.
+func NewBlobControlClient(addr string) (*BlobControlClient, error) {
 	conn, err := grpc.NewClient(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, err
 	}
-	return &ControlClient{
+	return &BlobControlClient{
 		addr:   addr,
 		conn:   conn,
 		client: basaltpb.NewBlobClient(conn),
@@ -31,12 +30,12 @@ func NewControlClient(addr string) (*ControlClient, error) {
 }
 
 // Close closes the client connection.
-func (c *ControlClient) Close() error {
+func (c *BlobControlClient) Close() error {
 	return c.conn.Close()
 }
 
 // Create initializes a new object on this blob server.
-func (c *ControlClient) Create(ctx context.Context, id ObjectID) error {
+func (c *BlobControlClient) Create(ctx context.Context, id ObjectID) error {
 	_, err := c.client.Create(ctx, &basaltpb.BlobCreateRequest{
 		Id: basaltpb.UUID(id),
 	})
@@ -45,7 +44,7 @@ func (c *ControlClient) Create(ctx context.Context, id ObjectID) error {
 
 // Seal marks an object as immutable on this replica.
 // Returns the final size of the sealed object.
-func (c *ControlClient) Seal(ctx context.Context, id ObjectID) (int64, error) {
+func (c *BlobControlClient) Seal(ctx context.Context, id ObjectID) (int64, error) {
 	resp, err := c.client.Seal(ctx, &basaltpb.BlobSealRequest{
 		Id: basaltpb.UUID(id),
 	})
@@ -56,7 +55,7 @@ func (c *ControlClient) Seal(ctx context.Context, id ObjectID) (int64, error) {
 }
 
 // Delete removes an object from this blob server.
-func (c *ControlClient) Delete(ctx context.Context, id ObjectID) error {
+func (c *BlobControlClient) Delete(ctx context.Context, id ObjectID) error {
 	_, err := c.client.Delete(ctx, &basaltpb.BlobDeleteRequest{
 		Id: basaltpb.UUID(id),
 	})
@@ -65,7 +64,7 @@ func (c *ControlClient) Delete(ctx context.Context, id ObjectID) error {
 
 // Stat returns metadata about an object.
 // Returns (size, sealed, error).
-func (c *ControlClient) Stat(ctx context.Context, id ObjectID) (int64, bool, error) {
+func (c *BlobControlClient) Stat(ctx context.Context, id ObjectID) (int64, bool, error) {
 	resp, err := c.client.Stat(ctx, &basaltpb.BlobStatRequest{
 		Id: basaltpb.UUID(id),
 	})

@@ -1,4 +1,4 @@
-package blob
+package basaltclient
 
 import (
 	"bytes"

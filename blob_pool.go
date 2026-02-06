@@ -1,48 +1,48 @@
-package blob
+package basaltclient
 
 import "sync"
 
 const defaultPoolSize = 8
 
-// DataClientPool manages pooled connections to blob server data endpoints.
+// BlobDataClientPool manages pooled connections to blob server data endpoints.
 // It maintains separate per-server pools and provides exclusive access to
 // clients via acquire/release semantics.
 //
-// DataClientPool is safe for concurrent use from multiple goroutines.
-type DataClientPool struct {
+// BlobDataClientPool is safe for concurrent use from multiple goroutines.
+type BlobDataClientPool struct {
 	poolSize int
 	mu       sync.Mutex
 	pools    map[string]*serverPool
 	closed   bool
 }
 
-// DataClientPoolOption configures a DataClientPool.
-type DataClientPoolOption func(*DataClientPool)
+// BlobDataClientPoolOption configures a BlobDataClientPool.
+type BlobDataClientPoolOption func(*BlobDataClientPool)
 
-// WithPoolSize sets the maximum number of connections per server.
+// WithBlobPoolSize sets the maximum number of connections per server.
 // The default is 8.
-func WithPoolSize(size int) DataClientPoolOption {
-	return func(p *DataClientPool) {
+func WithBlobPoolSize(size int) BlobDataClientPoolOption {
+	return func(p *BlobDataClientPool) {
 		if size > 0 {
 			p.poolSize = size
 		}
 	}
 }
 
-// serverPool manages a pool of DataClient connections to a single server.
+// serverPool manages a pool of BlobDataClient connections to a single server.
 type serverPool struct {
 	addr     string
 	poolSize int
 	mu       sync.Mutex
 	cond     *sync.Cond
-	clients  []*DataClient // available clients (LIFO stack)
-	count    int           // total created (available + in-use)
+	clients  []*BlobDataClient // available clients (LIFO stack)
+	count    int               // total created (available + in-use)
 	closed   bool
 }
 
-// NewDataClientPool creates a new data client pool.
-func NewDataClientPool(opts ...DataClientPoolOption) *DataClientPool {
-	p := &DataClientPool{
+// NewBlobDataClientPool creates a new data client pool.
+func NewBlobDataClientPool(opts ...BlobDataClientPoolOption) *BlobDataClientPool {
+	p := &BlobDataClientPool{
 		poolSize: defaultPoolSize,
 		pools:    make(map[string]*serverPool),
 	}
@@ -52,10 +52,10 @@ func NewDataClientPool(opts ...DataClientPoolOption) *DataClientPool {
 	return p
 }
 
-// Acquire returns a DataClient for the given server address. If all clients
+// Acquire returns a BlobDataClient for the given server address. If all clients
 // in the pool are in use, Acquire blocks until one becomes available.
 // The returned client must be released via Release or ReleaseWithError.
-func (p *DataClientPool) Acquire(addr string) *DataClient {
+func (p *BlobDataClientPool) Acquire(addr string) *BlobDataClient {
 	p.mu.Lock()
 	if p.closed {
 		p.mu.Unlock()
@@ -73,7 +73,7 @@ func (p *DataClientPool) Acquire(addr string) *DataClient {
 
 // Release returns a healthy client to the pool for reuse. The client must
 // have been obtained via Acquire and must not be used after calling Release.
-func (p *DataClientPool) Release(client *DataClient) {
+func (p *BlobDataClientPool) Release(client *BlobDataClient) {
 	if client == nil {
 		return
 	}
@@ -90,7 +90,7 @@ func (p *DataClientPool) Release(client *DataClient) {
 // The client's connection is closed and the slot is freed for a new connection.
 // The client must have been obtained via Acquire and must not be used after
 // calling ReleaseWithError.
-func (p *DataClientPool) ReleaseWithError(client *DataClient) {
+func (p *BlobDataClientPool) ReleaseWithError(client *BlobDataClient) {
 	if client == nil {
 		return
 	}
@@ -104,7 +104,7 @@ func (p *DataClientPool) ReleaseWithError(client *DataClient) {
 }
 
 // Close closes all connections in all pools and prevents new acquisitions.
-func (p *DataClientPool) Close() error {
+func (p *BlobDataClientPool) Close() error {
 	p.mu.Lock()
 	if p.closed {
 		p.mu.Unlock()
@@ -126,14 +126,14 @@ func newServerPool(addr string, poolSize int) *serverPool {
 	sp := &serverPool{
 		addr:     addr,
 		poolSize: poolSize,
-		clients:  make([]*DataClient, 0, poolSize),
+		clients:  make([]*BlobDataClient, 0, poolSize),
 	}
 	sp.cond = sync.NewCond(&sp.mu)
 	return sp
 }
 
-// acquire returns a DataClient from the pool, blocking if necessary.
-func (sp *serverPool) acquire() *DataClient {
+// acquire returns a BlobDataClient from the pool, blocking if necessary.
+func (sp *serverPool) acquire() *BlobDataClient {
 	sp.mu.Lock()
 	defer sp.mu.Unlock()
 
@@ -152,7 +152,7 @@ func (sp *serverPool) acquire() *DataClient {
 		// If we haven't reached the pool size limit, create a new client.
 		if sp.count < sp.poolSize {
 			sp.count++
-			return NewDataClient(sp.addr)
+			return NewBlobDataClient(sp.addr)
 		}
 
 		// Pool is at capacity, wait for a client to be released.
@@ -161,7 +161,7 @@ func (sp *serverPool) acquire() *DataClient {
 }
 
 // release returns a healthy client to the pool for reuse.
-func (sp *serverPool) release(client *DataClient) {
+func (sp *serverPool) release(client *BlobDataClient) {
 	sp.mu.Lock()
 	defer sp.mu.Unlock()
 
@@ -176,7 +176,7 @@ func (sp *serverPool) release(client *DataClient) {
 }
 
 // releaseWithError closes the client and frees the slot for a new connection.
-func (sp *serverPool) releaseWithError(client *DataClient) {
+func (sp *serverPool) releaseWithError(client *BlobDataClient) {
 	_ = client.Close()
 
 	sp.mu.Lock()

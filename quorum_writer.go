@@ -1,4 +1,4 @@
-package blob
+package basaltclient
 
 import (
 	"sync"
@@ -30,7 +30,7 @@ type QuorumWriter struct {
 }
 
 // quorumClient is the interface used by quorumReplicaWorker to communicate with replicas.
-// This interface exists primarily for testing; production code uses *DataClient.
+// This interface exists primarily for testing; production code uses *BlobDataClient.
 type quorumClient interface {
 	AppendSync(id ObjectID, offset uint64, data []byte) error
 	Close() error
@@ -58,9 +58,9 @@ type quorumRequest struct {
 // Used to inject mock clients for testing.
 type quorumClientFactory func(addr string) quorumClient
 
-// defaultQuorumClientFactory creates real DataClient instances.
+// defaultQuorumClientFactory creates real BlobDataClient instances.
 func defaultQuorumClientFactory(addr string) quorumClient {
-	return NewDataClient(addr)
+	return NewBlobDataClient(addr)
 }
 
 // NewQuorumWriter creates a new quorum writer for the given object and replicas.

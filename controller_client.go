@@ -1,5 +1,4 @@
-// Package controller provides the internal implementation of the controller client.
-package controller
+package basaltclient
 
 import (
 	"context"
@@ -10,20 +9,20 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-// Client is the controller gRPC client.
-type Client struct {
+// ControllerClient is the controller gRPC client.
+type ControllerClient struct {
 	addr   string
 	conn   *grpc.ClientConn
 	client basaltpb.ControllerClient
 }
 
-// New creates a new controller client connected to addr.
-func New(addr string) (*Client, error) {
+// NewControllerClient creates a new controller client connected to addr.
+func NewControllerClient(addr string) (*ControllerClient, error) {
 	conn, err := grpc.NewClient(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, err
 	}
-	return &Client{
+	return &ControllerClient{
 		addr:   addr,
 		conn:   conn,
 		client: basaltpb.NewControllerClient(conn),
@@ -31,12 +30,12 @@ func New(addr string) (*Client, error) {
 }
 
 // Close closes the client connection.
-func (c *Client) Close() error {
+func (c *ControllerClient) Close() error {
 	return c.conn.Close()
 }
 
 // Mount registers a Pebble instance and acquires exclusive write access to its store directory.
-func (c *Client) Mount(
+func (c *ControllerClient) Mount(
 	ctx context.Context, instanceID string, zone string, clusterID []byte, storeID []byte,
 ) (*basaltpb.MountResponse, error) {
 	return c.client.Mount(ctx, &basaltpb.MountRequest{
@@ -48,7 +47,7 @@ func (c *Client) Mount(
 }
 
 // Unmount releases the write lock on a store directory.
-func (c *Client) Unmount(ctx context.Context, mountID []byte) error {
+func (c *ControllerClient) Unmount(ctx context.Context, mountID []byte) error {
 	_, err := c.client.Unmount(ctx, &basaltpb.UnmountRequest{
 		MountId: basaltpb.UUIDFromBytes(mountID),
 	})
@@ -56,7 +55,9 @@ func (c *Client) Unmount(ctx context.Context, mountID []byte) error {
 }
 
 // Mkdir creates a subdirectory within a directory.
-func (c *Client) Mkdir(ctx context.Context, parentID []byte, name string) (basaltpb.UUID, error) {
+func (c *ControllerClient) Mkdir(
+	ctx context.Context, parentID []byte, name string,
+) (basaltpb.UUID, error) {
 	resp, err := c.client.Mkdir(ctx, &basaltpb.MkdirRequest{
 		ParentId: basaltpb.UUIDFromBytes(parentID),
 		Name:     name,
@@ -68,7 +69,7 @@ func (c *Client) Mkdir(ctx context.Context, parentID []byte, name string) (basal
 }
 
 // Rmdir removes an empty directory.
-func (c *Client) Rmdir(ctx context.Context, parentID []byte, name string) error {
+func (c *ControllerClient) Rmdir(ctx context.Context, parentID []byte, name string) error {
 	_, err := c.client.Rmdir(ctx, &basaltpb.RmdirRequest{
 		ParentId: basaltpb.UUIDFromBytes(parentID),
 		Name:     name,
@@ -77,7 +78,7 @@ func (c *Client) Rmdir(ctx context.Context, parentID []byte, name string) error 
 }
 
 // Create allocates a new file in a directory and selects replicas.
-func (c *Client) Create(
+func (c *ControllerClient) Create(
 	ctx context.Context, directoryID []byte, name string, policy *basaltpb.ReplicationPolicy,
 ) (*basaltpb.ObjectMeta, error) {
 	resp, err := c.client.Create(ctx, &basaltpb.CreateRequest{
@@ -94,7 +95,7 @@ func (c *Client) Create(
 // StatByID returns metadata for an object by ID.
 // If includeZombies is true, the object is returned even if it is a zombie
 // (scheduled for deletion).
-func (c *Client) StatByID(
+func (c *ControllerClient) StatByID(
 	ctx context.Context, objectID []byte, includeZombies bool,
 ) (*basaltpb.StatResponse, error) {
 	return c.client.StatByID(ctx, &basaltpb.StatByIDRequest{
@@ -104,7 +105,7 @@ func (c *Client) StatByID(
 }
 
 // StatByPath returns metadata for an object by (directory_id, name).
-func (c *Client) StatByPath(
+func (c *ControllerClient) StatByPath(
 	ctx context.Context, directoryID []byte, name string,
 ) (*basaltpb.StatResponse, error) {
 	return c.client.StatByPath(ctx, &basaltpb.StatByPathRequest{
@@ -114,7 +115,7 @@ func (c *Client) StatByPath(
 }
 
 // Delete removes an entry from a directory.
-func (c *Client) Delete(
+func (c *ControllerClient) Delete(
 	ctx context.Context, directoryID []byte, name string,
 ) (*basaltpb.DeleteResponse, error) {
 	return c.client.Delete(ctx, &basaltpb.DeleteRequest{
@@ -124,7 +125,7 @@ func (c *Client) Delete(
 }
 
 // Seal marks an object as immutable with its final size.
-func (c *Client) Seal(ctx context.Context, objectID []byte, size int64) error {
+func (c *ControllerClient) Seal(ctx context.Context, objectID []byte, size int64) error {
 	_, err := c.client.Seal(ctx, &basaltpb.SealRequest{
 		ObjectId: basaltpb.UUIDFromBytes(objectID),
 		Size_:    size,
@@ -133,7 +134,9 @@ func (c *Client) Seal(ctx context.Context, objectID []byte, size int64) error {
 }
 
 // Link creates a hardlink to an existing object in a directory.
-func (c *Client) Link(ctx context.Context, directoryID []byte, name string, objectID []byte) error {
+func (c *ControllerClient) Link(
+	ctx context.Context, directoryID []byte, name string, objectID []byte,
+) error {
 	_, err := c.client.Link(ctx, &basaltpb.LinkRequest{
 		DirectoryId: basaltpb.UUIDFromBytes(directoryID),
 		Name:        name,
@@ -143,7 +146,7 @@ func (c *Client) Link(ctx context.Context, directoryID []byte, name string, obje
 }
 
 // Rename moves an entry within the same directory.
-func (c *Client) Rename(
+func (c *ControllerClient) Rename(
 	ctx context.Context, directoryID []byte, oldName string, newName string,
 ) error {
 	_, err := c.client.Rename(ctx, &basaltpb.RenameRequest{
@@ -155,7 +158,9 @@ func (c *Client) Rename(
 }
 
 // List returns all entries in a directory.
-func (c *Client) List(ctx context.Context, directoryID []byte) ([]basaltpb.DirectoryEntry, error) {
+func (c *ControllerClient) List(
+	ctx context.Context, directoryID []byte,
+) ([]basaltpb.DirectoryEntry, error) {
 	stream, err := c.client.List(ctx, &basaltpb.ListRequest{
 		DirectoryId: basaltpb.UUIDFromBytes(directoryID),
 	})

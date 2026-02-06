@@ -1,5 +1,4 @@
-// Package blob provides the internal implementation of the blob client.
-package blob
+package basaltclient
 
 import (
 	"encoding/binary"
