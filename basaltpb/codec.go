@@ -2,11 +2,8 @@ package basaltpb
 
 import (
 	"github.com/gogo/protobuf/proto"
-	// Used instead of gogo/protobuf/proto for the fallback case
-	// to match the behavior of the upstream codec in
-	// google.golang.org/grpc/encoding/proto.
-	gproto "github.com/golang/protobuf/proto"
 	"google.golang.org/grpc/encoding"
+	gproto "google.golang.org/protobuf/proto"
 )
 
 func init() {
