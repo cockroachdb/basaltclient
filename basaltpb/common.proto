@@ -10,16 +10,18 @@ import "gogoproto/gogo.proto";
 message ObjectMeta {
   // Unique identifier for this object.
   bytes id = 1 [(gogoproto.customtype) = "UUID", (gogoproto.nullable) = false];
+  // Current size of the object in bytes. -1 for directories, 0 for unsealed files.
+  int64 size = 2;
   // List of replicas storing this object.
-  repeated ReplicaInfo replicas = 2;
-  // Current size of the object in bytes. -1 for directories, NULL for unsealed files.
-  int64 size = 3;
-  // Whether the object has been sealed (immutable).
-  bool sealed = 4;
+  repeated ReplicaInfo replicas = 3;
+  // Reference to archive location (e.g., S3/GCS path) if archived.
+  string archive_ref = 4;
   // Replication policy for the object (NULL for directories).
   ReplicationPolicy policy = 5;
-  // Reference to archive location (e.g., S3/GCS path) if archived.
-  string archive_ref = 6;
+  // Creation timestamp in unix nanoseconds.
+  int64 created_at_nanos = 6;
+  // Seal timestamp in unix nanoseconds (0 if unsealed).
+  int64 sealed_at_nanos = 7;
 }
 
 // ReplicaInfo describes a replica of an object stored on a blob server.
@@ -47,8 +49,10 @@ message DirectoryEntry {
   bytes id = 3 [(gogoproto.customtype) = "UUID", (gogoproto.nullable) = false];
   // Size in bytes (only set for sealed files).
   int64 size = 4;
-  // Whether the file is sealed (only applicable to files).
-  bool sealed = 5;
+  // Creation timestamp in unix nanoseconds.
+  int64 created_at_nanos = 5;
+  // Seal timestamp in unix nanoseconds (0 if unsealed).
+  int64 sealed_at_nanos = 6;
 }
 
 // Reference represents a namespace reference (hardlink) to an object.
