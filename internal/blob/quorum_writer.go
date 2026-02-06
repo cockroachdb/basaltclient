@@ -1,6 +1,10 @@
 package blob
 
-import "sync"
+import (
+	"sync"
+
+	"github.com/cockroachdb/basaltclient/basaltpb"
+)
 
 // QuorumWriter implements dedicated WAL writing with quorum semantics.
 // It uses persistent connections per replica (no pool contention) and
@@ -60,14 +64,14 @@ func defaultQuorumClientFactory(addr string) quorumClient {
 }
 
 // NewQuorumWriter creates a new quorum writer for the given object and replicas.
-func NewQuorumWriter(objectID ObjectID, replicas []string) *QuorumWriter {
+func NewQuorumWriter(objectID ObjectID, replicas []*basaltpb.ReplicaInfo) *QuorumWriter {
 	return newQuorumWriterWithFactory(objectID, replicas, defaultQuorumClientFactory)
 }
 
 // newQuorumWriterWithFactory creates a new quorum writer using the provided client factory.
 // This is primarily used for testing with mock clients.
 func newQuorumWriterWithFactory(
-	objectID ObjectID, replicas []string, factory quorumClientFactory,
+	objectID ObjectID, replicas []*basaltpb.ReplicaInfo, factory quorumClientFactory,
 ) *QuorumWriter {
 	quorum := (len(replicas) / 2) + 1 // majority quorum
 	w := &QuorumWriter{
@@ -77,11 +81,11 @@ func newQuorumWriterWithFactory(
 	}
 	w.cond = sync.NewCond(&w.mu)
 
-	for i, addr := range replicas {
+	for i, r := range replicas {
 		worker := &quorumReplicaWorker{
 			w:      w,
-			addr:   addr,
-			client: factory(addr),
+			addr:   r.Addr,
+			client: factory(r.Addr),
 		}
 		worker.cond = sync.NewCond(&worker.mu)
 		w.workers[i] = worker

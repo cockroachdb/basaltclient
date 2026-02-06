@@ -176,6 +176,6 @@ func NewBlobDataClientPool(opts ...BlobDataClientPoolOption) *BlobDataClientPool
 type QuorumWriter = blob.QuorumWriter
 
 // NewQuorumWriter creates a new quorum writer for the given object and replicas.
-func NewQuorumWriter(objectID ObjectID, replicas []string) *QuorumWriter {
+func NewQuorumWriter(objectID ObjectID, replicas []*basaltpb.ReplicaInfo) *QuorumWriter {
 	return blob.NewQuorumWriter(objectID, replicas)
 }
