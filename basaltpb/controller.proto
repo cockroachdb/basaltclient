@@ -213,5 +213,6 @@ message RegisterBlobServerRequest {
 }
 
 message RegisterBlobServerResponse {
-  // Empty for now; could add lease duration or other metadata later.
+  // Integer ID assigned to this blob server, used in objects.replicas arrays.
+  int32 blob_id = 1;
 }
