@@ -76,10 +76,12 @@ func (c *ControllerClient) Create(
 }
 
 // StatByID returns metadata for an object by ID.
+// If includeZombies is true, the object is returned even if it is a zombie
+// (scheduled for deletion).
 func (c *ControllerClient) StatByID(
-	ctx context.Context, objectID []byte,
+	ctx context.Context, objectID []byte, includeZombies bool,
 ) (*basaltpb.StatResponse, error) {
-	return c.client.StatByID(ctx, objectID)
+	return c.client.StatByID(ctx, objectID, includeZombies)
 }
 
 // StatByPath returns metadata for an object by (directory_id, name).

@@ -118,6 +118,8 @@ message StatByPathRequest {
 message StatByIDRequest {
   // Object ID to stat.
   bytes object_id = 1 [(gogoproto.customtype) = "UUID", (gogoproto.nullable) = false];
+  // If true, return the object even if it is a zombie (scheduled for deletion).
+  bool include_zombies = 2;
 }
 
 message StatResponse {

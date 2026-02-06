@@ -92,9 +92,14 @@ func (c *Client) Create(
 }
 
 // StatByID returns metadata for an object by ID.
-func (c *Client) StatByID(ctx context.Context, objectID []byte) (*basaltpb.StatResponse, error) {
+// If includeZombies is true, the object is returned even if it is a zombie
+// (scheduled for deletion).
+func (c *Client) StatByID(
+	ctx context.Context, objectID []byte, includeZombies bool,
+) (*basaltpb.StatResponse, error) {
 	return c.client.StatByID(ctx, &basaltpb.StatByIDRequest{
-		ObjectId: basaltpb.UUIDFromBytes(objectID),
+		ObjectId:       basaltpb.UUIDFromBytes(objectID),
+		IncludeZombies: includeZombies,
 	})
 }
 
