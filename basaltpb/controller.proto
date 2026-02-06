@@ -202,14 +202,16 @@ message RenameResponse {}
 message RegisterBlobServerRequest {
   // UUID generated and persisted by the blob server.
   bytes server_id = 1 [(gogoproto.customtype) = "UUID", (gogoproto.nullable) = false];
+  // Addr (host:port) for the gRPC control endpoint.
+  string control_addr = 2;
   // Addr (host:port) for the data protocol.
-  string addr = 2;
+  string data_addr = 3;
   // Zone of the blob server.
-  string zone = 3;
+  string zone = 4;
   // Total storage capacity in bytes.
-  int64 capacity_bytes = 4;
+  int64 capacity_bytes = 5;
   // Currently used storage in bytes.
-  int64 used_bytes = 5;
+  int64 used_bytes = 6;
 }
 
 message RegisterBlobServerResponse {
