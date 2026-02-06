@@ -45,9 +45,9 @@ func (c *ControllerClient) Close() error {
 
 // Mount registers a Pebble instance and acquires exclusive write access to its store directory.
 func (c *ControllerClient) Mount(
-	ctx context.Context, instanceID string, az string, clusterID []byte, storeID []byte,
+	ctx context.Context, instanceID string, zone string, clusterID []byte, storeID []byte,
 ) (*basaltpb.MountResponse, error) {
-	return c.client.Mount(ctx, instanceID, az, clusterID, storeID)
+	return c.client.Mount(ctx, instanceID, zone, clusterID, storeID)
 }
 
 // Unmount releases the write lock on a store directory.

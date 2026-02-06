@@ -57,13 +57,13 @@ func (p *ParsedPath) SplitPath() (dir, base string) {
 //   - ssd=N: Number of SSD replicas (default 3)
 //   - hdd=N: Number of HDD replicas (default 0)
 //   - archive: Enable cloud object storage tier (presence means true)
-//   - az=cross|local: Placement strategy (default cross)
+//   - zone=cross|local: Placement strategy (default cross)
 //
-// When az=local is specified, localAZ must be provided.
+// When zone=local is specified, localZone must be provided.
 // When an alias path is parsed, resolver must be provided.
 //
 // Returns nil for local paths (no // or basalt:// prefix).
-func ParsePath(path string, localAZ string, resolver AliasResolver) (*ParsedPath, error) {
+func ParsePath(path string, localZone string, resolver AliasResolver) (*ParsedPath, error) {
 	// Strip optional "basalt:" scheme prefix.
 	path = strings.TrimPrefix(path, "basalt:")
 
@@ -118,7 +118,7 @@ func ParsePath(path string, localAZ string, resolver AliasResolver) (*ParsedPath
 			Controllers: controllers,
 			Path:        namespacePath,
 		}
-		if err := parsed.Config.Parse(queryStr, localAZ); err != nil {
+		if err := parsed.Config.Parse(queryStr, localZone); err != nil {
 			return nil, err
 		}
 		return parsed, nil
@@ -162,7 +162,7 @@ func ParsePath(path string, localAZ string, resolver AliasResolver) (*ParsedPath
 		Controllers: controllers,
 		Path:        namespacePath,
 	}
-	if err := parsed.Config.Parse(queryStr, localAZ); err != nil {
+	if err := parsed.Config.Parse(queryStr, localZone); err != nil {
 		return nil, err
 	}
 	return parsed, nil

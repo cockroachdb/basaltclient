@@ -72,8 +72,8 @@ service Controller {
 message MountRequest {
   // Identifier for this Pebble instance (e.g., node ID + store ID).
   string instance_id = 1;
-  // Availability zone of the mounting node.
-  string az = 2;
+  // Zone of the mounting node.
+  string zone = 2;
   // UUID of the CockroachDB cluster.
   bytes cluster_id = 3 [(gogoproto.customtype) = "UUID", (gogoproto.nullable) = false];
   // UUID of the store within the cluster.
@@ -202,10 +202,10 @@ message RenameResponse {}
 message RegisterBlobServerRequest {
   // UUID generated and persisted by the blob server.
   bytes server_id = 1 [(gogoproto.customtype) = "UUID", (gogoproto.nullable) = false];
-  // Address (host:port) for the data protocol.
-  string address = 2;
-  // Availability zone of the blob server.
-  string az = 3;
+  // Addr (host:port) for the data protocol.
+  string addr = 2;
+  // Zone of the blob server.
+  string zone = 3;
   // Total storage capacity in bytes.
   int64 capacity_bytes = 4;
   // Currently used storage in bytes.

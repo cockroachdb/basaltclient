@@ -13,16 +13,16 @@ import (
 //   - ssd=N: Number of SSD replicas (default 3)
 //   - hdd=N: Number of HDD replicas (default 0)
 //   - archive: Enable cloud object storage tier (presence means true)
-//   - az=cross|local: Placement strategy (default cross)
+//   - zone=cross|local: Placement strategy (default cross)
 //
-// When az=local is specified, localAZ must be provided.
-func (c *ReplicationPolicy) Parse(queryStr, localAZ string) error {
+// When zone=local is specified, localZone must be provided.
+func (c *ReplicationPolicy) Parse(queryStr, localZone string) error {
 	// Zero out and apply defaults.
 	*c = ReplicationPolicy{
 		SsdReplicas: 3,
 		HddReplicas: 0,
 		Archive:     false,
-		LocalAz:     "",
+		LocalZone:   "",
 	}
 
 	if queryStr == "" {
@@ -39,7 +39,7 @@ func (c *ReplicationPolicy) Parse(queryStr, localAZ string) error {
 		"ssd":     true,
 		"hdd":     true,
 		"archive": true,
-		"az":      true,
+		"zone":    true,
 	}
 
 	// Check for unknown parameters (to catch typos like "sssd=3").
@@ -78,18 +78,18 @@ func (c *ReplicationPolicy) Parse(queryStr, localAZ string) error {
 		c.Archive = true
 	}
 
-	// Parse az parameter.
-	if v := values.Get("az"); v != "" {
+	// Parse zone parameter.
+	if v := values.Get("zone"); v != "" {
 		switch v {
 		case "cross":
 			// Default, no-op.
 		case "local":
-			if localAZ == "" {
-				return fmt.Errorf("az=local requires localAZ parameter")
+			if localZone == "" {
+				return fmt.Errorf("zone=local requires localZone parameter")
 			}
-			c.LocalAz = localAZ
+			c.LocalZone = localZone
 		default:
-			return fmt.Errorf("invalid az value %q: must be \"cross\" or \"local\"", v)
+			return fmt.Errorf("invalid zone value %q: must be \"cross\" or \"local\"", v)
 		}
 	}
 

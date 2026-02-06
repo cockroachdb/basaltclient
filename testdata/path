@@ -22,7 +22,7 @@ base: ""
 ssd: 3
 hdd: 0
 archive: false
-local_az: ""
+local_zone: ""
 
 parse
 //localhost:26257/dir/file.sst
@@ -34,7 +34,7 @@ base: "file.sst"
 ssd: 3
 hdd: 0
 archive: false
-local_az: ""
+local_zone: ""
 
 parse
 //host:1234/a/b/c
@@ -46,7 +46,7 @@ base: "c"
 ssd: 3
 hdd: 0
 archive: false
-local_az: ""
+local_zone: ""
 
 # Multiple controllers (comma-separated)
 parse
@@ -59,7 +59,7 @@ base: "path"
 ssd: 3
 hdd: 0
 archive: false
-local_az: ""
+local_zone: ""
 
 # Trailing slash means the path is a directory (empty base)
 parse
@@ -72,7 +72,7 @@ base: ""
 ssd: 3
 hdd: 0
 archive: false
-local_az: ""
+local_zone: ""
 
 # Alias format (three slashes) - resolved via AliasResolver
 
@@ -97,7 +97,7 @@ base: "file.sst"
 ssd: 3
 hdd: 0
 archive: false
-local_az: ""
+local_zone: ""
 
 parse
 ///prod/
@@ -109,7 +109,7 @@ base: ""
 ssd: 3
 hdd: 0
 archive: false
-local_az: ""
+local_zone: ""
 
 parse
 ///dev/myfile
@@ -121,7 +121,7 @@ base: "myfile"
 ssd: 3
 hdd: 0
 archive: false
-local_az: ""
+local_zone: ""
 
 # basalt: scheme prefix (for copy-paste URLs)
 parse
@@ -134,7 +134,7 @@ base: "file.sst"
 ssd: 3
 hdd: 0
 archive: false
-local_az: ""
+local_zone: ""
 
 parse
 basalt://host1:1234,host2:1234/path
@@ -146,7 +146,7 @@ base: "path"
 ssd: 3
 hdd: 0
 archive: false
-local_az: ""
+local_zone: ""
 
 parse
 basalt:///prod/cluster/store/file.sst
@@ -158,7 +158,7 @@ base: "file.sst"
 ssd: 3
 hdd: 0
 archive: false
-local_az: ""
+local_zone: ""
 
 # basalt: without // is a local path
 parse
@@ -178,7 +178,7 @@ base: "path"
 ssd: 2
 hdd: 0
 archive: false
-local_az: ""
+local_zone: ""
 
 parse
 //host:1234/path?hdd=1
@@ -190,7 +190,7 @@ base: "path"
 ssd: 3
 hdd: 1
 archive: false
-local_az: ""
+local_zone: ""
 
 parse
 //host:1234/path?ssd=2&hdd=1
@@ -202,7 +202,7 @@ base: "path"
 ssd: 2
 hdd: 1
 archive: false
-local_az: ""
+local_zone: ""
 
 parse
 //host:1234/path?archive
@@ -214,10 +214,10 @@ base: "path"
 ssd: 3
 hdd: 0
 archive: true
-local_az: ""
+local_zone: ""
 
 parse
-//host:1234/path?az=cross
+//host:1234/path?zone=cross
 ----
 controllers: host:1234
 path: /path
@@ -226,16 +226,16 @@ base: "path"
 ssd: 3
 hdd: 0
 archive: false
-local_az: ""
+local_zone: ""
 
-# az=local requires local-az to be set
-local-az
+# zone=local requires local-zone to be set
+local-zone
 us-east-1a
 ----
 ok
 
 parse
-//host:1234/path?az=local
+//host:1234/path?zone=local
 ----
 controllers: host:1234
 path: /path
@@ -244,16 +244,16 @@ base: "path"
 ssd: 3
 hdd: 0
 archive: false
-local_az: "us-east-1a"
+local_zone: "us-east-1a"
 
 # All parameters combined
-local-az
+local-zone
 us-west-2b
 ----
 ok
 
 parse
-//host:1234/path?ssd=2&hdd=1&archive&az=local
+//host:1234/path?ssd=2&hdd=1&archive&zone=local
 ----
 controllers: host:1234
 path: /path
@@ -262,7 +262,7 @@ base: "path"
 ssd: 2
 hdd: 1
 archive: true
-local_az: "us-west-2b"
+local_zone: "us-west-2b"
 
 # Config works with aliases too
 parse
@@ -275,7 +275,7 @@ base: "file"
 ssd: 1
 hdd: 0
 archive: true
-local_az: ""
+local_zone: ""
 
 # archive-only with ssd=0 hdd=0 is valid
 parse
@@ -288,10 +288,10 @@ base: "path"
 ssd: 0
 hdd: 0
 archive: true
-local_az: ""
+local_zone: ""
 
-# Reset local-az for error tests
-local-az
+# Reset local-zone for error tests
+local-zone
 
 ----
 ok
@@ -354,17 +354,17 @@ parse
 ----
 error: hdd must be non-negative, got -2
 
-# Invalid az value
+# Invalid zone value
 parse
-//host:1234/path?az=invalid
+//host:1234/path?zone=invalid
 ----
-error: invalid az value "invalid": must be "cross" or "local"
+error: invalid zone value "invalid": must be "cross" or "local"
 
-# az=local without local-az set
+# zone=local without local-zone set
 parse
-//host:1234/path?az=local
+//host:1234/path?zone=local
 ----
-error: az=local requires localAZ parameter
+error: zone=local requires localZone parameter
 
 # Zero replicas without archive is an error
 parse

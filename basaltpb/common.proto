@@ -24,10 +24,10 @@ message ObjectMeta {
 
 // ReplicaInfo describes a replica of an object stored on a blob server.
 message ReplicaInfo {
-  // Address of the blob server holding this replica (host:port).
-  string address = 1;
-  // Availability zone of the blob server.
-  string az = 2;
+  // Addr of the blob server holding this replica (host:port).
+  string addr = 1;
+  // Zone of the blob server.
+  string zone = 2;
 }
 
 // EntryType distinguishes files from directories in the namespace.
@@ -68,6 +68,6 @@ message ReplicationPolicy {
   int32 hdd_replicas = 2;
   // Whether to archive to cloud object storage (S3/GCS).
   bool archive = 3;
-  // If set, all replicas placed in this AZ; if empty, cross-AZ placement.
-  string local_az = 4;
+  // If set, all replicas placed in this zone; if empty, cross-zone placement.
+  string local_zone = 4;
 }

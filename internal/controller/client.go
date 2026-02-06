@@ -37,11 +37,11 @@ func (c *Client) Close() error {
 
 // Mount registers a Pebble instance and acquires exclusive write access to its store directory.
 func (c *Client) Mount(
-	ctx context.Context, instanceID string, az string, clusterID []byte, storeID []byte,
+	ctx context.Context, instanceID string, zone string, clusterID []byte, storeID []byte,
 ) (*basaltpb.MountResponse, error) {
 	return c.client.Mount(ctx, &basaltpb.MountRequest{
 		InstanceId: instanceID,
-		Az:         az,
+		Zone:       zone,
 		ClusterId:  basaltpb.UUIDFromBytes(clusterID),
 		StoreId:    basaltpb.UUIDFromBytes(storeID),
 	})

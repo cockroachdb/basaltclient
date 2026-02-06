@@ -21,16 +21,16 @@ func (r *testResolver) Resolve(name string) ([]string, error) {
 }
 
 func TestParsePath(t *testing.T) {
-	var localAZ string
+	var localZone string
 	resolver := &testResolver{
 		aliases: make(map[string][]string),
 	}
 
 	datadriven.RunTest(t, "testdata/path", func(t *testing.T, d *datadriven.TestData) string {
 		switch d.Cmd {
-		case "local-az":
+		case "local-zone":
 			// Set the local AZ for subsequent parse commands.
-			localAZ = strings.TrimSpace(d.Input)
+			localZone = strings.TrimSpace(d.Input)
 			return "ok"
 
 		case "alias":
@@ -51,7 +51,7 @@ func TestParsePath(t *testing.T) {
 			// Parse a Basalt path.
 			path := strings.TrimSpace(d.Input)
 
-			parsed, err := ParsePath(path, localAZ, resolver)
+			parsed, err := ParsePath(path, localZone, resolver)
 			if err != nil {
 				return fmt.Sprintf("error: %v", err)
 			}
@@ -70,7 +70,7 @@ func TestParsePath(t *testing.T) {
 			fmt.Fprintf(&buf, "ssd: %d\n", parsed.Config.SsdReplicas)
 			fmt.Fprintf(&buf, "hdd: %d\n", parsed.Config.HddReplicas)
 			fmt.Fprintf(&buf, "archive: %v\n", parsed.Config.Archive)
-			fmt.Fprintf(&buf, "local_az: %q", parsed.Config.LocalAz)
+			fmt.Fprintf(&buf, "local_zone: %q", parsed.Config.LocalZone)
 			return buf.String()
 
 		default:
