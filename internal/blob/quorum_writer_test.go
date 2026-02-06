@@ -93,7 +93,7 @@ func TestQuorumWriterLateResult(t *testing.T) {
 	}
 
 	objectID := ObjectID{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16}
-	replicas := []*basaltpb.ReplicaInfo{
+	replicas := []basaltpb.ReplicaInfo{
 		{Addr: "addr0"},
 		{Addr: "addr1"},
 		{Addr: "addr2"},

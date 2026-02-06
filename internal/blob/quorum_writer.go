@@ -64,14 +64,14 @@ func defaultQuorumClientFactory(addr string) quorumClient {
 }
 
 // NewQuorumWriter creates a new quorum writer for the given object and replicas.
-func NewQuorumWriter(objectID ObjectID, replicas []*basaltpb.ReplicaInfo) *QuorumWriter {
+func NewQuorumWriter(objectID ObjectID, replicas []basaltpb.ReplicaInfo) *QuorumWriter {
 	return newQuorumWriterWithFactory(objectID, replicas, defaultQuorumClientFactory)
 }
 
 // newQuorumWriterWithFactory creates a new quorum writer using the provided client factory.
 // This is primarily used for testing with mock clients.
 func newQuorumWriterWithFactory(
-	objectID ObjectID, replicas []*basaltpb.ReplicaInfo, factory quorumClientFactory,
+	objectID ObjectID, replicas []basaltpb.ReplicaInfo, factory quorumClientFactory,
 ) *QuorumWriter {
 	quorum := (len(replicas) / 2) + 1 // majority quorum
 	w := &QuorumWriter{

@@ -13,7 +13,7 @@ message ObjectMeta {
   // Current size of the object in bytes. -1 for directories, 0 for unsealed files.
   int64 size = 2;
   // List of replicas storing this object.
-  repeated ReplicaInfo replicas = 3;
+  repeated ReplicaInfo replicas = 3 [(gogoproto.nullable) = false];
   // Reference to archive location (e.g., S3/GCS path) if archived.
   string archive_ref = 4;
   // Replication policy for the object (NULL for directories).

@@ -127,7 +127,7 @@ message StatResponse {
   // Type of the entry (file or directory).
   EntryType type = 2;
   // All namespace references (hardlinks) to this object.
-  repeated Reference references = 3;
+  repeated Reference references = 3 [(gogoproto.nullable) = false];
 }
 
 message DeleteRequest {

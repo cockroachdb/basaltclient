@@ -155,7 +155,7 @@ func (c *Client) Rename(
 }
 
 // List returns all entries in a directory.
-func (c *Client) List(ctx context.Context, directoryID []byte) ([]*basaltpb.DirectoryEntry, error) {
+func (c *Client) List(ctx context.Context, directoryID []byte) ([]basaltpb.DirectoryEntry, error) {
 	stream, err := c.client.List(ctx, &basaltpb.ListRequest{
 		DirectoryId: basaltpb.UUIDFromBytes(directoryID),
 	})
@@ -163,7 +163,7 @@ func (c *Client) List(ctx context.Context, directoryID []byte) ([]*basaltpb.Dire
 		return nil, err
 	}
 
-	var entries []*basaltpb.DirectoryEntry
+	var entries []basaltpb.DirectoryEntry
 	for {
 		entry, err := stream.Recv()
 		if err == io.EOF {
@@ -172,7 +172,7 @@ func (c *Client) List(ctx context.Context, directoryID []byte) ([]*basaltpb.Dire
 		if err != nil {
 			return nil, err
 		}
-		entries = append(entries, entry)
+		entries = append(entries, *entry)
 	}
 	return entries, nil
 }

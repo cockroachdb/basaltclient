@@ -120,7 +120,7 @@ func (c *ControllerClient) Rename(
 // List returns all entries in a directory.
 func (c *ControllerClient) List(
 	ctx context.Context, directoryID []byte,
-) ([]*basaltpb.DirectoryEntry, error) {
+) ([]basaltpb.DirectoryEntry, error) {
 	return c.client.List(ctx, directoryID)
 }
 
@@ -176,6 +176,6 @@ func NewBlobDataClientPool(opts ...BlobDataClientPoolOption) *BlobDataClientPool
 type QuorumWriter = blob.QuorumWriter
 
 // NewQuorumWriter creates a new quorum writer for the given object and replicas.
-func NewQuorumWriter(objectID ObjectID, replicas []*basaltpb.ReplicaInfo) *QuorumWriter {
+func NewQuorumWriter(objectID ObjectID, replicas []basaltpb.ReplicaInfo) *QuorumWriter {
 	return blob.NewQuorumWriter(objectID, replicas)
 }
