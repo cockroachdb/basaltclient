@@ -216,5 +216,5 @@ message RegisterBlobServerRequest {
 
 message RegisterBlobServerResponse {
   // Integer ID assigned to this blob server, used in objects.replicas arrays.
-  int32 blob_id = 1;
+  int32 disk_id = 1;
 }
