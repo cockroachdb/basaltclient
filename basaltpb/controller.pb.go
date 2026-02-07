@@ -27,6 +27,8 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+// TODO(cockroachlabs/basalt#1): Simplify MountRequest to take a directory_id
+// instead of cluster_id+store_id, deriving caller identity from the mTLS cert.
 type MountRequest struct {
 	// Identifier for this Pebble instance (e.g., node ID + store ID).
 	InstanceId string `protobuf:"bytes,1,opt,name=instance_id,json=instanceId,proto3" json:"instance_id,omitempty"`
