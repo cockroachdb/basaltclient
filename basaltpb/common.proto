@@ -53,6 +53,8 @@ message DirectoryEntry {
   int64 created_at_nanos = 5;
   // Seal timestamp in unix nanoseconds (0 if unsealed).
   int64 sealed_at_nanos = 6;
+  // List of replicas storing this object (only set for files).
+  repeated ReplicaInfo replicas = 7 [(gogoproto.nullable) = false];
 }
 
 // Reference represents a namespace reference (hardlink) to an object.
