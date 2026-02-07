@@ -69,6 +69,8 @@ service Controller {
   // - ReportFailure for replica health reporting
 }
 
+// TODO(cockroachlabs/basalt#1): Simplify MountRequest to take a directory_id
+// instead of cluster_id+store_id, deriving caller identity from the mTLS cert.
 message MountRequest {
   // Identifier for this Pebble instance (e.g., node ID + store ID).
   string instance_id = 1;
