@@ -6,6 +6,11 @@ option go_package = "github.com/cockroachdb/basaltclient/basaltpb";
 
 import "gogoproto/gogo.proto";
 
+option (gogoproto.goproto_getters_all) = false;
+option (gogoproto.goproto_unrecognized_all) = false;
+option (gogoproto.goproto_sizecache_all) = false;
+option (gogoproto.goproto_unkeyed_all) = false;
+
 // ObjectMeta contains metadata about an object.
 message ObjectMeta {
   // Unique identifier for this object.

@@ -37,10 +37,7 @@ type MountRequest struct {
 	// UUID of the CockroachDB cluster.
 	ClusterId UUID `protobuf:"bytes,3,opt,name=cluster_id,json=clusterId,proto3,customtype=UUID" json:"cluster_id"`
 	// UUID of the store within the cluster.
-	StoreId              UUID     `protobuf:"bytes,4,opt,name=store_id,json=storeId,proto3,customtype=UUID" json:"store_id"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	StoreId UUID `protobuf:"bytes,4,opt,name=store_id,json=storeId,proto3,customtype=UUID" json:"store_id"`
 }
 
 func (m *MountRequest) Reset()         { *m = MountRequest{} }
@@ -76,30 +73,13 @@ func (m *MountRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MountRequest proto.InternalMessageInfo
 
-func (m *MountRequest) GetInstanceId() string {
-	if m != nil {
-		return m.InstanceId
-	}
-	return ""
-}
-
-func (m *MountRequest) GetZone() string {
-	if m != nil {
-		return m.Zone
-	}
-	return ""
-}
-
 type MountResponse struct {
 	// Unique mount ID for this session.
 	MountId UUID `protobuf:"bytes,1,opt,name=mount_id,json=mountId,proto3,customtype=UUID" json:"mount_id"`
 	// Root directory ID for the mounted store.
 	DirectoryId UUID `protobuf:"bytes,2,opt,name=directory_id,json=directoryId,proto3,customtype=UUID" json:"directory_id"`
 	// Write token for authenticating with blob servers.
-	WriteToken           []byte   `protobuf:"bytes,3,opt,name=write_token,json=writeToken,proto3" json:"write_token,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	WriteToken []byte `protobuf:"bytes,3,opt,name=write_token,json=writeToken,proto3" json:"write_token,omitempty"`
 }
 
 func (m *MountResponse) Reset()         { *m = MountResponse{} }
@@ -135,18 +115,8 @@ func (m *MountResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MountResponse proto.InternalMessageInfo
 
-func (m *MountResponse) GetWriteToken() []byte {
-	if m != nil {
-		return m.WriteToken
-	}
-	return nil
-}
-
 type UnmountRequest struct {
-	MountId              UUID     `protobuf:"bytes,1,opt,name=mount_id,json=mountId,proto3,customtype=UUID" json:"mount_id"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	MountId UUID `protobuf:"bytes,1,opt,name=mount_id,json=mountId,proto3,customtype=UUID" json:"mount_id"`
 }
 
 func (m *UnmountRequest) Reset()         { *m = UnmountRequest{} }
@@ -183,9 +153,6 @@ func (m *UnmountRequest) XXX_DiscardUnknown() {
 var xxx_messageInfo_UnmountRequest proto.InternalMessageInfo
 
 type UnmountResponse struct {
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *UnmountResponse) Reset()         { *m = UnmountResponse{} }
@@ -227,10 +194,7 @@ type CreateRequest struct {
 	// Name for the new file.
 	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	// Replication policy for the new file.
-	Policy               *ReplicationPolicy `protobuf:"bytes,3,opt,name=policy,proto3" json:"policy,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}           `json:"-"`
-	XXX_unrecognized     []byte             `json:"-"`
-	XXX_sizecache        int32              `json:"-"`
+	Policy *ReplicationPolicy `protobuf:"bytes,3,opt,name=policy,proto3" json:"policy,omitempty"`
 }
 
 func (m *CreateRequest) Reset()         { *m = CreateRequest{} }
@@ -266,25 +230,8 @@ func (m *CreateRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_CreateRequest proto.InternalMessageInfo
 
-func (m *CreateRequest) GetName() string {
-	if m != nil {
-		return m.Name
-	}
-	return ""
-}
-
-func (m *CreateRequest) GetPolicy() *ReplicationPolicy {
-	if m != nil {
-		return m.Policy
-	}
-	return nil
-}
-
 type CreateResponse struct {
-	Meta                 *ObjectMeta `protobuf:"bytes,1,opt,name=meta,proto3" json:"meta,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}    `json:"-"`
-	XXX_unrecognized     []byte      `json:"-"`
-	XXX_sizecache        int32       `json:"-"`
+	Meta *ObjectMeta `protobuf:"bytes,1,opt,name=meta,proto3" json:"meta,omitempty"`
 }
 
 func (m *CreateResponse) Reset()         { *m = CreateResponse{} }
@@ -320,23 +267,13 @@ func (m *CreateResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_CreateResponse proto.InternalMessageInfo
 
-func (m *CreateResponse) GetMeta() *ObjectMeta {
-	if m != nil {
-		return m.Meta
-	}
-	return nil
-}
-
 type StatByPathRequest struct {
 	// Directory containing the entry.
 	DirectoryId UUID `protobuf:"bytes,1,opt,name=directory_id,json=directoryId,proto3,customtype=UUID" json:"directory_id"`
 	// Name of the entry to stat.
 	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	// If true, include all namespace references (hardlinks) in the response.
-	IncludeReferences    bool     `protobuf:"varint,3,opt,name=include_references,json=includeReferences,proto3" json:"include_references,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	IncludeReferences bool `protobuf:"varint,3,opt,name=include_references,json=includeReferences,proto3" json:"include_references,omitempty"`
 }
 
 func (m *StatByPathRequest) Reset()         { *m = StatByPathRequest{} }
@@ -372,30 +309,13 @@ func (m *StatByPathRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_StatByPathRequest proto.InternalMessageInfo
 
-func (m *StatByPathRequest) GetName() string {
-	if m != nil {
-		return m.Name
-	}
-	return ""
-}
-
-func (m *StatByPathRequest) GetIncludeReferences() bool {
-	if m != nil {
-		return m.IncludeReferences
-	}
-	return false
-}
-
 type StatByIDRequest struct {
 	// Object ID to stat.
 	ObjectId UUID `protobuf:"bytes,1,opt,name=object_id,json=objectId,proto3,customtype=UUID" json:"object_id"`
 	// If true, include all namespace references (hardlinks) in the response.
 	IncludeReferences bool `protobuf:"varint,2,opt,name=include_references,json=includeReferences,proto3" json:"include_references,omitempty"`
 	// If true, return the object even if it is a zombie (scheduled for deletion).
-	IncludeZombies       bool     `protobuf:"varint,3,opt,name=include_zombies,json=includeZombies,proto3" json:"include_zombies,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	IncludeZombies bool `protobuf:"varint,3,opt,name=include_zombies,json=includeZombies,proto3" json:"include_zombies,omitempty"`
 }
 
 func (m *StatByIDRequest) Reset()         { *m = StatByIDRequest{} }
@@ -431,20 +351,6 @@ func (m *StatByIDRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_StatByIDRequest proto.InternalMessageInfo
 
-func (m *StatByIDRequest) GetIncludeReferences() bool {
-	if m != nil {
-		return m.IncludeReferences
-	}
-	return false
-}
-
-func (m *StatByIDRequest) GetIncludeZombies() bool {
-	if m != nil {
-		return m.IncludeZombies
-	}
-	return false
-}
-
 type StatResponse struct {
 	Meta *ObjectMeta `protobuf:"bytes,1,opt,name=meta,proto3" json:"meta,omitempty"`
 	// Type of the entry (file or directory).
@@ -453,10 +359,7 @@ type StatResponse struct {
 	// Only populated when include_references is set in the request.
 	References []Reference `protobuf:"bytes,3,rep,name=references,proto3" json:"references"`
 	// True if the object is a zombie (scheduled for deletion).
-	Zombie               bool     `protobuf:"varint,4,opt,name=zombie,proto3" json:"zombie,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	Zombie bool `protobuf:"varint,4,opt,name=zombie,proto3" json:"zombie,omitempty"`
 }
 
 func (m *StatResponse) Reset()         { *m = StatResponse{} }
@@ -492,42 +395,11 @@ func (m *StatResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_StatResponse proto.InternalMessageInfo
 
-func (m *StatResponse) GetMeta() *ObjectMeta {
-	if m != nil {
-		return m.Meta
-	}
-	return nil
-}
-
-func (m *StatResponse) GetType() EntryType {
-	if m != nil {
-		return m.Type
-	}
-	return EntryType_ENTRY_TYPE_UNSPECIFIED
-}
-
-func (m *StatResponse) GetReferences() []Reference {
-	if m != nil {
-		return m.References
-	}
-	return nil
-}
-
-func (m *StatResponse) GetZombie() bool {
-	if m != nil {
-		return m.Zombie
-	}
-	return false
-}
-
 type DeleteRequest struct {
 	// Directory containing the entry to delete.
 	DirectoryId UUID `protobuf:"bytes,1,opt,name=directory_id,json=directoryId,proto3,customtype=UUID" json:"directory_id"`
 	// Name of the entry to delete.
-	Name                 string   `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 }
 
 func (m *DeleteRequest) Reset()         { *m = DeleteRequest{} }
@@ -563,21 +435,11 @@ func (m *DeleteRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_DeleteRequest proto.InternalMessageInfo
 
-func (m *DeleteRequest) GetName() string {
-	if m != nil {
-		return m.Name
-	}
-	return ""
-}
-
 type DeleteResponse struct {
 	// Object ID that was unlinked (for files only).
 	ObjectId UUID `protobuf:"bytes,1,opt,name=object_id,json=objectId,proto3,customtype=UUID" json:"object_id"`
 	// True if this was the last reference and the object will be deleted.
-	ObjectDeleted        bool     `protobuf:"varint,2,opt,name=object_deleted,json=objectDeleted,proto3" json:"object_deleted,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	ObjectDeleted bool `protobuf:"varint,2,opt,name=object_deleted,json=objectDeleted,proto3" json:"object_deleted,omitempty"`
 }
 
 func (m *DeleteResponse) Reset()         { *m = DeleteResponse{} }
@@ -613,21 +475,11 @@ func (m *DeleteResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_DeleteResponse proto.InternalMessageInfo
 
-func (m *DeleteResponse) GetObjectDeleted() bool {
-	if m != nil {
-		return m.ObjectDeleted
-	}
-	return false
-}
-
 type SealRequest struct {
 	// Object to seal.
 	ObjectId UUID `protobuf:"bytes,1,opt,name=object_id,json=objectId,proto3,customtype=UUID" json:"object_id"`
 	// Final size of the object.
-	Size_                int64    `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	Size_ int64 `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty"`
 }
 
 func (m *SealRequest) Reset()         { *m = SealRequest{} }
@@ -663,17 +515,7 @@ func (m *SealRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_SealRequest proto.InternalMessageInfo
 
-func (m *SealRequest) GetSize_() int64 {
-	if m != nil {
-		return m.Size_
-	}
-	return 0
-}
-
 type SealResponse struct {
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *SealResponse) Reset()         { *m = SealResponse{} }
@@ -713,10 +555,7 @@ type MkdirRequest struct {
 	// Parent directory in which to create the subdirectory.
 	ParentId UUID `protobuf:"bytes,1,opt,name=parent_id,json=parentId,proto3,customtype=UUID" json:"parent_id"`
 	// Name for the new directory.
-	Name                 string   `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 }
 
 func (m *MkdirRequest) Reset()         { *m = MkdirRequest{} }
@@ -752,19 +591,9 @@ func (m *MkdirRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MkdirRequest proto.InternalMessageInfo
 
-func (m *MkdirRequest) GetName() string {
-	if m != nil {
-		return m.Name
-	}
-	return ""
-}
-
 type MkdirResponse struct {
 	// ID of the newly created directory.
-	DirectoryId          UUID     `protobuf:"bytes,1,opt,name=directory_id,json=directoryId,proto3,customtype=UUID" json:"directory_id"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	DirectoryId UUID `protobuf:"bytes,1,opt,name=directory_id,json=directoryId,proto3,customtype=UUID" json:"directory_id"`
 }
 
 func (m *MkdirResponse) Reset()         { *m = MkdirResponse{} }
@@ -804,10 +633,7 @@ type RmdirRequest struct {
 	// Parent directory containing the directory to remove.
 	ParentId UUID `protobuf:"bytes,1,opt,name=parent_id,json=parentId,proto3,customtype=UUID" json:"parent_id"`
 	// Name of the directory to remove.
-	Name                 string   `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 }
 
 func (m *RmdirRequest) Reset()         { *m = RmdirRequest{} }
@@ -843,17 +669,7 @@ func (m *RmdirRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_RmdirRequest proto.InternalMessageInfo
 
-func (m *RmdirRequest) GetName() string {
-	if m != nil {
-		return m.Name
-	}
-	return ""
-}
-
 type RmdirResponse struct {
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *RmdirResponse) Reset()         { *m = RmdirResponse{} }
@@ -891,10 +707,7 @@ var xxx_messageInfo_RmdirResponse proto.InternalMessageInfo
 
 type ListRequest struct {
 	// Directory to list.
-	DirectoryId          UUID     `protobuf:"bytes,1,opt,name=directory_id,json=directoryId,proto3,customtype=UUID" json:"directory_id"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	DirectoryId UUID `protobuf:"bytes,1,opt,name=directory_id,json=directoryId,proto3,customtype=UUID" json:"directory_id"`
 }
 
 func (m *ListRequest) Reset()         { *m = ListRequest{} }
@@ -936,10 +749,7 @@ type LinkRequest struct {
 	// Name for the new link.
 	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	// Existing object to link to.
-	ObjectId             UUID     `protobuf:"bytes,3,opt,name=object_id,json=objectId,proto3,customtype=UUID" json:"object_id"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	ObjectId UUID `protobuf:"bytes,3,opt,name=object_id,json=objectId,proto3,customtype=UUID" json:"object_id"`
 }
 
 func (m *LinkRequest) Reset()         { *m = LinkRequest{} }
@@ -975,17 +785,7 @@ func (m *LinkRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_LinkRequest proto.InternalMessageInfo
 
-func (m *LinkRequest) GetName() string {
-	if m != nil {
-		return m.Name
-	}
-	return ""
-}
-
 type LinkResponse struct {
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *LinkResponse) Reset()         { *m = LinkResponse{} }
@@ -1027,10 +827,7 @@ type RenameRequest struct {
 	// Current name of the entry.
 	OldName string `protobuf:"bytes,2,opt,name=old_name,json=oldName,proto3" json:"old_name,omitempty"`
 	// New name for the entry.
-	NewName              string   `protobuf:"bytes,3,opt,name=new_name,json=newName,proto3" json:"new_name,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	NewName string `protobuf:"bytes,3,opt,name=new_name,json=newName,proto3" json:"new_name,omitempty"`
 }
 
 func (m *RenameRequest) Reset()         { *m = RenameRequest{} }
@@ -1066,24 +863,7 @@ func (m *RenameRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_RenameRequest proto.InternalMessageInfo
 
-func (m *RenameRequest) GetOldName() string {
-	if m != nil {
-		return m.OldName
-	}
-	return ""
-}
-
-func (m *RenameRequest) GetNewName() string {
-	if m != nil {
-		return m.NewName
-	}
-	return ""
-}
-
 type RenameResponse struct {
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *RenameResponse) Reset()         { *m = RenameResponse{} }
@@ -1131,10 +911,7 @@ type HeartbeatBlobServerRequest struct {
 	// Total storage capacity in bytes.
 	CapacityBytes int64 `protobuf:"varint,5,opt,name=capacity_bytes,json=capacityBytes,proto3" json:"capacity_bytes,omitempty"`
 	// Currently used storage in bytes.
-	UsedBytes            int64    `protobuf:"varint,6,opt,name=used_bytes,json=usedBytes,proto3" json:"used_bytes,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	UsedBytes int64 `protobuf:"varint,6,opt,name=used_bytes,json=usedBytes,proto3" json:"used_bytes,omitempty"`
 }
 
 func (m *HeartbeatBlobServerRequest) Reset()         { *m = HeartbeatBlobServerRequest{} }
@@ -1170,47 +947,9 @@ func (m *HeartbeatBlobServerRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_HeartbeatBlobServerRequest proto.InternalMessageInfo
 
-func (m *HeartbeatBlobServerRequest) GetControlAddr() string {
-	if m != nil {
-		return m.ControlAddr
-	}
-	return ""
-}
-
-func (m *HeartbeatBlobServerRequest) GetDataAddr() string {
-	if m != nil {
-		return m.DataAddr
-	}
-	return ""
-}
-
-func (m *HeartbeatBlobServerRequest) GetZone() string {
-	if m != nil {
-		return m.Zone
-	}
-	return ""
-}
-
-func (m *HeartbeatBlobServerRequest) GetCapacityBytes() int64 {
-	if m != nil {
-		return m.CapacityBytes
-	}
-	return 0
-}
-
-func (m *HeartbeatBlobServerRequest) GetUsedBytes() int64 {
-	if m != nil {
-		return m.UsedBytes
-	}
-	return 0
-}
-
 type HeartbeatBlobServerResponse struct {
 	// Integer ID assigned to this blob server, used in objects.replicas arrays.
-	DiskId               int32    `protobuf:"varint,1,opt,name=disk_id,json=diskId,proto3" json:"disk_id,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	DiskId int32 `protobuf:"varint,1,opt,name=disk_id,json=diskId,proto3" json:"disk_id,omitempty"`
 }
 
 func (m *HeartbeatBlobServerResponse) Reset()         { *m = HeartbeatBlobServerResponse{} }
@@ -1246,13 +985,6 @@ func (m *HeartbeatBlobServerResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_HeartbeatBlobServerResponse proto.InternalMessageInfo
 
-func (m *HeartbeatBlobServerResponse) GetDiskId() int32 {
-	if m != nil {
-		return m.DiskId
-	}
-	return 0
-}
-
 func init() {
 	proto.RegisterType((*MountRequest)(nil), "basaltpb.MountRequest")
 	proto.RegisterType((*MountResponse)(nil), "basaltpb.MountResponse")
@@ -1283,75 +1015,76 @@ func init() {
 func init() { proto.RegisterFile("basaltpb/controller.proto", fileDescriptor_6ae6a4f3446e7bd8) }
 
 var fileDescriptor_6ae6a4f3446e7bd8 = []byte{
-	// 1079 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x57, 0x4f, 0x6f, 0xdc, 0x44,
-	0x14, 0xc7, 0x8d, 0xb3, 0x71, 0xde, 0xfe, 0x09, 0x99, 0xb6, 0xe9, 0xee, 0x46, 0x24, 0xc5, 0x22,
-	0x4a, 0x10, 0x90, 0x45, 0xa9, 0x40, 0x4d, 0x2b, 0x2a, 0xba, 0x0d, 0x12, 0x96, 0x1a, 0xa8, 0x9c,
-	0xe4, 0xd2, 0xcb, 0x6a, 0xec, 0x19, 0x12, 0xb3, 0x5e, 0xcf, 0x62, 0xcf, 0x36, 0xda, 0x48, 0x9c,
-	0x11, 0x9c, 0xb9, 0xf0, 0x3d, 0xf8, 0x00, 0x1c, 0x7b, 0xe4, 0xcc, 0xa1, 0x82, 0x7c, 0x12, 0x34,
-	0x7f, 0xec, 0x1d, 0x27, 0xbb, 0x94, 0x44, 0xb9, 0x79, 0xdf, 0xfb, 0xbd, 0x37, 0xbf, 0xf7, 0x9e,
-	0xe7, 0xf7, 0xbc, 0xd0, 0x0a, 0x70, 0x86, 0x63, 0x3e, 0x0c, 0x3a, 0x21, 0x4b, 0x78, 0xca, 0xe2,
-	0x98, 0xa6, 0xdb, 0xc3, 0x94, 0x71, 0x86, 0x9c, 0xdc, 0xd5, 0xbe, 0x6b, 0x80, 0x06, 0x03, 0x96,
-	0x28, 0x40, 0xfb, 0xce, 0x31, 0x3b, 0x66, 0xf2, 0xb1, 0x23, 0x9e, 0x94, 0xd5, 0xfd, 0xcd, 0x82,
-	0xda, 0x3e, 0x1b, 0x25, 0xdc, 0xa7, 0x3f, 0x8c, 0x68, 0xc6, 0xd1, 0x3a, 0x54, 0xa3, 0x24, 0xe3,
-	0x38, 0x09, 0x69, 0x2f, 0x22, 0x4d, 0xeb, 0xbe, 0xb5, 0xb5, 0xe8, 0x43, 0x6e, 0xf2, 0x08, 0x42,
-	0x60, 0x9f, 0xb1, 0x84, 0x36, 0x6f, 0x49, 0x8f, 0x7c, 0x46, 0x1f, 0x01, 0x84, 0xf1, 0x28, 0xe3,
-	0x34, 0x15, 0x31, 0x73, 0xf7, 0xad, 0xad, 0x5a, 0xb7, 0xf6, 0xfa, 0xcd, 0xfa, 0x3b, 0x7f, 0xbd,
-	0x59, 0xb7, 0x8f, 0x8e, 0xbc, 0x3d, 0x7f, 0x51, 0xfb, 0x3d, 0x82, 0x36, 0xc1, 0xc9, 0x38, 0x4b,
-	0x65, 0x7a, 0x7b, 0x0a, 0x74, 0x41, 0x7a, 0x3d, 0xe2, 0xfe, 0x62, 0x41, 0x5d, 0x73, 0xcb, 0x86,
-	0x2c, 0xc9, 0xa8, 0x08, 0x1d, 0x08, 0x43, 0xce, 0xec, 0x52, 0xa8, 0xf4, 0x7a, 0x04, 0x75, 0xa0,
-	0x46, 0xa2, 0x94, 0x86, 0x9c, 0xa5, 0x63, 0x01, 0xbe, 0x35, 0x05, 0x5c, 0x2d, 0x10, 0x1e, 0x11,
-	0x65, 0x9f, 0xa6, 0x11, 0xa7, 0x3d, 0xce, 0xfa, 0x34, 0x51, 0x25, 0xf8, 0x20, 0x4d, 0x87, 0xc2,
-	0xe2, 0xee, 0x42, 0xe3, 0x28, 0x19, 0x98, 0x9d, 0xfa, 0xbf, 0x64, 0xdc, 0x65, 0x58, 0x2a, 0x42,
-	0x55, 0x21, 0xee, 0xcf, 0x16, 0xd4, 0x9f, 0xa5, 0x14, 0x73, 0x9a, 0x67, 0xbb, 0xc8, 0xd8, 0x7a,
-	0x1b, 0x63, 0x04, 0x76, 0x82, 0x07, 0xc5, 0x1c, 0xc4, 0x33, 0x7a, 0x00, 0x95, 0x21, 0x8b, 0xa3,
-	0x70, 0x2c, 0x0b, 0xa8, 0xee, 0xac, 0x6e, 0xe7, 0xef, 0xc2, 0xb6, 0x4f, 0x87, 0x71, 0x14, 0x62,
-	0x1e, 0xb1, 0xe4, 0x85, 0x84, 0xf8, 0x1a, 0xea, 0x3e, 0x82, 0x46, 0x4e, 0x45, 0xb7, 0x79, 0x0b,
-	0xec, 0x01, 0xe5, 0x58, 0x72, 0xa8, 0xee, 0xdc, 0x99, 0x24, 0xf9, 0x36, 0xf8, 0x9e, 0x86, 0x7c,
-	0x9f, 0x72, 0xec, 0x4b, 0x84, 0xfb, 0x93, 0x05, 0xcb, 0x07, 0x1c, 0xf3, 0xee, 0xf8, 0x05, 0xe6,
-	0x27, 0x37, 0x5a, 0xcb, 0x27, 0x80, 0xa2, 0x24, 0x8c, 0x47, 0x84, 0xf6, 0x52, 0xfa, 0x1d, 0x4d,
-	0x69, 0x12, 0xd2, 0x4c, 0xd6, 0xe5, 0xf8, 0xcb, 0xda, 0xe3, 0x17, 0x0e, 0xf7, 0x57, 0x0b, 0x96,
-	0x14, 0x13, 0x6f, 0x2f, 0xe7, 0xf1, 0x21, 0x2c, 0x32, 0xc9, 0x78, 0x16, 0x09, 0x47, 0xb9, 0x3d,
-	0x32, 0xe3, 0xb4, 0x5b, 0x33, 0x4e, 0x43, 0x9b, 0xb0, 0x94, 0xc3, 0xcf, 0xd8, 0x20, 0x88, 0x0a,
-	0x66, 0x0d, 0x6d, 0x7e, 0xa9, 0xac, 0xee, 0xef, 0x16, 0xd4, 0x04, 0xad, 0xab, 0xf7, 0x16, 0x6d,
-	0x82, 0xcd, 0xc7, 0x43, 0xd5, 0x94, 0xc6, 0xce, 0xed, 0x09, 0xf2, 0xab, 0x84, 0xa7, 0xe3, 0xc3,
-	0xf1, 0x90, 0xfa, 0x12, 0x80, 0x76, 0x01, 0x4a, 0x1d, 0x9a, 0xdb, 0xaa, 0x9a, 0xf0, 0x82, 0x76,
-	0xd7, 0x16, 0xc5, 0xfb, 0x06, 0x18, 0xad, 0x40, 0x45, 0xf1, 0x97, 0x37, 0xd1, 0xf1, 0xf5, 0x2f,
-	0xf7, 0x10, 0xea, 0x7b, 0x34, 0xa6, 0x37, 0xfb, 0x7a, 0xba, 0x01, 0x34, 0xf2, 0xac, 0xba, 0x1b,
-	0x57, 0x98, 0xd0, 0x06, 0x34, 0x34, 0x94, 0xc8, 0x1c, 0x44, 0x4f, 0xa7, 0xae, 0xac, 0x2a, 0x31,
-	0x71, 0x9f, 0x43, 0xf5, 0x80, 0xe2, 0xf8, 0x1a, 0xaf, 0x00, 0x02, 0x3b, 0x8b, 0xce, 0x14, 0xe3,
-	0x39, 0x5f, 0x3e, 0xbb, 0x0d, 0xa8, 0xa9, 0x6c, 0xfa, 0xde, 0xee, 0x43, 0x6d, 0xbf, 0x4f, 0xa2,
-	0xd4, 0x48, 0x3f, 0xc4, 0x29, 0x9d, 0x2d, 0x02, 0x8e, 0x72, 0xcf, 0x68, 0xc8, 0x97, 0x50, 0xd7,
-	0xe9, 0x74, 0x3f, 0xae, 0xda, 0x66, 0x41, 0xc8, 0x1f, 0xdc, 0x1c, 0xa1, 0x25, 0xa8, 0xeb, 0x74,
-	0xba, 0xe0, 0x27, 0x50, 0x7d, 0x1e, 0x65, 0xfc, 0xba, 0xaf, 0x81, 0xfb, 0xa3, 0x88, 0x4f, 0xfa,
-	0x37, 0xaa, 0x0c, 0xa5, 0x99, 0xce, 0xfd, 0xd7, 0x4c, 0xc5, 0xfc, 0xd4, 0xf1, 0xba, 0x9c, 0x57,
-	0x50, 0xf7, 0xa9, 0x48, 0x72, 0x6d, 0x42, 0x2d, 0x70, 0x58, 0x4c, 0x7a, 0x06, 0xa9, 0x05, 0x16,
-	0x93, 0x6f, 0x04, 0xaf, 0x16, 0x38, 0x09, 0x3d, 0x55, 0xae, 0x39, 0xe5, 0x4a, 0xe8, 0xa9, 0x70,
-	0xb9, 0xef, 0x42, 0x23, 0x3f, 0x57, 0x33, 0xf9, 0xc7, 0x82, 0xf6, 0xd7, 0x14, 0xa7, 0x3c, 0xa0,
-	0x98, 0x77, 0x63, 0x16, 0x1c, 0xd0, 0xf4, 0x15, 0x35, 0xe7, 0x98, 0x49, 0xc3, 0xcc, 0x39, 0x2a,
-	0xb7, 0x47, 0xd0, 0xfb, 0x50, 0xd3, 0x5f, 0x03, 0x3d, 0x4c, 0x48, 0xaa, 0x59, 0x55, 0xb5, 0xed,
-	0x29, 0x21, 0x29, 0x5a, 0x85, 0x45, 0x82, 0x39, 0x56, 0x7e, 0x45, 0xcd, 0x11, 0x06, 0xe9, 0xcc,
-	0x17, 0xba, 0x6d, 0x2c, 0xf4, 0x0d, 0x68, 0x84, 0x78, 0x88, 0xc3, 0x88, 0x8f, 0x7b, 0xc1, 0x98,
-	0xd3, 0xac, 0x39, 0x2f, 0x6f, 0x45, 0x3d, 0xb7, 0x76, 0x85, 0x11, 0xbd, 0x07, 0x30, 0xca, 0x28,
-	0xd1, 0x90, 0x8a, 0x84, 0x2c, 0x0a, 0x8b, 0x74, 0xbb, 0x9f, 0xc3, 0xea, 0xd4, 0x12, 0xf5, 0xcb,
-	0x7e, 0x0f, 0x16, 0x48, 0x94, 0xf5, 0xf3, 0x0a, 0xe7, 0xfd, 0x8a, 0xf8, 0xe9, 0x91, 0x9d, 0x3f,
-	0x2a, 0x00, 0xcf, 0x8a, 0x0f, 0x1c, 0xf4, 0x10, 0xe6, 0xe5, 0x67, 0x00, 0x5a, 0x99, 0x88, 0x9a,
-	0xf9, 0xcd, 0xd2, 0xbe, 0x77, 0xc9, 0xae, 0x4f, 0x78, 0x02, 0x0b, 0x7a, 0xf3, 0xa2, 0xe6, 0x04,
-	0x53, 0xde, 0xe3, 0xed, 0xd6, 0x14, 0x8f, 0x8e, 0x7f, 0x0c, 0x15, 0xb5, 0x1a, 0x91, 0x71, 0x44,
-	0x69, 0x6f, 0xb7, 0x9b, 0x97, 0x1d, 0x3a, 0xf8, 0x29, 0xc0, 0x64, 0x35, 0x22, 0x63, 0x15, 0x5f,
-	0x5a, 0x98, 0xed, 0x95, 0xb2, 0xb3, 0x48, 0xf1, 0x05, 0x38, 0xf9, 0x4e, 0x43, 0xad, 0x8b, 0x09,
-	0x8a, 0x3d, 0x37, 0x33, 0xfc, 0x31, 0x54, 0x94, 0x2c, 0x9a, 0xf4, 0x4b, 0xba, 0x6e, 0xd2, 0xbf,
-	0x20, 0xcd, 0x9f, 0x81, 0x2d, 0xa4, 0x0f, 0xdd, 0x35, 0x92, 0x4f, 0x84, 0xb5, 0x74, 0xa6, 0xa1,
-	0x90, 0x72, 0x58, 0x42, 0xd2, 0x4a, 0xc3, 0x32, 0x24, 0xb3, 0x34, 0xac, 0x92, 0xf6, 0x3d, 0x84,
-	0x79, 0xa9, 0x3d, 0x66, 0xa4, 0xa9, 0x6d, 0x66, 0x64, 0x49, 0xa4, 0xd0, 0x2e, 0xd8, 0x42, 0xa4,
-	0x4c, 0xaa, 0x86, 0x68, 0x95, 0x6a, 0xcc, 0x6f, 0xb2, 0xdc, 0xa1, 0x9f, 0x5a, 0xa2, 0x4a, 0x21,
-	0x10, 0xe5, 0xd0, 0x42, 0xaf, 0xcc, 0x2a, 0x4d, 0x1d, 0x11, 0x9d, 0x55, 0xf7, 0xd9, 0xec, 0x6c,
-	0x49, 0x59, 0xcc, 0x53, 0xcb, 0x57, 0x1f, 0x05, 0x70, 0x7b, 0xca, 0xb5, 0x40, 0x1f, 0x4c, 0x02,
-	0x66, 0x0b, 0x43, 0x7b, 0xe3, 0x2d, 0x28, 0x75, 0x46, 0xf7, 0xd1, 0xeb, 0xf3, 0x35, 0xeb, 0xcf,
-	0xf3, 0x35, 0xeb, 0xef, 0xf3, 0x35, 0xeb, 0xe5, 0xc7, 0xc7, 0x11, 0x3f, 0x19, 0x05, 0xdb, 0x21,
-	0x1b, 0x74, 0x42, 0x16, 0xf6, 0x53, 0x86, 0xc3, 0x13, 0x12, 0x74, 0x54, 0xaa, 0x30, 0x8e, 0x68,
-	0xc2, 0x3b, 0x79, 0xde, 0xa0, 0x22, 0xff, 0x1a, 0x3c, 0xf8, 0x37, 0x00, 0x00, 0xff, 0xff, 0x8d,
-	0x00, 0xeb, 0x87, 0x6e, 0x0c, 0x00, 0x00,
+	// 1098 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x57, 0x4f, 0x4f, 0x1b, 0x47,
+	0x14, 0x67, 0x61, 0x31, 0xe6, 0xf9, 0x0f, 0x65, 0x92, 0x10, 0x30, 0xaa, 0x49, 0x57, 0x45, 0x50,
+	0xb5, 0xc5, 0x15, 0x51, 0xab, 0xd0, 0xa8, 0x51, 0xe3, 0x50, 0xa9, 0x5b, 0x85, 0x36, 0x5a, 0xe0,
+	0x92, 0x8b, 0x35, 0xbb, 0x33, 0x85, 0x2d, 0xeb, 0x1d, 0x77, 0x77, 0x1c, 0x64, 0xa4, 0x9e, 0xab,
+	0xf6, 0xd4, 0x43, 0x2f, 0xfd, 0x1e, 0xfd, 0x00, 0x3d, 0x72, 0xcc, 0xb1, 0xea, 0x21, 0x6a, 0xe0,
+	0x8b, 0x54, 0xf3, 0x67, 0xd7, 0xb3, 0x60, 0x37, 0x01, 0x71, 0x1b, 0xbf, 0xbf, 0xbf, 0xf7, 0xde,
+	0xcc, 0xef, 0xad, 0x61, 0xc9, 0xc7, 0x29, 0x8e, 0x78, 0xcf, 0x6f, 0x05, 0x2c, 0xe6, 0x09, 0x8b,
+	0x22, 0x9a, 0x6c, 0xf4, 0x12, 0xc6, 0x19, 0x2a, 0x67, 0xaa, 0xc6, 0x1d, 0xc3, 0xa8, 0xdb, 0x65,
+	0xb1, 0x32, 0x68, 0xdc, 0x3e, 0x60, 0x07, 0x4c, 0x1e, 0x5b, 0xe2, 0xa4, 0xa4, 0xce, 0x1f, 0x16,
+	0x54, 0x77, 0x58, 0x3f, 0xe6, 0x1e, 0xfd, 0xb1, 0x4f, 0x53, 0x8e, 0x56, 0xa0, 0x12, 0xc6, 0x29,
+	0xc7, 0x71, 0x40, 0x3b, 0x21, 0x59, 0xb4, 0xee, 0x59, 0xeb, 0xb3, 0x1e, 0x64, 0x22, 0x97, 0x20,
+	0x04, 0xf6, 0x09, 0x8b, 0xe9, 0xe2, 0xa4, 0xd4, 0xc8, 0x33, 0xfa, 0x10, 0x20, 0x88, 0xfa, 0x29,
+	0xa7, 0x89, 0xf0, 0x99, 0xba, 0x67, 0xad, 0x57, 0xdb, 0xd5, 0xd3, 0x57, 0x2b, 0x13, 0xff, 0xbc,
+	0x5a, 0xb1, 0xf7, 0xf7, 0xdd, 0x6d, 0x6f, 0x56, 0xeb, 0x5d, 0x82, 0xd6, 0xa0, 0x9c, 0x72, 0x96,
+	0xc8, 0xf0, 0xf6, 0x08, 0xd3, 0x19, 0xa9, 0x75, 0x89, 0xf3, 0xab, 0x05, 0x35, 0x8d, 0x2d, 0xed,
+	0xb1, 0x38, 0xa5, 0xc2, 0xb5, 0x2b, 0x04, 0x19, 0xb2, 0x4b, 0xae, 0x52, 0xeb, 0x12, 0xd4, 0x82,
+	0x2a, 0x09, 0x13, 0x1a, 0x70, 0x96, 0x0c, 0x84, 0xf1, 0xe4, 0x08, 0xe3, 0x4a, 0x6e, 0xe1, 0x12,
+	0x51, 0xf6, 0x71, 0x12, 0x72, 0xda, 0xe1, 0xec, 0x88, 0xc6, 0xaa, 0x04, 0x0f, 0xa4, 0x68, 0x4f,
+	0x48, 0x9c, 0x2d, 0xa8, 0xef, 0xc7, 0x5d, 0xb3, 0x53, 0x6f, 0x0b, 0xc6, 0x99, 0x87, 0xb9, 0xdc,
+	0x55, 0x15, 0xe2, 0xfc, 0x62, 0x41, 0xed, 0x49, 0x42, 0x31, 0xa7, 0x59, 0xb4, 0x8b, 0x88, 0xad,
+	0x37, 0x21, 0x46, 0x60, 0xc7, 0xb8, 0x9b, 0xcf, 0x41, 0x9c, 0xd1, 0x7d, 0x28, 0xf5, 0x58, 0x14,
+	0x06, 0x03, 0x59, 0x40, 0x65, 0x73, 0x79, 0x23, 0xbb, 0x0b, 0x1b, 0x1e, 0xed, 0x45, 0x61, 0x80,
+	0x79, 0xc8, 0xe2, 0x67, 0xd2, 0xc4, 0xd3, 0xa6, 0xce, 0xe7, 0x50, 0xcf, 0xa0, 0xe8, 0x36, 0xaf,
+	0x83, 0xdd, 0xa5, 0x1c, 0x4b, 0x0c, 0x95, 0xcd, 0xdb, 0xc3, 0x20, 0xdf, 0xf9, 0x3f, 0xd0, 0x80,
+	0xef, 0x50, 0x8e, 0x3d, 0x69, 0xe1, 0xfc, 0x6c, 0xc1, 0xfc, 0x2e, 0xc7, 0xbc, 0x3d, 0x78, 0x86,
+	0xf9, 0xe1, 0x8d, 0xd6, 0xf2, 0x31, 0xa0, 0x30, 0x0e, 0xa2, 0x3e, 0xa1, 0x9d, 0x84, 0x7e, 0x4f,
+	0x13, 0x1a, 0x07, 0x34, 0x95, 0x75, 0x95, 0xbd, 0x79, 0xad, 0xf1, 0x72, 0x85, 0xf3, 0xbb, 0x05,
+	0x73, 0x0a, 0x89, 0xbb, 0x9d, 0xe1, 0xf8, 0x00, 0x66, 0x99, 0x44, 0x3c, 0x0e, 0x44, 0x59, 0xa9,
+	0x5d, 0x32, 0x26, 0xdb, 0xe4, 0x98, 0x6c, 0x68, 0x0d, 0xe6, 0x32, 0xf3, 0x13, 0xd6, 0xf5, 0xc3,
+	0x1c, 0x59, 0x5d, 0x8b, 0x9f, 0x2b, 0xa9, 0xf3, 0xa7, 0x05, 0x55, 0x01, 0xeb, 0xea, 0xbd, 0x45,
+	0x6b, 0x60, 0xf3, 0x41, 0x4f, 0x35, 0xa5, 0xbe, 0x79, 0x6b, 0x68, 0xf9, 0x55, 0xcc, 0x93, 0xc1,
+	0xde, 0xa0, 0x47, 0x3d, 0x69, 0x80, 0xb6, 0x00, 0x0a, 0x1d, 0x9a, 0x5a, 0xaf, 0x98, 0xe6, 0x39,
+	0xec, 0xb6, 0x2d, 0x8a, 0xf7, 0x0c, 0x63, 0xb4, 0x00, 0x25, 0x85, 0x5f, 0xbe, 0xc4, 0xb2, 0xa7,
+	0x7f, 0x39, 0x7b, 0x50, 0xdb, 0xa6, 0x11, 0xbd, 0xd9, 0xeb, 0xe9, 0xf8, 0x50, 0xcf, 0xa2, 0xea,
+	0x6e, 0x5c, 0x61, 0x42, 0xab, 0x50, 0xd7, 0xa6, 0x44, 0xc6, 0x20, 0x7a, 0x3a, 0x35, 0x25, 0x55,
+	0x81, 0x89, 0xf3, 0x14, 0x2a, 0xbb, 0x14, 0x47, 0xd7, 0xb8, 0x02, 0x08, 0xec, 0x34, 0x3c, 0x51,
+	0x88, 0xa7, 0x3c, 0x79, 0x76, 0xea, 0x50, 0x55, 0xd1, 0xf4, 0xbb, 0xdd, 0x81, 0xea, 0xce, 0x11,
+	0x09, 0x13, 0x23, 0x7c, 0x0f, 0x27, 0x74, 0x3c, 0x09, 0x94, 0x95, 0x7a, 0x4c, 0x43, 0xbe, 0x84,
+	0x9a, 0x0e, 0xa7, 0xfb, 0x71, 0xd5, 0x36, 0x0b, 0x40, 0x5e, 0xf7, 0xe6, 0x00, 0xcd, 0x41, 0x4d,
+	0x87, 0xd3, 0x05, 0x3f, 0x82, 0xca, 0xd3, 0x30, 0xe5, 0xd7, 0xbd, 0x06, 0xce, 0x4f, 0xc2, 0x3f,
+	0x3e, 0xba, 0x51, 0x66, 0x28, 0xcc, 0x74, 0xea, 0xff, 0x66, 0x2a, 0xe6, 0xa7, 0xd2, 0xeb, 0x72,
+	0x5e, 0x40, 0xcd, 0xa3, 0x22, 0xc8, 0xb5, 0x01, 0x2d, 0x41, 0x99, 0x45, 0xa4, 0x63, 0x80, 0x9a,
+	0x61, 0x11, 0xf9, 0x56, 0xe0, 0x5a, 0x82, 0x72, 0x4c, 0x8f, 0x95, 0x6a, 0x4a, 0xa9, 0x62, 0x7a,
+	0x2c, 0x54, 0xce, 0x3b, 0x50, 0xcf, 0xf2, 0x6a, 0x24, 0xaf, 0x2d, 0x68, 0x7c, 0x4d, 0x71, 0xc2,
+	0x7d, 0x8a, 0x79, 0x3b, 0x62, 0xfe, 0x2e, 0x4d, 0x5e, 0x50, 0x73, 0x8e, 0xa9, 0x14, 0x8c, 0x9d,
+	0xa3, 0x52, 0xbb, 0x04, 0xbd, 0x07, 0x55, 0xfd, 0x35, 0xd0, 0xc1, 0x84, 0x24, 0x1a, 0x55, 0x45,
+	0xcb, 0x1e, 0x13, 0x92, 0xa0, 0x65, 0x98, 0x25, 0x98, 0x63, 0xa5, 0x57, 0xd0, 0xca, 0x42, 0x20,
+	0x95, 0xd9, 0x42, 0xb7, 0x8d, 0x85, 0xbe, 0x0a, 0xf5, 0x00, 0xf7, 0x70, 0x10, 0xf2, 0x41, 0xc7,
+	0x1f, 0x70, 0x9a, 0x2e, 0x4e, 0xcb, 0x57, 0x51, 0xcb, 0xa4, 0x6d, 0x21, 0x44, 0xef, 0x02, 0xf4,
+	0x53, 0x4a, 0xb4, 0x49, 0x49, 0x9a, 0xcc, 0x0a, 0x89, 0x54, 0x3b, 0x9f, 0xc1, 0xf2, 0xc8, 0x12,
+	0xf5, 0x65, 0xbf, 0x0b, 0x33, 0x24, 0x4c, 0x8f, 0xb2, 0x0a, 0xa7, 0xbd, 0x92, 0xf8, 0xe9, 0x92,
+	0xcd, 0xbf, 0x4a, 0x00, 0x4f, 0xf2, 0x0f, 0x1c, 0xf4, 0x00, 0xa6, 0xe5, 0x67, 0x00, 0x5a, 0x18,
+	0x92, 0x9a, 0xf9, 0xcd, 0xd2, 0xb8, 0x7b, 0x49, 0xae, 0x33, 0x3c, 0x82, 0x19, 0xbd, 0x79, 0xd1,
+	0xe2, 0xd0, 0xa6, 0xb8, 0xc7, 0x1b, 0x4b, 0x23, 0x34, 0xda, 0xff, 0x21, 0x94, 0xd4, 0x6a, 0x44,
+	0x46, 0x8a, 0xc2, 0xde, 0x6e, 0x2c, 0x5e, 0x56, 0x68, 0xe7, 0xc7, 0x00, 0xc3, 0xd5, 0x88, 0x8c,
+	0x55, 0x7c, 0x69, 0x61, 0x36, 0x16, 0x8a, 0xca, 0x3c, 0xc4, 0x17, 0x50, 0xce, 0x76, 0x1a, 0x5a,
+	0xba, 0x18, 0x20, 0xdf, 0x73, 0x63, 0xdd, 0x1f, 0x42, 0x49, 0xd1, 0xa2, 0x09, 0xbf, 0xc0, 0xeb,
+	0x26, 0xfc, 0x0b, 0xd4, 0xfc, 0x29, 0xd8, 0x82, 0xfa, 0xd0, 0x1d, 0x23, 0xf8, 0x90, 0x58, 0x0b,
+	0x39, 0x0d, 0x86, 0x94, 0xc3, 0x12, 0x94, 0x56, 0x18, 0x96, 0x41, 0x99, 0x85, 0x61, 0x15, 0xb8,
+	0xef, 0x01, 0x4c, 0x4b, 0xee, 0x31, 0x3d, 0x4d, 0x6e, 0x33, 0x3d, 0x0b, 0x24, 0x85, 0xb6, 0xc0,
+	0x16, 0x24, 0x65, 0x42, 0x35, 0x48, 0xab, 0x50, 0x63, 0xf6, 0x92, 0xe5, 0x0e, 0xfd, 0xc4, 0x12,
+	0x55, 0x0a, 0x82, 0x28, 0xba, 0xe6, 0x7c, 0x65, 0x56, 0x69, 0xf2, 0x88, 0xe8, 0xac, 0x7a, 0xcf,
+	0x66, 0x67, 0x0b, 0xcc, 0x62, 0x66, 0x2d, 0x3e, 0x7d, 0xe4, 0xc3, 0xad, 0x11, 0xcf, 0x02, 0xbd,
+	0x3f, 0x74, 0x18, 0x4f, 0x0c, 0x8d, 0xd5, 0x37, 0x58, 0xa9, 0x1c, 0xed, 0x6f, 0x4e, 0x5f, 0x37,
+	0x27, 0x4e, 0xcf, 0x9a, 0xd6, 0xcb, 0xb3, 0xa6, 0xf5, 0xef, 0x59, 0xd3, 0xfa, 0xed, 0xbc, 0x39,
+	0xf1, 0xf2, 0xbc, 0x39, 0xf1, 0xf7, 0x79, 0x73, 0xe2, 0xf9, 0x47, 0x07, 0x21, 0x3f, 0xec, 0xfb,
+	0x1b, 0x01, 0xeb, 0xb6, 0x02, 0x16, 0x1c, 0x25, 0x0c, 0x07, 0x87, 0xc4, 0x6f, 0xa9, 0xd0, 0x41,
+	0x14, 0xd2, 0x98, 0xb7, 0xb2, 0x3c, 0x7e, 0x49, 0xfe, 0x55, 0xb8, 0xff, 0x5f, 0x00, 0x00, 0x00,
+	0xff, 0xff, 0xa0, 0x6f, 0x92, 0x1f, 0x7e, 0x0c, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -1972,10 +1705,6 @@ func (m *MountRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.XXX_unrecognized != nil {
-		i -= len(m.XXX_unrecognized)
-		copy(dAtA[i:], m.XXX_unrecognized)
-	}
 	{
 		size := m.StoreId.Size()
 		i -= size
@@ -2033,10 +1762,6 @@ func (m *MountResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.XXX_unrecognized != nil {
-		i -= len(m.XXX_unrecognized)
-		copy(dAtA[i:], m.XXX_unrecognized)
-	}
 	if len(m.WriteToken) > 0 {
 		i -= len(m.WriteToken)
 		copy(dAtA[i:], m.WriteToken)
@@ -2087,10 +1812,6 @@ func (m *UnmountRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.XXX_unrecognized != nil {
-		i -= len(m.XXX_unrecognized)
-		copy(dAtA[i:], m.XXX_unrecognized)
-	}
 	{
 		size := m.MountId.Size()
 		i -= size
@@ -2124,10 +1845,6 @@ func (m *UnmountResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.XXX_unrecognized != nil {
-		i -= len(m.XXX_unrecognized)
-		copy(dAtA[i:], m.XXX_unrecognized)
-	}
 	return len(dAtA) - i, nil
 }
 
@@ -2151,10 +1868,6 @@ func (m *CreateRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.XXX_unrecognized != nil {
-		i -= len(m.XXX_unrecognized)
-		copy(dAtA[i:], m.XXX_unrecognized)
-	}
 	if m.Policy != nil {
 		{
 			size, err := m.Policy.MarshalToSizedBuffer(dAtA[:i])
@@ -2207,10 +1920,6 @@ func (m *CreateResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.XXX_unrecognized != nil {
-		i -= len(m.XXX_unrecognized)
-		copy(dAtA[i:], m.XXX_unrecognized)
-	}
 	if m.Meta != nil {
 		{
 			size, err := m.Meta.MarshalToSizedBuffer(dAtA[:i])
@@ -2246,10 +1955,6 @@ func (m *StatByPathRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.XXX_unrecognized != nil {
-		i -= len(m.XXX_unrecognized)
-		copy(dAtA[i:], m.XXX_unrecognized)
-	}
 	if m.IncludeReferences {
 		i--
 		if m.IncludeReferences {
@@ -2300,10 +2005,6 @@ func (m *StatByIDRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.XXX_unrecognized != nil {
-		i -= len(m.XXX_unrecognized)
-		copy(dAtA[i:], m.XXX_unrecognized)
-	}
 	if m.IncludeZombies {
 		i--
 		if m.IncludeZombies {
@@ -2357,10 +2058,6 @@ func (m *StatResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.XXX_unrecognized != nil {
-		i -= len(m.XXX_unrecognized)
-		copy(dAtA[i:], m.XXX_unrecognized)
-	}
 	if m.Zombie {
 		i--
 		if m.Zombie {
@@ -2425,10 +2122,6 @@ func (m *DeleteRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.XXX_unrecognized != nil {
-		i -= len(m.XXX_unrecognized)
-		copy(dAtA[i:], m.XXX_unrecognized)
-	}
 	if len(m.Name) > 0 {
 		i -= len(m.Name)
 		copy(dAtA[i:], m.Name)
@@ -2469,10 +2162,6 @@ func (m *DeleteResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.XXX_unrecognized != nil {
-		i -= len(m.XXX_unrecognized)
-		copy(dAtA[i:], m.XXX_unrecognized)
-	}
 	if m.ObjectDeleted {
 		i--
 		if m.ObjectDeleted {
@@ -2516,10 +2205,6 @@ func (m *SealRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.XXX_unrecognized != nil {
-		i -= len(m.XXX_unrecognized)
-		copy(dAtA[i:], m.XXX_unrecognized)
-	}
 	if m.Size_ != 0 {
 		i = encodeVarintController(dAtA, i, uint64(m.Size_))
 		i--
@@ -2558,10 +2243,6 @@ func (m *SealResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.XXX_unrecognized != nil {
-		i -= len(m.XXX_unrecognized)
-		copy(dAtA[i:], m.XXX_unrecognized)
-	}
 	return len(dAtA) - i, nil
 }
 
@@ -2585,10 +2266,6 @@ func (m *MkdirRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.XXX_unrecognized != nil {
-		i -= len(m.XXX_unrecognized)
-		copy(dAtA[i:], m.XXX_unrecognized)
-	}
 	if len(m.Name) > 0 {
 		i -= len(m.Name)
 		copy(dAtA[i:], m.Name)
@@ -2629,10 +2306,6 @@ func (m *MkdirResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.XXX_unrecognized != nil {
-		i -= len(m.XXX_unrecognized)
-		copy(dAtA[i:], m.XXX_unrecognized)
-	}
 	{
 		size := m.DirectoryId.Size()
 		i -= size
@@ -2666,10 +2339,6 @@ func (m *RmdirRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.XXX_unrecognized != nil {
-		i -= len(m.XXX_unrecognized)
-		copy(dAtA[i:], m.XXX_unrecognized)
-	}
 	if len(m.Name) > 0 {
 		i -= len(m.Name)
 		copy(dAtA[i:], m.Name)
@@ -2710,10 +2379,6 @@ func (m *RmdirResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.XXX_unrecognized != nil {
-		i -= len(m.XXX_unrecognized)
-		copy(dAtA[i:], m.XXX_unrecognized)
-	}
 	return len(dAtA) - i, nil
 }
 
@@ -2737,10 +2402,6 @@ func (m *ListRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.XXX_unrecognized != nil {
-		i -= len(m.XXX_unrecognized)
-		copy(dAtA[i:], m.XXX_unrecognized)
-	}
 	{
 		size := m.DirectoryId.Size()
 		i -= size
@@ -2774,10 +2435,6 @@ func (m *LinkRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.XXX_unrecognized != nil {
-		i -= len(m.XXX_unrecognized)
-		copy(dAtA[i:], m.XXX_unrecognized)
-	}
 	{
 		size := m.ObjectId.Size()
 		i -= size
@@ -2828,10 +2485,6 @@ func (m *LinkResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.XXX_unrecognized != nil {
-		i -= len(m.XXX_unrecognized)
-		copy(dAtA[i:], m.XXX_unrecognized)
-	}
 	return len(dAtA) - i, nil
 }
 
@@ -2855,10 +2508,6 @@ func (m *RenameRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.XXX_unrecognized != nil {
-		i -= len(m.XXX_unrecognized)
-		copy(dAtA[i:], m.XXX_unrecognized)
-	}
 	if len(m.NewName) > 0 {
 		i -= len(m.NewName)
 		copy(dAtA[i:], m.NewName)
@@ -2906,10 +2555,6 @@ func (m *RenameResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.XXX_unrecognized != nil {
-		i -= len(m.XXX_unrecognized)
-		copy(dAtA[i:], m.XXX_unrecognized)
-	}
 	return len(dAtA) - i, nil
 }
 
@@ -2933,10 +2578,6 @@ func (m *HeartbeatBlobServerRequest) MarshalToSizedBuffer(dAtA []byte) (int, err
 	_ = i
 	var l int
 	_ = l
-	if m.XXX_unrecognized != nil {
-		i -= len(m.XXX_unrecognized)
-		copy(dAtA[i:], m.XXX_unrecognized)
-	}
 	if m.UsedBytes != 0 {
 		i = encodeVarintController(dAtA, i, uint64(m.UsedBytes))
 		i--
@@ -3001,10 +2642,6 @@ func (m *HeartbeatBlobServerResponse) MarshalToSizedBuffer(dAtA []byte) (int, er
 	_ = i
 	var l int
 	_ = l
-	if m.XXX_unrecognized != nil {
-		i -= len(m.XXX_unrecognized)
-		copy(dAtA[i:], m.XXX_unrecognized)
-	}
 	if m.DiskId != 0 {
 		i = encodeVarintController(dAtA, i, uint64(m.DiskId))
 		i--
@@ -3042,9 +2679,6 @@ func (m *MountRequest) Size() (n int) {
 	n += 1 + l + sovController(uint64(l))
 	l = m.StoreId.Size()
 	n += 1 + l + sovController(uint64(l))
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
 	return n
 }
 
@@ -3062,9 +2696,6 @@ func (m *MountResponse) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovController(uint64(l))
 	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
 	return n
 }
 
@@ -3076,9 +2707,6 @@ func (m *UnmountRequest) Size() (n int) {
 	_ = l
 	l = m.MountId.Size()
 	n += 1 + l + sovController(uint64(l))
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
 	return n
 }
 
@@ -3088,9 +2716,6 @@ func (m *UnmountResponse) Size() (n int) {
 	}
 	var l int
 	_ = l
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
 	return n
 }
 
@@ -3110,9 +2735,6 @@ func (m *CreateRequest) Size() (n int) {
 		l = m.Policy.Size()
 		n += 1 + l + sovController(uint64(l))
 	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
 	return n
 }
 
@@ -3125,9 +2747,6 @@ func (m *CreateResponse) Size() (n int) {
 	if m.Meta != nil {
 		l = m.Meta.Size()
 		n += 1 + l + sovController(uint64(l))
-	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
 	}
 	return n
 }
@@ -3147,9 +2766,6 @@ func (m *StatByPathRequest) Size() (n int) {
 	if m.IncludeReferences {
 		n += 2
 	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
 	return n
 }
 
@@ -3166,9 +2782,6 @@ func (m *StatByIDRequest) Size() (n int) {
 	}
 	if m.IncludeZombies {
 		n += 2
-	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
 	}
 	return n
 }
@@ -3195,9 +2808,6 @@ func (m *StatResponse) Size() (n int) {
 	if m.Zombie {
 		n += 2
 	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
 	return n
 }
 
@@ -3213,9 +2823,6 @@ func (m *DeleteRequest) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovController(uint64(l))
 	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
 	return n
 }
 
@@ -3229,9 +2836,6 @@ func (m *DeleteResponse) Size() (n int) {
 	n += 1 + l + sovController(uint64(l))
 	if m.ObjectDeleted {
 		n += 2
-	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
 	}
 	return n
 }
@@ -3247,9 +2851,6 @@ func (m *SealRequest) Size() (n int) {
 	if m.Size_ != 0 {
 		n += 1 + sovController(uint64(m.Size_))
 	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
 	return n
 }
 
@@ -3259,9 +2860,6 @@ func (m *SealResponse) Size() (n int) {
 	}
 	var l int
 	_ = l
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
 	return n
 }
 
@@ -3277,9 +2875,6 @@ func (m *MkdirRequest) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovController(uint64(l))
 	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
 	return n
 }
 
@@ -3291,9 +2886,6 @@ func (m *MkdirResponse) Size() (n int) {
 	_ = l
 	l = m.DirectoryId.Size()
 	n += 1 + l + sovController(uint64(l))
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
 	return n
 }
 
@@ -3309,9 +2901,6 @@ func (m *RmdirRequest) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovController(uint64(l))
 	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
 	return n
 }
 
@@ -3321,9 +2910,6 @@ func (m *RmdirResponse) Size() (n int) {
 	}
 	var l int
 	_ = l
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
 	return n
 }
 
@@ -3335,9 +2921,6 @@ func (m *ListRequest) Size() (n int) {
 	_ = l
 	l = m.DirectoryId.Size()
 	n += 1 + l + sovController(uint64(l))
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
 	return n
 }
 
@@ -3355,9 +2938,6 @@ func (m *LinkRequest) Size() (n int) {
 	}
 	l = m.ObjectId.Size()
 	n += 1 + l + sovController(uint64(l))
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
 	return n
 }
 
@@ -3367,9 +2947,6 @@ func (m *LinkResponse) Size() (n int) {
 	}
 	var l int
 	_ = l
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
 	return n
 }
 
@@ -3389,9 +2966,6 @@ func (m *RenameRequest) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovController(uint64(l))
 	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
 	return n
 }
 
@@ -3401,9 +2975,6 @@ func (m *RenameResponse) Size() (n int) {
 	}
 	var l int
 	_ = l
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
 	return n
 }
 
@@ -3433,9 +3004,6 @@ func (m *HeartbeatBlobServerRequest) Size() (n int) {
 	if m.UsedBytes != 0 {
 		n += 1 + sovController(uint64(m.UsedBytes))
 	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
 	return n
 }
 
@@ -3447,9 +3015,6 @@ func (m *HeartbeatBlobServerResponse) Size() (n int) {
 	_ = l
 	if m.DiskId != 0 {
 		n += 1 + sovController(uint64(m.DiskId))
-	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
 	}
 	return n
 }
@@ -3631,7 +3196,6 @@ func (m *MountRequest) Unmarshal(dAtA []byte) error {
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -3782,7 +3346,6 @@ func (m *MountResponse) Unmarshal(dAtA []byte) error {
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -3866,7 +3429,6 @@ func (m *UnmountRequest) Unmarshal(dAtA []byte) error {
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -3917,7 +3479,6 @@ func (m *UnmountResponse) Unmarshal(dAtA []byte) error {
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -4069,7 +3630,6 @@ func (m *CreateRequest) Unmarshal(dAtA []byte) error {
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -4156,7 +3716,6 @@ func (m *CreateResponse) Unmarshal(dAtA []byte) error {
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -4292,7 +3851,6 @@ func (m *StatByPathRequest) Unmarshal(dAtA []byte) error {
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -4416,7 +3974,6 @@ func (m *StatByIDRequest) Unmarshal(dAtA []byte) error {
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -4576,7 +4133,6 @@ func (m *StatResponse) Unmarshal(dAtA []byte) error {
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -4692,7 +4248,6 @@ func (m *DeleteRequest) Unmarshal(dAtA []byte) error {
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -4796,7 +4351,6 @@ func (m *DeleteResponse) Unmarshal(dAtA []byte) error {
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -4899,7 +4453,6 @@ func (m *SealRequest) Unmarshal(dAtA []byte) error {
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -4950,7 +4503,6 @@ func (m *SealResponse) Unmarshal(dAtA []byte) error {
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -5066,7 +4618,6 @@ func (m *MkdirRequest) Unmarshal(dAtA []byte) error {
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -5150,7 +4701,6 @@ func (m *MkdirResponse) Unmarshal(dAtA []byte) error {
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -5266,7 +4816,6 @@ func (m *RmdirRequest) Unmarshal(dAtA []byte) error {
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -5317,7 +4866,6 @@ func (m *RmdirResponse) Unmarshal(dAtA []byte) error {
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -5401,7 +4949,6 @@ func (m *ListRequest) Unmarshal(dAtA []byte) error {
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -5550,7 +5097,6 @@ func (m *LinkRequest) Unmarshal(dAtA []byte) error {
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -5601,7 +5147,6 @@ func (m *LinkResponse) Unmarshal(dAtA []byte) error {
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -5749,7 +5294,6 @@ func (m *RenameRequest) Unmarshal(dAtA []byte) error {
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -5800,7 +5344,6 @@ func (m *RenameResponse) Unmarshal(dAtA []byte) error {
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -6018,7 +5561,6 @@ func (m *HeartbeatBlobServerRequest) Unmarshal(dAtA []byte) error {
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -6088,7 +5630,6 @@ func (m *HeartbeatBlobServerResponse) Unmarshal(dAtA []byte) error {
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
