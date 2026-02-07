@@ -93,24 +93,28 @@ func (c *ControllerClient) Create(
 }
 
 // StatByID returns metadata for an object by ID.
+// If includeReferences is true, all namespace references (hardlinks) are included.
 // If includeZombies is true, the object is returned even if it is a zombie
 // (scheduled for deletion).
 func (c *ControllerClient) StatByID(
-	ctx context.Context, objectID []byte, includeZombies bool,
+	ctx context.Context, objectID []byte, includeReferences bool, includeZombies bool,
 ) (*basaltpb.StatResponse, error) {
 	return c.client.StatByID(ctx, &basaltpb.StatByIDRequest{
-		ObjectId:       basaltpb.UUIDFromBytes(objectID),
-		IncludeZombies: includeZombies,
+		ObjectId:          basaltpb.UUIDFromBytes(objectID),
+		IncludeReferences: includeReferences,
+		IncludeZombies:    includeZombies,
 	})
 }
 
 // StatByPath returns metadata for an object by (directory_id, name).
+// If includeReferences is true, all namespace references (hardlinks) are included.
 func (c *ControllerClient) StatByPath(
-	ctx context.Context, directoryID []byte, name string,
+	ctx context.Context, directoryID []byte, name string, includeReferences bool,
 ) (*basaltpb.StatResponse, error) {
 	return c.client.StatByPath(ctx, &basaltpb.StatByPathRequest{
-		DirectoryId: basaltpb.UUIDFromBytes(directoryID),
-		Name:        name,
+		DirectoryId:       basaltpb.UUIDFromBytes(directoryID),
+		Name:              name,
+		IncludeReferences: includeReferences,
 	})
 }
 

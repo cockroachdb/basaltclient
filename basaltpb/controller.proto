@@ -113,13 +113,17 @@ message StatByPathRequest {
   bytes directory_id = 1 [(gogoproto.customtype) = "UUID", (gogoproto.nullable) = false];
   // Name of the entry to stat.
   string name = 2;
+  // If true, include all namespace references (hardlinks) in the response.
+  bool include_references = 3;
 }
 
 message StatByIDRequest {
   // Object ID to stat.
   bytes object_id = 1 [(gogoproto.customtype) = "UUID", (gogoproto.nullable) = false];
+  // If true, include all namespace references (hardlinks) in the response.
+  bool include_references = 2;
   // If true, return the object even if it is a zombie (scheduled for deletion).
-  bool include_zombies = 2;
+  bool include_zombies = 3;
 }
 
 message StatResponse {
@@ -127,7 +131,10 @@ message StatResponse {
   // Type of the entry (file or directory).
   EntryType type = 2;
   // All namespace references (hardlinks) to this object.
+  // Only populated when include_references is set in the request.
   repeated Reference references = 3 [(gogoproto.nullable) = false];
+  // True if the object is a zombie (scheduled for deletion).
+  bool zombie = 4;
 }
 
 message DeleteRequest {
