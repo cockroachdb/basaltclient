@@ -58,11 +58,11 @@ service Controller {
   // Requires mount or unmounted directory.
   rpc Rename(RenameRequest) returns (RenameResponse);
 
-  // RegisterBlobServer registers a blob server with the controller.
+  // HeartbeatBlobServer registers a blob server with the controller.
   // Uses UPSERT semantics: handles initial registration, heartbeats, and
   // capacity updates. Blob servers should call this periodically to maintain
   // liveness.
-  rpc RegisterBlobServer(RegisterBlobServerRequest) returns (RegisterBlobServerResponse);
+  rpc HeartbeatBlobServer(HeartbeatBlobServerRequest) returns (HeartbeatBlobServerResponse);
 
   // TODO: Add additional RPCs:
   // - Heartbeat for mount liveness
@@ -208,7 +208,7 @@ message RenameRequest {
 
 message RenameResponse {}
 
-message RegisterBlobServerRequest {
+message HeartbeatBlobServerRequest {
   // UUID generated and persisted by the blob server.
   bytes server_id = 1 [(gogoproto.customtype) = "UUID", (gogoproto.nullable) = false];
   // Addr (host:port) for the gRPC control endpoint.
@@ -223,7 +223,7 @@ message RegisterBlobServerRequest {
   int64 used_bytes = 6;
 }
 
-message RegisterBlobServerResponse {
+message HeartbeatBlobServerResponse {
   // Integer ID assigned to this blob server, used in objects.replicas arrays.
   int32 disk_id = 1;
 }
