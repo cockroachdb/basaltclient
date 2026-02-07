@@ -64,7 +64,7 @@ service Controller {
   // liveness.
   rpc HeartbeatBlobServer(HeartbeatBlobServerRequest) returns (HeartbeatBlobServerResponse);
 
-  // TODO: Add additional RPCs:
+  // TODO(cockroachlabs/basalt#4): Add additional RPCs:
   // - Heartbeat for mount liveness
   // - ReportFailure for replica health reporting
 }
