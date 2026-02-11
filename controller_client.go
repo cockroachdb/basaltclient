@@ -18,7 +18,7 @@ type ControllerClient struct {
 
 // NewControllerClient creates a new controller client connected to addr.
 func NewControllerClient(addr string) (*ControllerClient, error) {
-	conn, err := grpc.NewClient(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.Dial(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, err
 	}

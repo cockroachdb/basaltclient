@@ -18,7 +18,7 @@ type BlobControlClient struct {
 
 // NewBlobControlClient creates a new control client connected to the blob server at addr.
 func NewBlobControlClient(addr string) (*BlobControlClient, error) {
-	conn, err := grpc.NewClient(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.Dial(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, err
 	}
