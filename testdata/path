@@ -74,9 +74,8 @@ hdd: 0
 archive: false
 local_zone: ""
 
-# Alias format (three slashes) - resolved via AliasResolver
+# Alias resolution - register aliases for testing
 
-# Register aliases for testing
 alias
 prod controller1:26257,controller2:26257
 ----
@@ -87,8 +86,21 @@ dev localhost:26257
 ----
 ok
 
+# Alias without basalt: prefix
 parse
-///prod/cluster/store/file.sst
+//dev/myfile
+----
+controllers: localhost:26257
+path: /myfile
+dir: ""
+base: "myfile"
+ssd: 3
+hdd: 0
+archive: false
+local_zone: ""
+
+parse
+//prod/cluster/store/file.sst
 ----
 controllers: controller1:26257, controller2:26257
 path: /cluster/store/file.sst
@@ -100,7 +112,7 @@ archive: false
 local_zone: ""
 
 parse
-///prod/
+//prod/
 ----
 controllers: controller1:26257, controller2:26257
 path: /
@@ -111,8 +123,9 @@ hdd: 0
 archive: false
 local_zone: ""
 
+# Alias with basalt: scheme prefix
 parse
-///dev/myfile
+basalt://dev/myfile
 ----
 controllers: localhost:26257
 path: /myfile
@@ -123,7 +136,32 @@ hdd: 0
 archive: false
 local_zone: ""
 
-# basalt: scheme prefix (for copy-paste URLs)
+parse
+basalt://prod/cluster/store
+----
+controllers: controller1:26257, controller2:26257
+path: /cluster/store
+dir: "/cluster"
+base: "store"
+ssd: 3
+hdd: 0
+archive: false
+local_zone: ""
+
+# Alias with query parameters
+parse
+basalt://prod/file?ssd=1&archive
+----
+controllers: controller1:26257, controller2:26257
+path: /file
+dir: ""
+base: "file"
+ssd: 1
+hdd: 0
+archive: true
+local_zone: ""
+
+# basalt: scheme prefix with direct address
 parse
 basalt://localhost:26257/dir/file.sst
 ----
@@ -143,18 +181,6 @@ controllers: host1:1234, host2:1234
 path: /path
 dir: ""
 base: "path"
-ssd: 3
-hdd: 0
-archive: false
-local_zone: ""
-
-parse
-basalt:///prod/cluster/store/file.sst
-----
-controllers: controller1:26257, controller2:26257
-path: /cluster/store/file.sst
-dir: "/cluster/store"
-base: "file.sst"
 ssd: 3
 hdd: 0
 archive: false
@@ -266,7 +292,7 @@ local_zone: "us-west-2b"
 
 # Config works with aliases too
 parse
-///prod/file?ssd=1&archive
+//prod/file?ssd=1&archive
 ----
 controllers: controller1:26257, controller2:26257
 path: /file
@@ -301,26 +327,16 @@ ok
 parse
 //
 ----
-error: empty controller address
-
-parse
-///
-----
-error: empty alias name
+error: empty controller address or alias
 
 parse
 basalt://
 ----
-error: empty controller address
-
-parse
-basalt:///
-----
-error: empty alias name
+error: empty controller address or alias
 
 # Unknown alias
 parse
-///unknown/path
+//unknown/path
 ----
 error: resolving alias "unknown": unknown alias: unknown
 

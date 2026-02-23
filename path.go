@@ -49,9 +49,12 @@ func (p *ParsedPath) SplitPath() (dir, base string) {
 // Supported formats:
 //   - "//host:port/path?query" - direct controller address
 //   - "//host1:port,host2:port/path" - multiple controllers
-//   - "///alias/path?query" - named alias (resolved via resolver)
+//   - "//alias/path?query" - named alias (resolved via resolver)
 //   - "basalt://..." - same formats with scheme prefix
 //   - "/local/path" - returns nil (local filesystem path)
+//
+// When the address part contains no colon or comma, it is treated as an
+// alias and resolved via the resolver.
 //
 // Query parameters for replication configuration:
 //   - ssd=N: Number of SSD replicas (default 3)
@@ -77,55 +80,6 @@ func ParsePath(path string, localZone string, resolver AliasResolver) (*ParsedPa
 	var controllers []string
 	var namespacePath string
 
-	// Check for alias format (starts with another /).
-	if strings.HasPrefix(rest, "/") {
-		// Format: ///alias/path?query
-		rest = rest[1:] // Remove the third slash.
-
-		// Split off query string first.
-		queryIdx := strings.Index(rest, "?")
-		var queryStr string
-		if queryIdx >= 0 {
-			queryStr = rest[queryIdx+1:]
-			rest = rest[:queryIdx]
-		}
-
-		// Find the alias name (up to the next /).
-		var alias string
-		idx := strings.Index(rest, "/")
-		if idx < 0 {
-			alias = rest
-			namespacePath = "/"
-		} else {
-			alias = rest[:idx]
-			namespacePath = rest[idx:]
-		}
-
-		if alias == "" {
-			return nil, fmt.Errorf("empty alias name")
-		}
-
-		// Resolve the alias.
-		if resolver == nil {
-			return nil, fmt.Errorf("alias %q requires resolver", alias)
-		}
-		controllers, err := resolver.Resolve(alias)
-		if err != nil {
-			return nil, fmt.Errorf("resolving alias %q: %w", alias, err)
-		}
-
-		parsed := &ParsedPath{
-			Controllers: controllers,
-			Path:        namespacePath,
-		}
-		if err := parsed.Config.Parse(queryStr, localZone); err != nil {
-			return nil, err
-		}
-		return parsed, nil
-	}
-
-	// Format: //host:port/path?query or //host:port,host:port/path?query
-
 	// Split off query string first.
 	queryIdx := strings.Index(rest, "?")
 	var queryStr string
@@ -134,7 +88,7 @@ func ParsePath(path string, localZone string, resolver AliasResolver) (*ParsedPa
 		rest = rest[:queryIdx]
 	}
 
-	// Find where the path starts.
+	// Find where the path starts (first / after the address part).
 	idx := strings.Index(rest, "/")
 	var addrPart string
 	if idx < 0 {
@@ -146,7 +100,27 @@ func ParsePath(path string, localZone string, resolver AliasResolver) (*ParsedPa
 	}
 
 	if addrPart == "" {
-		return nil, fmt.Errorf("empty controller address")
+		return nil, fmt.Errorf("empty controller address or alias")
+	}
+
+	// If the address part contains no colon or comma, treat it as an
+	// alias and resolve via the resolver.
+	if !strings.ContainsAny(addrPart, ":,") {
+		if resolver == nil {
+			return nil, fmt.Errorf("alias %q requires resolver", addrPart)
+		}
+		resolved, err := resolver.Resolve(addrPart)
+		if err != nil {
+			return nil, fmt.Errorf("resolving alias %q: %w", addrPart, err)
+		}
+		parsed := &ParsedPath{
+			Controllers: resolved,
+			Path:        namespacePath,
+		}
+		if err := parsed.Config.Parse(queryStr, localZone); err != nil {
+			return nil, err
+		}
+		return parsed, nil
 	}
 
 	// Split comma-separated addresses.
