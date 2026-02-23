@@ -118,11 +118,11 @@ func (c *ControllerClient) StatByPath(
 	})
 }
 
-// Delete removes an entry from a directory.
-func (c *ControllerClient) Delete(
+// Unlink removes an entry from a directory.
+func (c *ControllerClient) Unlink(
 	ctx context.Context, directoryID []byte, name string,
-) (*basaltpb.DeleteResponse, error) {
-	return c.client.Delete(ctx, &basaltpb.DeleteRequest{
+) (*basaltpb.UnlinkResponse, error) {
+	return c.client.Unlink(ctx, &basaltpb.UnlinkRequest{
 		DirectoryId: basaltpb.UUIDFromBytes(directoryID),
 		Name:        name,
 	})

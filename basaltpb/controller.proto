@@ -34,10 +34,10 @@ service Controller {
   // Does not require a mount.
   rpc StatByID(StatByIDRequest) returns (StatResponse);
 
-  // Delete removes an entry from a directory. If this was the last reference
+  // Unlink removes an entry from a directory. If this was the last reference
   // to the object, the object and its replicas are scheduled for deletion.
   // Requires mount or unmounted directory.
-  rpc Delete(DeleteRequest) returns (DeleteResponse);
+  rpc Unlink(UnlinkRequest) returns (UnlinkResponse);
 
   // Seal marks an object as immutable with its final size.
   // Requires mount or unmounted directory.
@@ -144,14 +144,14 @@ message StatResponse {
   bool zombie = 4;
 }
 
-message DeleteRequest {
-  // Directory containing the entry to delete.
+message UnlinkRequest {
+  // Directory containing the entry to unlink.
   bytes directory_id = 1 [(gogoproto.customtype) = "UUID", (gogoproto.nullable) = false];
-  // Name of the entry to delete.
+  // Name of the entry to unlink.
   string name = 2;
 }
 
-message DeleteResponse {
+message UnlinkResponse {
   // Object ID that was unlinked (for files only).
   bytes object_id = 1 [(gogoproto.customtype) = "UUID", (gogoproto.nullable) = false];
   // True if this was the last reference and the object will be deleted.
