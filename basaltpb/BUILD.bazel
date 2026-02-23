@@ -1,0 +1,26 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "basaltpb",
+    srcs = [
+        "blob.pb.go",
+        "codec.go",
+        "common.pb.go",
+        "config.go",
+        "controller.pb.go",
+        "sealed.go",
+        "uuid.go",
+    ],
+    importpath = "github.com/cockroachdb/basaltclient/basaltpb",
+    visibility = ["//visibility:public"],
+    deps = [
+        "@com_github_gogo_protobuf//gogoproto",
+        "@com_github_gogo_protobuf//proto",
+        "@com_github_google_uuid//:uuid",
+        "@org_golang_google_grpc//:grpc",
+        "@org_golang_google_grpc//codes",
+        "@org_golang_google_grpc//encoding",
+        "@org_golang_google_grpc//status",
+        "@org_golang_google_protobuf//proto",
+    ],
+)

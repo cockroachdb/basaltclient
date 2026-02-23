@@ -1,0 +1,39 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "basaltclient",
+    srcs = [
+        "blob_control.go",
+        "blob_data.go",
+        "blob_pool.go",
+        "blob_protocol.go",
+        "controller_client.go",
+        "doc.go",
+        "path.go",
+        "quorum_writer.go",
+    ],
+    importpath = "github.com/cockroachdb/basaltclient",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//basaltpb",
+        "@com_github_cockroachdb_errors//:errors",
+        "@org_golang_google_grpc//:grpc",
+        "@org_golang_google_grpc//credentials/insecure",
+    ],
+)
+
+go_test(
+    name = "basaltclient_test",
+    srcs = [
+        "blob_pool_test.go",
+        "blob_protocol_test.go",
+        "path_test.go",
+        "quorum_writer_test.go",
+    ],
+    data = glob(["testdata/**"]),
+    embed = [":basaltclient"],
+    deps = [
+        "//basaltpb",
+        "@com_github_cockroachdb_datadriven//:datadriven",
+    ],
+)
