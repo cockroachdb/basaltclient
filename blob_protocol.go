@@ -5,6 +5,7 @@ import (
 	"io"
 
 	"github.com/cockroachdb/errors"
+	"github.com/google/uuid"
 )
 
 // Protocol constants.
@@ -118,6 +119,12 @@ var (
 
 // ObjectID is a 16-byte unique identifier for an object.
 type ObjectID [ObjectIDSize]byte
+
+// String returns the ObjectID formatted as a UUID string
+// (e.g. "42dad1bc-c7f8-476e-98c4-954ceb624126").
+func (id ObjectID) String() string {
+	return uuid.UUID(id).String()
+}
 
 // RequestHeader represents a request message header.
 type RequestHeader struct {
