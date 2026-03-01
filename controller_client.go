@@ -9,21 +9,37 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
+// ControllerClientConfig configures a ControllerClient.
+type ControllerClientConfig struct {
+	// Logger is the logger for diagnostic messages. If nil, DefaultLogger is used.
+	Logger Logger
+}
+
 // ControllerClient is the controller gRPC client.
 type ControllerClient struct {
 	addr   string
+	logger Logger
 	conn   *grpc.ClientConn
 	client basaltpb.ControllerClient
 }
 
 // NewControllerClient creates a new controller client connected to addr.
-func NewControllerClient(addr string) (*ControllerClient, error) {
+func NewControllerClient(addr string, cfg ...ControllerClientConfig) (*ControllerClient, error) {
+	var c ControllerClientConfig
+	if len(cfg) > 0 {
+		c = cfg[0]
+	}
+	if c.Logger == nil {
+		c.Logger = DefaultLogger
+	}
+
 	conn, err := grpc.Dial(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, err
 	}
 	return &ControllerClient{
 		addr:   addr,
+		logger: c.Logger,
 		conn:   conn,
 		client: basaltpb.NewControllerClient(conn),
 	}, nil
